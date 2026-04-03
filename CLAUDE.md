@@ -15,6 +15,8 @@ Read these before doing any work:
 | `docs/vision.md` | North star — what Myna is, who it's for, core principles |
 | `docs/decisions.md` | Settled decisions — do not re-debate these |
 | `docs/open-questions.md` | Unresolved questions — add here if you surface new ones |
+| `docs/design-deliverables.md` | Checklist of what design phase must produce before build starts |
+| `docs/roadmap.md` | Living task list — milestones, tasks, backlog |
 | `docs/design-context.md` | **IGNORE unless explicitly asked.** Early brainstorm from a different AI tool. Many ideas here were rejected or rethought. Do not pull from this unprompted. |
 | `docs/requirements.md` | **IGNORE unless explicitly asked.** Early brainstorm specs — many are wrong or outdated. Do not use as a starting point for requirements. |
 
@@ -31,6 +33,7 @@ Each file covers one domain of Myna's functionality. These are being actively re
 | `docs/requirements/daily-workflow.md` | Daily notes, planning, syncs, summaries, dashboards |
 | `docs/requirements/writing-and-drafts.md` | Email drafts, rewrites, structured messages, doc review |
 | `docs/requirements/self-tracking.md` | Own contributions, brag docs, promo packets, self-reviews |
+| `docs/requirements/setup-and-config.md` | First-run setup, config system, communication style interview |
 
 ## Development Journal
 
@@ -70,3 +73,13 @@ Each file covers one domain of Myna's functionality. These are being actively re
 5. **Add decisions.** If the user settles a question during your conversation, add it to `docs/decisions.md`.
 6. **AI model agnostic.** Never assume a specific AI provider. Myna must work with Claude, Gemini, Codex, Kiro, etc.
 7. **Draft, never send.** Myna never sends emails, posts messages, or takes external actions (except personal calendar events with no attendees).
+
+## Phase-Specific Instructions
+
+Read the file for the phase you're working in:
+
+| File | When to read |
+|------|-------------|
+| `docs/instructions/requirements.md` | When discussing or writing requirements |
+| `docs/instructions/design.md` | When designing the system |
+| `docs/instructions/build.md` | When implementing, testing, or shipping |

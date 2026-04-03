@@ -125,13 +125,16 @@ The MCP is kept lightweight and thin so it's easy to update as Obsidian releases
 
 ### Setup
 
-Setup is an interactive conversation, not a config file to fill out. The agent walks you through it:
+Setup is an interactive conversation (~5 min), not a config file to fill out. The agent walks you through it:
 
 1. **Which AI model?** (Claude Code, Kiro, Gemini, Codex)
 2. **Where's your vault?** (path, or create new)
 3. **What MCP connections do you have?** (email, Slack, calendar — all optional, skip what you don't have)
+4. **What projects are you working on?** (names, aliases, mapped email folders/Slack channels)
+5. **Who do you work with?** (direct reports, manager, key collaborators — names and roles)
+6. **What recurring meetings do you have?** (optional, add later)
 
-That's it. You're running. Everything else has sensible defaults and can be configured later as you use more features (add projects, people, meeting names, communication preferences). Power users can skip the interactive setup and edit config files directly.
+After setup, Myna can immediately do useful things like "prep brief for my 1:1 with Sarah" because it knows who Sarah is. Everything else has sensible defaults and can be added later. Power users can skip the interactive setup and edit config files directly.
 
 ---
 

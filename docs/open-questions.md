@@ -21,7 +21,7 @@ Each entry:
 **Raised:** 2026-03-31
 **Context:** Myna must work with multiple AI providers. Need a way to define agent behavior that isn't tied to a specific model's system prompt format.
 **Options considered:** MCP-based tool definitions, shared markdown prompts, provider adapter layer
-**Status:** Open
+**Status:** Resolved → D007 (common instructions + setup-time adaptation per model)
 
 ### Q002 — What's the right MCP server architecture?
 **Raised:** 2026-03-31
@@ -33,7 +33,7 @@ Each entry:
 **Raised:** 2026-03-31
 **Context:** Phase 1 has 40 features. Might be better to ship a tiny subset first to validate the approach.
 **Options considered:** Full Phase 1, stripped Phase 0 with 5-10 features, iterative delivery within Phase 1
-**Status:** Open
+**Status:** Partially resolved — Vision defines P0 (interactive prompts, user-triggered) and P1 (automation). The old 40-feature scope is being reworked via domain threads. Exact feature prioritization within P0 still open.
 
 ### Q004 — How should the review queue UX work across AI clients?
 **Raised:** 2026-03-31
