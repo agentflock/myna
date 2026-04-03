@@ -4,8 +4,11 @@
 
 **Scope:** Email triage, thread summaries, message processing, inbox/channel scanning.
 
-**Reference:** See features 12, 13, 39, 40 in `docs/requirements.md` for earlier specs.
+**Feature notes:** See `docs/features/email-and-messaging.md` for brainstorm notes to review.
 
 ---
 
-<!-- Requirements will be added through domain-specific exploration threads -->
+## Features
+
+## Requirements
+

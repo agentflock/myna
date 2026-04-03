@@ -4,8 +4,11 @@
 
 **Scope:** Tracking your own contributions, decisions, impact, feedback given, reviews done. Generating brag docs, promo packets, self-reviews.
 
-**Reference:** See features 23, 25 in `docs/requirements.md` for related earlier specs (those focus on tracking others — this is the inward-facing equivalent).
+**Feature notes:** See `docs/features/self-tracking.md` for brainstorm notes to review.
 
 ---
 
-<!-- Requirements will be added through domain-specific exploration threads -->
+## Features
+
+## Requirements
+

@@ -4,8 +4,11 @@
 
 **Scope:** Person files, observations, contributions, feedback, recognition, 1:1 analysis, engagement signals, performance narratives.
 
-**Reference:** See features 19, 20, 21, 22, 23, 24, 25, 26 in `docs/requirements.md` for earlier specs.
+**Feature notes:** See `docs/features/people-management.md` for brainstorm notes to review.
 
 ---
 
-<!-- Requirements will be added through domain-specific exploration threads -->
+## Features
+
+## Requirements
+

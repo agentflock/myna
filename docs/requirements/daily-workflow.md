@@ -4,8 +4,11 @@
 
 **Scope:** Daily notes, morning sync, quick capture, planning, priority coaching, weekly/monthly summaries, dashboards, review queue, park/resume.
 
-**Reference:** See features 2, 27, 28, 31, 32, 36, 38 in `docs/requirements.md` for earlier specs.
+**Feature notes:** See `docs/features/daily-workflow.md` for brainstorm notes to review.
 
 ---
 
-<!-- Requirements will be added through domain-specific exploration threads -->
+## Features
+
+## Requirements
+

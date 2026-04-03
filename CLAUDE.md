@@ -17,8 +17,9 @@ Read these before doing any work:
 | `docs/open-questions.md` | Unresolved questions — add here if you surface new ones |
 | `docs/design-deliverables.md` | Checklist of what design phase must produce before build starts |
 | `docs/roadmap.md` | Living task list — milestones, tasks, backlog |
-| `docs/design-context.md` | **IGNORE unless explicitly asked.** Early brainstorm from a different AI tool. Many ideas here were rejected or rethought. Do not pull from this unprompted. |
+| `docs/design-context.md` | **IGNORE unless explicitly asked.** **IGNORE unless explicitly asked.** Early brainstorm notes. Many ideas were rejected or rethought. Do not pull from this unprompted. |
 | `docs/requirements.md` | **IGNORE unless explicitly asked.** Early brainstorm specs — many are wrong or outdated. Do not use as a starting point for requirements. |
+| `docs/features.md` | **IGNORE unless explicitly asked.** Early brainstorm feature list. Many ideas were rethought. Do not pull from this unprompted. |
 
 ## Requirement Files (by domain)
 
@@ -51,7 +52,7 @@ Each file covers one domain of Myna's functionality. These are being actively re
 - Human intervention was needed (what and why)
 - Human intervention was NOT needed where you'd expect it would be
 - Claude made a mistake — what kind, how it was caught, how it was fixed
-- An idea came from an unexpected place (e.g. a different AI tool, a workaround)
+- An idea came from an unexpected place (e.g. a workaround, a user insight)
 - Anything about multi-thread coordination, context transfer, or AI-to-AI handoffs
 - Anything that would make a reader say "huh, that's interesting"
 
@@ -68,7 +69,7 @@ Each file covers one domain of Myna's functionality. These are being actively re
 
 1. **Vision is authoritative.** If a requirement contradicts `docs/vision.md`, the vision wins.
 2. **Decisions are settled.** Don't re-open items in `docs/decisions.md` unless the user explicitly asks.
-3. **Ignore design-context.md and requirements.md.** These are from an earlier brainstorm with a different AI tool. Many ideas in them are wrong or were rethought. Do NOT read them, pull from them, or use them as a starting point — unless the user explicitly asks you to look at them.
+3. **Ignore design-context.md and requirements.md.** These are early brainstorm notes. Many ideas in them are wrong or were rethought. Do NOT read them, pull from them, or use them as a starting point — unless the user explicitly asks you to look at them.
 4. **Add open questions.** If you surface a question that isn't answered by existing docs, add it to `docs/open-questions.md`.
 5. **Add decisions.** If the user settles a question during your conversation, add it to `docs/decisions.md`.
 6. **AI model agnostic.** Never assume a specific AI provider. Myna must work with Claude, Gemini, Codex, Kiro, etc.

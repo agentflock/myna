@@ -4,8 +4,11 @@
 
 **Scope:** Project files, timelines, tasks, blocker detection, context switching, search.
 
-**Reference:** See features 1, 15, 16, 17, 18, 30 in `docs/requirements.md` for earlier specs.
+**Feature notes:** See `docs/features/projects-and-tasks.md` for brainstorm notes to review.
 
 ---
 
-<!-- Requirements will be added through domain-specific exploration threads -->
+## Features
+
+## Requirements
+

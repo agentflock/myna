@@ -1,14 +1,20 @@
+# macOS
+.DS_Store
+
 # Myna reference files (not authoritative, kept for personal context)
 docs/requirements.md
 docs/design-context.md
+docs/features.md
 docs/features1.md
 docs/features2.md
+CLAUDE-PHASE1.md
+docs/phase1-requirements.md
 
 # Development journal (raw material for blog, not project docs)
 docs/dev-journal.md
 
+# Feature notes from brainstorming (not authoritative)
+docs/features/
+
 # Personal prompts and notes
 docs/prompts/
-
-# Roadmap (living task list, tracked locally)
-docs/roadmap.md

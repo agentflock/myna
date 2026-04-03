@@ -17,6 +17,36 @@ Each entry:
 
 ---
 
+### D017 — User-typed observations are direct write, agent-extracted go through review queue
+**Date:** 2026-04-03
+**Context:** D004 says all judgment calls go through review queue. But when the user explicitly types an observation ("observation about Sarah: great escalation handling"), they've already made the judgment — no need to approve their own words. However, when Myna extracts observations from meeting notes or emails, it might misinterpret.
+**Decision:** Two paths for observations: (1) user explicitly types it → direct write to person file, no review queue. (2) Myna extracts it from meeting notes, email, or Slack → review queue before writing. Same principle applies to contributions in self-tracking.
+**Alternatives rejected:** All observations through review queue (unnecessary friction for explicit user input), all observations direct write (risky for agent-extracted ones).
+
+### D016 — BLUF as default for all professional writing
+**Date:** 2026-04-03
+**Context:** Emails and messages need a consistent structure. BLUF (Bottom Line Up Front) leads with the answer/ask, then provides context. Widely used in tech and military communication.
+**Decision:** All professional writing (emails, Slack messages, status updates) uses BLUF structure by default in tone and rewrite modes. Fix mode (grammar only) does not restructure.
+**Alternatives rejected:** No default structure (inconsistent output), recipient-specific structure (too complex for first version).
+
+### D015 — Source provenance on all direct timeline writes
+**Date:** 2026-04-03
+**Context:** When Myna writes directly to project timelines (from email or messaging processing), the user needs to trace back to the original source.
+**Decision:** All direct timeline writes include full source provenance: original text (verbatim), sender, and date/timestamp. This applies to any automated write that bypasses the review queue.
+**Alternatives rejected:** Summary only (loses traceability), link to source only (source may move or be deleted).
+
+### D014 — Decisions logged as timeline entries, no separate decision log
+**Date:** 2026-04-03
+**Context:** Decisions need to be recorded but a separate decision log creates another file to maintain and check.
+**Decision:** Decisions are logged as timeline entries in the relevant project file with a `Decision` category tag. No separate decision log file. Decisions are discoverable via Dataview queries filtering by category.
+**Alternatives rejected:** Separate decision log (one more file to maintain, decisions lose project context).
+
+### D013 — Delegations are tasks with type:: delegation, not a separate tracker
+**Date:** 2026-04-03
+**Context:** Need to track tasks delegated to others. Could be a separate tracker file or a property on regular tasks.
+**Decision:** Delegations are regular TODOs with `type:: delegation` and a `person::` field for the owner. They live in the same task files as other tasks. Surfaced via Dataview queries filtering by type. No separate delegation tracker file.
+**Alternatives rejected:** Separate delegation tracker (duplicates task data, two places to update).
+
 ### D012 — Clean folder structure, agent internals under _system
 **Date:** 2026-04-02
 **Context:** The `myna/` folder should feel like the user's workspace, not an agent's dump. Config, templates, dashboards, logs, and other Myna plumbing shouldn't clutter the top-level.
@@ -71,11 +101,11 @@ Each entry:
 **Decision:** Items requiring interpretation (action items, delegations, decisions, recognition) always go through a review queue before being written to their final destination.
 **Alternatives rejected:** Fully automated extraction (too many false positives create bad data).
 
-### D003 — Draft only, never send
-**Date:** 2026-03-31
-**Context:** Risk of AI sending wrong message to wrong person is too high.
-**Decision:** Myna drafts all outbound communications but never sends them. Only exception is personal calendar events (no attendees).
-**Alternatives rejected:** Auto-send with confirmation (still too risky — one wrong click).
+### D003 — Draft only, never send + three-layer calendar protection
+**Date:** 2026-03-31 (updated 2026-04-03)
+**Context:** Risk of AI sending wrong message to wrong person is too high. Calendar writes need extra protection since they're the one external write Myna does.
+**Decision:** Myna drafts all outbound communications but never sends them. Only exception is personal calendar events (no attendees). Calendar writes use three-layer protection where supported by the AI model: (1) agent instruction rule — never add attendees, always use configured prefix, (2) pre-tool check — rejects any call with attendees or missing prefix, (3) explicit confirmation — agent shows all parameters before creating. If the AI model doesn't support guardrails/hooks (layers 1-2), rely on the instruction rule and explicit confirmation only.
+**Alternatives rejected:** Auto-send with confirmation (still too risky — one wrong click), no calendar writes at all (loses useful time-blocking capability).
 
 ### D002 — AI model agnostic
 **Date:** 2026-03-31
