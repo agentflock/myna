@@ -64,6 +64,7 @@ Each file covers one domain of Myna's functionality. These are being actively re
 - Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `style:`, `ci:`, `build:`
 - Keep commits atomic — one logical change per commit
 - Write clear commit messages: subject line explains the "what", body explains the "why" if needed
+- **Never add Co-Authored-By lines.** Do not add Claude or any AI co-author to commits.
 
 ## Ground Rules
 
