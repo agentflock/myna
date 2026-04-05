@@ -50,7 +50,7 @@ Myna processes emails, Slack messages, meeting notes, and documents — all of w
 Ambiguous project name? Unclear meeting reference? Myna asks. A wrong guess creates bad data silently. Asking takes 5 seconds.
 
 ### 7. AI Model Agnostic
-Myna is not tied to any specific AI model. High-level agent instructions are shared across all models. During setup, you select your AI model (Claude, Kiro CLI, Gemini, Codex) and the system generates model-specific configuration — prompt formatting, guardrails where supported, feature flags for capabilities the model doesn't support.
+Myna is not tied to any specific AI model. This is achieved through a two-layer architecture: all agent content — behaviors, steering, skills, foundations, templates — lives as **tool-neutral files** in a content layer that contains no tool-specific syntax. A lightweight **install-time adapter** packages the content layer for the target AI tool's expected runtime format and locations, handling prompt formatting, guardrails where supported, and feature flags for capabilities the model doesn't support. During setup, you select your AI model (Claude, Kiro CLI, Gemini, Codex) and the adapter produces the right configuration for that tool. Adding a new AI tool in the future means writing a new install adapter, not rewriting content. See D038 for the full rationale.
 
 ### 8. Enterprise-Friendly, Minimal Infrastructure
 Myna doesn't require new infrastructure and doesn't send data anywhere. For external services (email, Slack, calendar), it connects to whatever MCP servers your enterprise already provides. The only MCP Myna ships is a lightweight Obsidian CLI wrapper for vault operations — local-only, no network calls.

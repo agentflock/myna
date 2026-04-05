@@ -65,7 +65,7 @@ Myna is **not an application**. There is no server, no API, no frontend.
 - **Local-first** — All data lives in your Obsidian vault as plain markdown
 - **Draft, never send** — Every outbound communication requires your explicit action
 - **Human-in-the-loop** — Items requiring judgment go through a review queue
-- **AI model agnostic** — Works with Claude, Gemini, Codex, Kiro CLI, and future models
+- **AI model agnostic** — Works with Claude, Gemini, Codex, Kiro CLI, and future models via a tool-neutral content layer + per-tool install adapter (content authored once; new AI tools added as new adapters, not rewrites)
 - **Enterprise-friendly** — No new infrastructure, connects to your company's existing MCP servers
 - **Config-driven** — All personal data in gitignored config files; system is shareable as-is
 

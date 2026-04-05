@@ -67,6 +67,8 @@ When the user corrects your direction or you discover a non-obvious pattern duri
 
 Build pipeline restructured on 2026-04-05 to a 9-phase agent-first structure — see D025 and D030–D037 and `docs/roadmap.md`. Every phase has an operational guide at `docs/instructions/phase-{N}-{name}.md` (read via the Starting a Task protocol above).
 
+**Content vs adapter layers (D038).** All artifacts in the table below — agent behaviors, steering, skills, foundations, templates — are authored as **tool-neutral files** (markdown + YAML). The install step (Phase 6) packages them for the target AI tool's runtime format and locations (Kiro CLI for v1). Do NOT embed tool-specific syntax or paths in content files — if something depends on how Kiro CLI loads agents, registers MCPs, or expects file locations, it belongs in the adapter, not the content.
+
 Artifact ownership across phases:
 
 | Artifact | Populated in phase | Purpose |
