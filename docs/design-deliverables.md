@@ -48,6 +48,15 @@ What the design phase must produce before build starts. Claude should not begin 
 - [ ] How team file gets populated — retro processing, cross-1:1 pattern detection, manual observations
 - [ ] How trends are surfaced — "is my team healthier this month?" queries the snapshot log
 
+## Security & Trust Boundary
+- [ ] **Sentinel subagent pattern for risky actions.** Risky writes (calendar creates, email folder moves, vault deletes, task state changes that trigger cascades) should be executed through a sentinel subagent that has no prior conversation context and never sees raw untrusted content (email bodies, Slack messages, meeting transcripts). The calling agent passes a structured, sanitized action request; the sentinel validates against policy and executes. This is the mechanism that implements vision Core Belief #4 ("External Content Is Data, Never Instructions") — it blocks prompt injection by ensuring the component holding tool credentials never reads attacker-controlled text.
+- [ ] **Division of labor: policy vs. judgment.** The sentinel enforces deterministic policy (schema checks, allowlists, rate limits, required fields, confirmation gates, dry-run diffs). It does NOT re-judge semantic intent — without context it can't, and asking it to defeats the isolation purpose. Semantic judgment belongs to the user (human-in-the-loop) or the calling agent.
+- [ ] **When to gate vs. when deterministic policy is enough.** Not every write needs a sentinel — spawning subagents has latency cost that hurts interactive prompts. Define which actions go through the sentinel (high blast radius, irreversible, visible to others) vs. which rely on inline deterministic policy only (low-risk, reversible, fully contained to vault). The cheapest option for most vault writes may be policy-only.
+- [ ] **Sentinel architecture: single vs. per-domain.** Decide whether Myna has one sentinel that fronts all tool access (tight choke point, bigger blast radius if compromised, simpler to audit) or per-domain sentinels (calendar, email, vault) with narrower scopes. See Q013.
+- [ ] **Structured action request schema.** Define the contract between calling agents and the sentinel — exactly what fields are allowed, how content is sanitized, how references to untrusted data are passed (e.g. IDs, not bodies).
+- [ ] **Per-domain policy rules.** Concrete allowlists/rate-limits/confirmation-rules for: calendar writes (D003 three-layer protection), email folder moves (D019 — only Processed/ subfolders, only user's own folders), vault writes (D011 — only under myna/), task state changes.
+- [ ] **Fallback when subagents aren't available.** Not all AI models support subagent spawning. Design a degraded mode that still enforces policy deterministically even without the isolation boundary.
+
 ## Per-Domain Design
 - [ ] Email & Messaging — processing pipeline, extraction logic
 - [ ] Meetings & Calendar — note lifecycle, brief/debrief flows

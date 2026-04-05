@@ -86,6 +86,18 @@ Myna is in the **requirements phase**. Vision and core decisions are settled; do
 - **P0 — Interactive prompts.** All features work as natural language prompts. User triggers every action manually.
 - **P1 — Automation.** Scheduled/background agents via headless AI agent runs.
 
+## Two Goals, Not One
+
+This project has two first-class outputs.
+
+**Primary goal:** Myna itself — a working local-first AI assistant you can install and use.
+
+**Second goal:** figuring out the methodology for having Claude autonomously build an agentic system end-to-end — from feature ideas through foundations, requirements, build, test, and fix — with concentrated human effort upfront and minimal oversight during the main build. The methodology that emerges (pipeline structure, templates, recipes, verification checklists, escalation rules, learning-capture discipline) is captured as it develops and is intended to be reusable for building other agentic assistants on top of Claude or any capable LLM.
+
+Myna is the first artifact. The methodology is the second. Both ship.
+
+The methodology lives across several files as it stabilizes: see [decisions D025–D029](docs/decisions.md) for the pipeline shape and autonomy model, the [roadmap](docs/roadmap.md) for how the phases map to real work, and `docs/foundations.md` + `docs/instructions/*` as they are written during the build. A companion article about the process is planned for post-launch.
+
 ## Project Documentation
 
 | Document | Purpose |

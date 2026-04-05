@@ -4,87 +4,84 @@
 
 Myna is a local-first personal assistant for tech professionals. It's a set of AI agents that manage emails, Slack, meetings, projects, tasks, and people — drafting but never sending, organizing but never deciding. All data lives in an Obsidian vault as plain markdown.
 
+**This project has two first-class outputs, not one:**
+
+1. **Myna itself** — the working assistant.
+2. **A methodology for having Claude autonomously build an agentic system end-to-end** — from feature ideas through foundations, requirements, build, test, and fix, with concentrated human effort upfront and minimal oversight during the main build. The methodology lives in D025–D029, `docs/foundations.md`, `docs/instructions/*`, and the capture discipline. Intended to be reusable for building other agentic assistants on any capable LLM.
+
+Treat process artifacts (roadmap, decisions, foundations, instructions/\*, dev-journal) with the same care as product artifacts. Both ship. When updating any process artifact, ask: "would this still make sense to someone using this playbook to build a different agentic assistant?"
+
 **Status:** Idea refinement and requirements phase. Not yet in implementation.
 
 ## Key Documents
 
-Read these before doing any work:
-
 | File | Purpose |
-|------|---------|
-| `docs/vision.md` | North star — what Myna is, who it's for, core principles |
-| `docs/decisions.md` | Settled decisions — do not re-debate these |
+|---|---|
+| `docs/vision.md` | North star |
+| `docs/decisions.md` | Settled decisions — do not re-debate |
 | `docs/open-questions.md` | Unresolved questions — add here if you surface new ones |
-| `docs/design-deliverables.md` | Checklist of what design phase must produce before build starts |
-| `docs/roadmap.md` | Living task list — milestones, tasks, backlog |
-| `docs/design-context.md` | **IGNORE unless explicitly asked.** **IGNORE unless explicitly asked.** Early brainstorm notes. Many ideas were rejected or rethought. Do not pull from this unprompted. |
-| `docs/requirements.md` | **IGNORE unless explicitly asked.** Early brainstorm specs — many are wrong or outdated. Do not use as a starting point for requirements. |
-| `docs/features.md` | **IGNORE unless explicitly asked.** Early brainstorm feature list. Many ideas were rethought. Do not pull from this unprompted. |
+| `docs/roadmap.md` | Living task list, phase structure, backlog |
+| `docs/dev-journal.md` | Running log; see its header for entry triggers and format |
+| `docs/instructions/phase-{N}-{name}.md` | Operational guide for each build phase |
 
-## Requirement Files (by domain)
+Approved features for every domain live in `docs/requirements/{domain}.md` under the `## Features` section. This is the only authoritative source for what's being built.
 
-Each file covers one domain of Myna's functionality. These are being actively refined.
+## Starting a Task
 
-| File | Domain |
-|------|--------|
-| `docs/requirements/email-and-messaging.md` | Email triage, thread summaries, message processing |
-| `docs/requirements/meetings-and-calendar.md` | Meeting notes, briefs, debriefs, calendar writes |
-| `docs/requirements/projects-and-tasks.md` | Project files, tasks, timelines, context switching |
-| `docs/requirements/people-management.md` | Person files, observations, feedback, recognition |
-| `docs/requirements/daily-workflow.md` | Daily notes, planning, syncs, summaries, dashboards |
-| `docs/requirements/writing-and-drafts.md` | Email drafts, rewrites, structured messages, doc review |
-| `docs/requirements/self-tracking.md` | Own contributions, brag docs, promo packets, self-reviews |
-| `docs/requirements/setup-and-config.md` | First-run setup, config system, communication style interview |
+When the user says "start P{X}-T{Y}", "start phase N", "begin {task}", or similar task-kickoff phrasing:
+
+1. Look up the task in `docs/roadmap.md`.
+2. Read the phase operational guide at `docs/instructions/phase-{N}-{name}.md` — it contains the context reading list, phase rules, and per-task details. This is authoritative — do not improvise.
+3. Follow the guide's instructions from there.
+
+If the phase operational guide doesn't exist, stop and tell the user. Do not invent a reading list or rules on the fly.
 
 ## Development Journal
 
-`docs/dev-journal.md` is a running log for a post-launch article about building Myna entirely with Claude. **Err on the side of writing too much — we'll filter later.** Write a journal entry for ANY of the following:
+`docs/dev-journal.md` is raw material for a post-launch article. Write an entry any time something interesting happens during a session — decisions, surprises, user corrections, patterns, mistakes, unexpected ideas. Err on the side of too many entries; we'll filter later. Full list of triggers and the entry format: see the header of `dev-journal.md`.
 
-- A decision was made (and why — the reasoning is the interesting part)
-- Something surprised you or the user
-- An approach worked well (or failed) — and why
-- The user corrected Claude's direction or thinking
-- A requirement changed or was added/removed
-- An interesting trade-off was discussed
-- Claude autonomously designed, built, tested, or fixed something
-- A feature was completed or a milestone reached
-- A pattern or workflow emerged for AI-assisted development
-- Human intervention was needed (what and why)
-- Human intervention was NOT needed where you'd expect it would be
-- Claude made a mistake — what kind, how it was caught, how it was fixed
-- An idea came from an unexpected place (e.g. a workaround, a user insight)
-- Anything about multi-thread coordination, context transfer, or AI-to-AI handoffs
-- Anything that would make a reader say "huh, that's interesting"
+## Learning-Capture Discipline (D029)
 
-**Do NOT skip entries because they seem minor.** A small moment during build might be the best anecdote in the article. When in doubt, write it down.
+When the user corrects your direction or you discover a non-obvious pattern during build work, write it to the appropriate file **immediately**, not at the end of the session. Default target: `docs/instructions/build-feature.md`. Structural learnings → `docs/foundations.md`. Narrative → `docs/dev-journal.md`. Full routing table and rationale: D029.
+
+**Test:** "If a fresh Claude session had only these files, would it succeed?" If no, the docs are incomplete — fix the docs, not the conversation.
 
 ## Git Conventions
 
 - **Never auto-commit.** Only commit when the user explicitly asks.
-- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `style:`, `ci:`, `build:`
-- Keep commits atomic — one logical change per commit
-- Write clear commit messages that describe what was accomplished, not which files changed:
-  - **Subject line:** lead with the most important change, in plain language. "refine email and daily-workflow features" NOT "update 6 docs files"
-  - **Body:** explain what was done and why — the decisions made, the design changes, the problems solved. NOT a list of files modified or sections edited.
-  - A reader should understand the significance of the commit from the message alone, without looking at the diff
-- **Never add Co-Authored-By lines.** Do not add Claude or any AI co-author to commits.
+- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `style:`, `ci:`, `build:`.
+- Keep commits atomic — one logical change per commit.
+- Commit messages describe what was accomplished, not which files changed. Subject: lead with the most important change in plain language. Body: explain what was done and why — the decisions made, problems solved — not a list of edits.
+- **Never add Co-Authored-By lines.**
 
 ## Ground Rules
 
-1. **Vision is authoritative.** If a requirement contradicts `docs/vision.md`, the vision wins.
+1. **Vision is authoritative.** If a requirement contradicts `docs/vision.md`, vision wins.
 2. **Decisions are settled.** Don't re-open items in `docs/decisions.md` unless the user explicitly asks.
-3. **Ignore design-context.md and requirements.md.** These are early brainstorm notes. Many ideas in them are wrong or were rethought. Do NOT read them, pull from them, or use them as a starting point — unless the user explicitly asks you to look at them.
-4. **Add open questions.** If you surface a question that isn't answered by existing docs, add it to `docs/open-questions.md`.
-5. **Add decisions.** If the user settles a question during your conversation, add it to `docs/decisions.md`.
-6. **AI model agnostic.** Never assume a specific AI provider. Myna must work with Claude, Gemini, Codex, Kiro, etc.
-7. **Draft, never send.** Myna never sends emails, posts messages, or takes external actions (except personal calendar events with no attendees).
+3. **Add open questions.** If you surface a question not answered by existing docs, add it to `docs/open-questions.md`.
+4. **Add decisions.** If the user settles a question during your conversation, add it to `docs/decisions.md`.
+5. **AI model agnostic.** Never assume a specific AI provider. Myna must work with Claude, Gemini, Codex, Kiro, etc.
+6. **Draft, never send.** Myna never sends emails, posts messages, or takes external actions (except personal calendar events with no attendees).
 
 ## Phase-Specific Instructions
 
-Read the file for the phase you're working in:
+Build pipeline restructured on 2026-04-05 to a 9-phase agent-first structure — see D025 and D030–D037 and `docs/roadmap.md`. Every phase has an operational guide at `docs/instructions/phase-{N}-{name}.md` (read via the Starting a Task protocol above).
 
-| File | When to read |
-|------|-------------|
-| `docs/instructions/requirements.md` | When discussing or writing requirements |
-| `docs/instructions/design.md` | When designing the system |
-| `docs/instructions/build.md` | When implementing, testing, or shipping |
+Artifact ownership across phases:
+
+| Artifact | Populated in phase | Purpose |
+|---|---|---|
+| `docs/foundations.md` + `docs/architecture.md` | 0 | Complete scaffolding: agents, routing, steering, data structures, patterns, feature-to-agent mapping |
+| vault folders, templates, config files, agent bootstraps, steering stubs, MCP wrapper stub | 1 | Empty but structured containers |
+| `.claude/` skills/subagents (Writer/Reviewer/Refiner/Iterator) | 2 | Claude Code build harness (not part of Myna runtime) |
+| `docs/instructions/agent-build-sdlc-rules.md` | 2 | Initial rules for the build harness |
+| Reference agent content + captured learnings | 3 | One agent fully built; learnings feed Phase 4 |
+| `docs/instructions/build-agent.md` | 4 | Finalized recipe for building an agent |
+| `docs/instructions/verify-agent.md` | 4 | Structural lint checks (NOT behavioral tests) |
+| `docs/instructions/escalation-rules.md` | 4 | Tripwires for stop-and-ask vs. proceed |
+| All remaining agents | 5 | Built autonomously using the Phase 4 recipe |
+| Install script (Kiro) | 6 | Runnable installer; v1 targets Kiro only per D035 |
+| `docs/testing-plan.md` | 7 | Manual testing plan (user executes post-ship) |
+| README, setup guide, v1.0 tag | 8 | Public release |
+
+**Automated behavioral testing is NOT in the pipeline** (deferred per D033). Structural lint exists but is not testing. **Open-source contribution model is NOT in the pipeline** (deferred post-launch per D036). **Done = Phase 8 complete** (D037); real-world testing and bug fixing are post-ship activities outside the pipeline.

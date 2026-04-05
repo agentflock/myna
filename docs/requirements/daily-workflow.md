@@ -4,8 +4,6 @@
 
 **Scope:** Daily notes, morning sync, quick capture, planning, priority coaching, weekly/monthly summaries, dashboards, review queue, park/resume.
 
-**Feature notes:** See `docs/features/daily-workflow.md` for finalized features. Features will be copied here when all domains are reviewed.
-
 ---
 
 ## Features

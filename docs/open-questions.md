@@ -83,6 +83,15 @@ Each entry:
 **Options considered:** P0 (useful for quick mobile checks), deferred (Obsidian mobile covers most needs, build it only if friction emerges)
 **Status:** Resolved — deferred. Stick to Obsidian for P0. Revisit only if Obsidian doesn't support something or the UX is too complex.
 
+### Q013 — Sentinel subagent architecture: single vs. per-domain, and what to gate
+**Raised:** 2026-04-04
+**Context:** Risky writes (calendar creates, email folder moves, vault deletes) should be executed through a sentinel subagent that has no prior context and never sees raw untrusted content — this implements vision Core Belief #4 and blocks prompt injection by ensuring the tool-credential holder never reads attacker-controlled text. The sentinel's job is deterministic policy enforcement (schema, allowlist, rate limits, confirmation gates), not semantic re-judgment. But two design questions remain: (1) single sentinel fronting all tool access vs. per-domain sentinels, and (2) which actions actually need the sentinel vs. which can rely on inline deterministic policy. Subagent spawning has latency cost that hurts interactive prompts, so gating everything isn't free.
+**Options considered:**
+- Single sentinel for all tool access — tight choke point, simpler audit, but bigger blast radius if compromised and one bottleneck for all writes
+- Per-domain sentinels (calendar, email, vault) — narrower scopes, parallelizable, but more components to build and maintain
+- Hybrid: sentinel only for high-blast-radius actions (calendar, email moves, cascading task changes), inline deterministic policy for low-risk contained writes (vault markdown under myna/)
+**Status:** Open — decide during design phase. Tracked as a design deliverable under "Security & Trust Boundary."
+
 ### Q012 — Tag registry: fourth config file or section in registry.md?
 **Raised:** 2026-04-03
 **Context:** Auto-tagging (cross-domain feature) needs a tag registry that defines available tags and their mapping rules (folder-based, keyword-based, person/project-based). This could be a section in the existing `registry.md` config or a separate fourth config file.
