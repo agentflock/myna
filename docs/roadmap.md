@@ -90,8 +90,8 @@ Myna is built via a **4-phase pipeline**: Design, Build, Install, Ship (D044). T
 | P1-T08 | Skills: draft, draft-replies | Done |
 | P1-T09 | Skill: calendar | Done |
 | P1-T10 | Skills: review, self-track, park | Done |
-| P1-T11 | Steering files (safety, conventions, output, system) | Not started |
-| P1-T12 | Main agent | Not started |
+| P1-T11 | Steering files (safety, conventions, output, system) | Done |
+| P1-T12 | Main agent | Done |
 | P1-T13 | Cross-skill audit | Not started |
 
 ### Phase 2 — Installation Script
