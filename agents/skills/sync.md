@@ -34,7 +34,7 @@ Sets up or refreshes your day — creates the daily note, generates meeting prep
 2. Read today's calendar via `calendar.list_events`. For each meeting:
    - Determine meeting type from attendees, title, and recurrence pattern: 1:1 (two attendees), standup, project, adhoc. Check `meetings.yaml` for type overrides.
    - Create or update the prep file under `Meetings/{type}/{name}.md`. For 1:1s, append a new session section. For recurring, append a new session. For adhoc, create a new file.
-   - Prep content: generate a brief meeting prep (key topics, open items related to attendees/projects). Full meeting prep is the prep-meeting skill's job — sync generates lightweight preps.
+   - Prep content: generate a lightweight meeting prep covering at minimum: (1) carry-forward items from the previous session (unchecked prep items), (2) your open action items related to attendees or the meeting's project, (3) for 1:1s — any entries in the person's Pending Feedback section. Exclude from lightweight preps: coaching suggestions, career development context, personal notes, pre-read analysis — these are the prep-meeting skill's value-add.
    - Add a linked checkbox to the daily note Meetings section: `- [ ] {HH:MM} [[{meeting-file}]] — {meeting name}`
 
 3. Read open tasks across project files via the `tasks` MCP tool. Surface overdue tasks and tasks due today in the Immediate Attention section.
@@ -49,9 +49,11 @@ Sets up or refreshes your day — creates the daily note, generates meeting prep
 
 8. If `features.milestones` is enabled, check `people.yaml` for upcoming birthdays and work anniversaries within the next 7 days. Add to Milestones section.
 
-9. Suggest top 3 priorities based on: due dates (sooner = higher), defer count (tasks deferred multiple times rank higher), blocking status (blockers on others rank higher), and overdue delegations.
+9. If `features.attention_gap_detection` is enabled: for each person in `people.yaml` with `relationship_tier: direct`, check the most recent entry date in their person file's Observations and Recognition sections. If the gap between today and the most recent entry exceeds 45 days, add to the Immediate Attention section: "⚠ Attention gap: no observations logged for {person} in {N} days." Also check career development: if no career topic has appeared in 1:1 prep for that person in 4+ months, add: "⚠ No career topics logged for {person} in {N} months."
 
-10. Output summary: "Sync complete ({HH:MM}). {N} meetings ({X} hrs), {N} overdue tasks, {N} overdue delegations, {N} items in review queue. Top priority: {description}."
+10. Suggest top 3 priorities based on: due dates (sooner = higher), defer count (tasks deferred multiple times rank higher), blocking status (blockers on others rank higher), and overdue delegations.
+
+11. Output summary: "Sync complete ({HH:MM}). {N} meetings ({X} hrs), {N} overdue tasks, {N} overdue delegations, {N} items in review queue. Top priority: {description}."
 
 ### Weekly Note
 
@@ -147,7 +149,7 @@ After every sync, show a one-line summary with counts. For re-runs, also mention
 - **Morning Focus is sacred.** Never overwrite, move, or modify the Morning Focus section. It lives outside snapshot sections.
 - **Missing files are not errors.** If project files, review queue files, or person files don't exist yet (first run, empty vault), skip those data sources and show counts as zero. A fresh vault is valid — sync still creates the daily note, reads the calendar, and generates meeting preps.
 - **Snapshots are immutable.** On re-run, prepend a new snapshot. Never edit, collapse, restructure, or delete previous snapshots.
-- **Lightweight meeting preps.** Sync generates brief preps (key topics, open items). The prep-meeting skill handles deep meeting preparation with coaching suggestions.
+- **Lightweight meeting preps.** Sync generates preps with carry-forwards, your open action items, and pending feedback (for 1:1s). The prep-meeting skill adds coaching suggestions, career context, personal notes, and pre-read analysis.
 - **No skill chaining.** After sync, tell the user about follow-up actions ("Say 'prep for my 1:1 with Sarah' for detailed prep") but do not automatically invoke other skills.
 - **Archive threshold.** If `journal.archive_after_days` is not configured, default to 30 days. Never archive the current day's or current week's note.
 - **Weekly note timing.** Create weekly note on first sync of the week only. If the user syncs on Wednesday and no weekly note exists for this week, create it then.

@@ -66,7 +66,9 @@ Closes out the day or the week — compares what you planned against what happen
    - **Tasks: Completed vs Carried:** count of tasks completed vs carried forward, broken down by project
    - **Self-Reflection:** agent-generated prompts based on this week's patterns — time allocation balance (meeting-heavy days vs focus days), feedback gaps (days since last feedback to each direct report, if manager), delegation health (overdue delegations trend), recurring carry-overs (tasks carried 3+ times)
 
-5. Output summary: "Weekly summary written to {weekly note path}. {N} accomplishments, {N} decisions, {N} active blockers, {completed}/{total} tasks completed. Reflection prompts added."
+5. If `features.team_health` is enabled and `user.role` is `engineering-manager` or `pm`: generate a Team Health snapshot for each direct report (relationship_tier: direct in people.yaml). For each person, compute: open task count, overdue count, days since last 1:1, days since last feedback, overdue delegation count. Append the snapshot to `Team/{team-name}.md` under `## Health Snapshots` with a dated header `### {YYYY-MM-DD}` and the metrics table. If the team file doesn't exist, create it from the team template with the team name derived from the user's team or from the direct reports' common team in people.yaml.
+
+6. Output summary: "Weekly summary written to {weekly note path}. {N} accomplishments, {N} decisions, {N} active blockers, {completed}/{total} tasks completed. Reflection prompts added."
 
 ## Output
 
@@ -96,6 +98,8 @@ Contributions also written to `Journal/contributions-{monday-date}.md` with full
 Uncertain contributions written to `ReviewQueue/review-self.md` with the standard review queue entry format.
 
 Weekly summary appended to `Journal/WeeklyNote-{monday-date}.md`.
+
+- **Team file** (`Team/{team-name}.md`): health snapshot appended under `## Health Snapshots` (weekly summary only, if team_health enabled)
 
 ## Rules
 

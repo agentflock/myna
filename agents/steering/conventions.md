@@ -230,6 +230,10 @@ All TODOs use Obsidian Tasks plugin format:
 
 Omit optional fields when not applicable — only include fields that have values.
 
-Inferred fields are marked inline: `[project:: Auth Migration (inferred)]` so the user knows what to verify.
+Inferred fields are tracked via `[review-status:: pending]` on the task. Do NOT embed "(inferred)" text inside property values — it breaks Dataview queries. Instead, note the inference in the task description text:
+```
+- [ ] Get spec reviewed 📅 2026-04-10 ⏫ [project:: Auth Migration] [review-status:: pending] [Inferred] — project inferred from email folder
+```
+The property value stays clean (`Auth Migration`), the `[review-status:: pending]` flags it for review, and the description note explains what was inferred.
 
 The agent always creates formatted tasks from natural language. The user never types task syntax.

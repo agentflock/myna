@@ -52,11 +52,11 @@ Read the Notes section (Discussion, Action Items, Decisions subsections and any 
 
 **Action items for the user:**
 - Create a task in the relevant project file under `## Open Tasks`.
-- Format as Obsidian Tasks plugin TODO: `- [ ] {description} [due:: {date}] [project:: {name}]`
-- Resolve relative dates ("by Friday") to actual dates.
+- Format as Obsidian Tasks plugin TODO: `- [ ] {description} 📅 {due-date} [project:: {name}] [type:: task] [{provenance}]`
+- Resolve relative dates ("by Friday") to actual dates. Use priority emoji (⏫ high, 🔼 medium) when priority is evident from context.
 
 **Action items for others (delegations):**
-- Same format with additional fields: `[type:: delegation] [person:: {name}]`
+- Same format with additional fields: `[type:: delegation] [person:: {name}]` and wiki-link `[[{person-name}]]`
 - Link to the person: `[[{person-name}]]`
 
 **Decisions:**

@@ -41,14 +41,14 @@ Extracts structured data from email, Slack messages, or pasted documents and rou
 
    b. **Extract structured data.** A single email can produce multiple entries for different destinations. For each item, determine the destination and provenance:
       - Action items with explicit owner, action, and date → task in project file `[Auto]`. Format as Obsidian Tasks plugin TODO with fields: title, project, priority, due date, effort estimate, type, person (for delegations)
-      - Action items where owner or date is inferred → task in project file `[Inferred]` with inferred fields marked (e.g., `priority:: high (inferred — blocks launch)`), `review-status:: pending`
+      - Action items where owner or date is inferred → task in project file `[Inferred]` with `review-status:: pending` and inference noted in description text (e.g., `— priority inferred, blocks launch`). Do NOT embed "(inferred)" inside property values.
       - Decisions → project timeline entry `[Auto]`
       - Blockers → project timeline entry with callout block `[Auto]`
       - Timeline-worthy updates → project timeline entry `[Auto]` or `[Inferred]`
       - Delegation signals → task with `type:: delegation` and `person::` field
       - Recognition of someone → person file Recognition section
       - Person observations → person file Observations section
-      - Contribution signals (you did something notable) → `Journal/contributions-{week}.md`
+      - Contribution signals (you did something notable) → `Journal/contributions-{monday-date}.md`
       - Genuinely ambiguous items → route to the appropriate review queue
 
    c. **Meeting summary detection:** If the email contains a meeting summary (recap, minutes, action items from a meeting):
@@ -63,13 +63,18 @@ Extracts structured data from email, Slack messages, or pasted documents and rou
 
    f. **Bulk write confirmation.** Before writing any entries from this batch: count the number of distinct destination files that will be modified. If 5 or more files will be modified, show the user a summary table (destination file, number of entries to add) and wait for confirmation before writing. For batches of 10+ emails, always show the summary first regardless of file count.
 
-   g. **Write entries.** For each non-duplicate entry:
+   g. **Check destination files exist.** Before writing to a project file (`Projects/{project}.md`) or person file (`People/{person}.md`), check if the file exists. If not:
+      - **Person files:** create from the template in `_system/templates/person.md`, populating frontmatter from `people.yaml`. If no template exists, create a minimal file with frontmatter (name, role, relationship tier) and standard section headers.
+      - **Project files:** create from the template in `_system/templates/project.md`, populating from `projects.yaml`. If no template exists, create a minimal file with frontmatter and standard section headers (Overview, Timeline, Open Tasks, Links, Notes).
+      - If the entity isn't in config (unknown person or project), route the item to `review-work.md` with a note: "Could not resolve destination — entity not in config."
+
+   h. **Write entries.** For each non-duplicate entry:
       - `[Auto]` and `[Inferred]` entries → write directly to destination files using `append` under the correct section header. Timeline entries sorted by event date, not processing date. Follow the canonical entry formats from conventions.md.
       - Genuinely ambiguous entries → route to the appropriate review queue (`review-work.md`, `review-people.md`, or `review-self.md`)
 
-   h. **Store source text.** Append the verbatim email content to `_system/sources/{project-name}.md` with date, sender, and subject as header. Include which vault entries reference this source.
+   i. **Store source text.** Append the verbatim email content to `_system/sources/{project-name}.md` with date, sender, and subject as header. Include which vault entries reference this source.
 
-   i. **Move to processed (dedup layer 1):** Move the email to processed folder via `email.move_message`. If `email.processed_folder` is "per-project": move to `{project-folder}/Processed/`. If "common": move to the folder in `email.common_folder`.
+   j. **Move to processed (dedup layer 1):** Move the email to processed folder via `email.move_message`. If `email.processed_folder` is "per-project": move to `{project-folder}/Processed/`. If "common": move to the folder in `email.common_folder`.
 
 4. Log the processing run to `_system/logs/audit.md`.
 
@@ -85,7 +90,7 @@ Extracts structured data from email, Slack messages, or pasted documents and rou
    - Source stored in `_system/sources/{project-name}.md` with channel name and timestamp
    - For threaded conversations, read the full thread via `slack.read_thread` before extraction
 
-8. **Keyword tags in inbox channel:** If a message comes from a designated inbox channel and contains keyword tags (TODO, LOG, BLOCKER, DECISION, RECOGNITION), use those to determine the destination type directly.
+8. **Keyword tags:** If a message contains explicit keyword tags (TODO, LOG, BLOCKER, DECISION, RECOGNITION), use those to determine the destination type directly.
 
 9. Update `_system/logs/processed-channels.md` with the latest processed timestamp for each channel.
 
@@ -97,7 +102,7 @@ Extracts structured data from email, Slack messages, or pasted documents and rou
 
 11. Output a summary with two parts:
 
-    **One-line count:** "Processed {N} emails from {M} folders, {P} messages from {Q} channels. {X} items written directly, {Y} in review queues. {Z} skipped as duplicates."
+    **One-line count:** "Processed {N} emails from {M} folders, {P} messages from {Q} channels. {X} items written directly, {Y} in review queues. {Z} skipped as duplicates." If Y > 0, add: "Say 'review my queue' to check the {Y} ambiguous items."
 
     **Changes by file** (always show this — not optional):
     ```
@@ -114,7 +119,7 @@ Extracts structured data from email, Slack messages, or pasted documents and rou
 
 - **Project files** (`Projects/{project-name}.md`): timeline entries under `## Timeline`, tasks under `## Open Tasks`, links under `## Links`, notes under `## Notes`
 - **Person files** (`People/{person-name}.md`): observations under `## Observations`, recognition under `## Recognition`
-- **Contributions log** (`Journal/contributions-{week}.md`): contribution entries
+- **Contributions log** (`Journal/contributions-{monday-date}.md`): contribution entries
 - **Review queues**: ambiguous items routed to `review-work.md`, `review-people.md`, `review-self.md`
 - **Source files** (`_system/sources/{entity-name}.md`): verbatim text
 - **Audit log** (`_system/logs/audit.md`): processing run summary
@@ -132,7 +137,7 @@ Extracts structured data from email, Slack messages, or pasted documents and rou
 - If email MCP is not available, inform the user that email processing is unavailable. Other processing (Slack, documents) may still work.
 - If Slack MCP is not available, inform the user that messaging processing is unavailable.
 - Check feature toggles before each processing type. A user may have email processing enabled but messaging processing disabled.
-- Tasks with inferred fields get `review-status:: pending` with inferred fields clearly marked (e.g., `priority:: high (inferred — blocks launch)`).
+- Tasks with inferred fields get `review-status:: pending` with inference noted in description text (not inside property values — that breaks Dataview queries).
 - Contribution detection is conservative. Tasks you completed → `[Auto]`. Blockers you may have resolved → `[Inferred]`. Uncertain → `review-self.md`.
 
 ## Examples

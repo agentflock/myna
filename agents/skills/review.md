@@ -78,6 +78,7 @@ Summarize what was done: "{N} items approved and written, {M} discarded, {K} rem
 - **Discarded items still get audit records.** Log discards to the processed file with action "discarded" so there's a trail.
 - **If a queue file doesn't exist,** skip it silently — the user may not have any items in that category.
 - **Check `features.self_tracking`** before processing review-self items. If disabled, skip review-self and note it.
+- **No undo for approvals.** Once an item is written to its destination, it can't be automatically reversed — vault writes are append-only. If the user approved an item by mistake, they can find and delete the entry in the destination file in Obsidian. The audit trail in `processed-{date}.md` shows exactly what was written and where.
 
 ## Examples
 

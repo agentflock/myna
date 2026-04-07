@@ -76,13 +76,13 @@ Routes user-entered data to the right vault destinations. The user says what hap
 
 "add task: [description]"
 
-1. Extract task attributes from natural language: title, project (resolve via fuzzy name resolution), priority, due date (resolve relative dates to absolute), type (task, delegation, dependency), person (for delegations), effort estimate.
-2. Mark each attribute as explicit (stated by user) or inferred (agent's guess). If any field is inferred, add `[review-status:: pending]` with the inferred fields marked: `[project:: Auth Migration (inferred)]`.
+1. Extract task attributes from natural language: title, project (resolve via fuzzy name resolution), priority, start date (resolve relative dates to absolute), due date (resolve relative dates to absolute), type (task, delegation, dependency), person (for delegations), effort estimate.
+2. Mark each attribute as explicit (stated by user) or inferred (agent's guess). If any field is inferred, add `[review-status:: pending]` and note the inference in the task description text (e.g., `— project inferred from context`). Do NOT embed "(inferred)" inside property values — it breaks Dataview queries.
 3. Write the formatted TODO using Obsidian Tasks plugin syntax:
    ```
    - [ ] {title} 📅 {due-date} {priority-emoji} [project:: {name}] [type:: {type}] [person:: {name}] [User]
    ```
-   Priority emoji: `⏫` high, `🔼` medium, omit for low. Omit optional fields (`[person::]`, `[effort::]`, `[review-status::]`) when not applicable.
+   Priority emoji: `⏫` high, `🔼` medium, omit for low. Start date: `🛫 {date}` when specified. Omit optional fields (`[person::]`, `[effort::]`, `[review-status::]`, `🛫`) when not applicable.
 4. Append the task to the relevant project file under `## Open Tasks`. If no project can be determined, append to today's daily note.
 
 **Recurring tasks:** "create recurring task: weekly status update"
@@ -160,7 +160,7 @@ User: "add task: get the caching approach reviewed"
 
 No project, no due date, no owner stated. Skill infers project from conversation context (if available) or asks. If it infers:
 ```
-- [ ] Get the caching approach reviewed 🔼 [project:: Platform API (inferred)] [type:: task] [review-status:: pending] [User]
+- [ ] Get the caching approach reviewed 🔼 [project:: Platform API] [type:: task] [review-status:: pending] [User] — project inferred from context
 ```
 Output: "Task created in Projects/platform-api.md. Inferred fields: project (Platform API). Review when convenient."
 

@@ -158,3 +158,54 @@ User says: "prep for my 1:1 with Sarah"
 ```
 
 5. **Output:** "Prepped 1:1 with Sarah (2:00 PM). 8 items — 1 carry-forward, 1 missed action item from you, 1 pending feedback."
+
+### Example: Design/Doc Review Prep
+
+```
+User says: "prep for the design review at 2pm"
+
+1. **Calendar:** finds "Auth Caching Design Review" at 2:00 PM. 5 attendees (cross-team). Type: adhoc.
+2. **File:** `Meetings/Adhoc/auth-caching-design-review.md` doesn't exist → creates it with frontmatter and tags.
+3. **Reads:** Project file (auth-migration — open blockers, recent decisions), meeting context (Sarah shared a design doc link in the project timeline).
+4. **Generates prep:**
+
+```markdown
+### Prep
+
+- [ ] **Open action items:** API spec review due Friday (assigned to you)
+- [ ] **Blocker:** OAuth provider credentials still pending from Team X (12 days)
+- [ ] **Recent decision:** Token caching approach decided — Option B with in-memory TTL (Apr 2)
+
+### Pre-Read
+- [ ] **TL;DR:** Proposes in-memory caching with TTL for auth service tokens, replacing the current no-cache approach
+- [ ] **Key Decisions Being Asked:** Approve in-memory over Redis; accept 50k active token limit; agree on TTL duration
+- [ ] **Risks and Concerns:** Memory pressure at >50k concurrent tokens; no cache warming strategy described; single point of failure if service restarts
+- [ ] **Questions to Ask:** What's the production token cardinality? How does cache invalidation work on password reset? What's the plan for monitoring cache hit rates?
+- [ ] **How It Relates to Your Projects:** Auth migration timeline depends on this decision; delayed approval pushes integration testing past May 1
+- [ ] **Stakeholder Impact:** Infrastructure team not consulted on memory requirements; SRE team needs to approve monitoring approach
+```
+
+5. **Output:** "Prepped design review (2:00 PM). 3 context items + 6-section pre-read analysis."
+```
+
+### Example: Standup Prep
+
+```
+User says: "prep for my remaining meetings" — standup at 9:30 AM is the only unprepped meeting.
+
+1. **Calendar:** finds "Daily Standup" at 9:30 AM. 6 attendees (all directs). Type: recurring (standup).
+2. **File:** `Meetings/Recurring/daily-standup.md` exists. Appends `## 2026-04-06 Session` and `### Prep`.
+3. **Reads:** Task items (your completions since last standup), delegation status, project files for team blockers.
+4. **Generates prep:**
+
+```markdown
+### Prep
+
+- [ ] **Your updates:** Completed API spec review (auth-migration). In progress: MBR draft.
+- [ ] **Overdue delegations:** Marcus — deployment timeline doc (3 days overdue)
+- [ ] **Team blockers:** Auth migration blocked on Team X OAuth credentials (12 days). Platform API schema validation waiting on infra team (5 days).
+- [ ] **From last standup:** Alex was going to investigate the flaky test suite — follow up on status.
+```
+
+5. **Output:** "Prepped 1 meeting (standup 9:30 AM). 1 overdue delegation to follow up, 2 team blockers."
+```

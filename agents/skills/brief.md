@@ -106,6 +106,7 @@ Determine which brief type the user is requesting, then follow the matching sect
    - **Carry-forward rate:** Count items that were carried forward (unchecked prep items becoming the next session's prep). High carry-forward rate indicates recurring bottleneck.
    - **Feedback delivery:** Count sessions with pending feedback in prep vs sessions where feedback items were checked off.
    - **Session gap:** Calculate the gap between each session and flag if any gap exceeded 3 weeks.
+   - **Topic source balance:** For each session, categorize prep items as: user-added (topics the user manually added to prep), carried from previous (unchecked items from prior session), or agent-generated (items created by prep-meeting). Calculate percentages across sessions. Flag if agent-generated items consistently dominate (>70%) — the user may be under-engaged in setting the agenda.
 
 4. Present inline as a factual analysis — dates, counts, rates. No inferences about morale or performance. "You completed 7 of 10 action items across 5 sessions. Sarah completed 12 of 14." is factual. "Sarah is reliable" is not.
 
@@ -133,6 +134,27 @@ Determine which brief type the user is requesting, then follow the matching sect
 6. Save to `Drafts/[Self] Performance Narrative {person} {period}.md` automatically (performance narratives are always saved — they aggregate significant data the user will iterate on).
 
 7. Confirm: "Performance narrative for Sarah saved to Drafts/. {N} [Inferred] items flagged for verification."
+
+### Review Calibration
+
+Triggered by "review my narratives", "calibrate my reviews", or "check my reviews for consistency."
+
+1. Find all `[Self] Performance Narrative` drafts in `Drafts/` that cover the same time period (e.g., all H1 narratives, all Q1 narratives).
+
+2. If fewer than 2 narratives found, tell the user: "Need at least 2 narratives from the same period to calibrate. Generate narratives for your other direct reports first."
+
+3. Compare across the set:
+   - **Evidence count** per person (how many specific contributions cited)
+   - **Narrative length** (word count per person)
+   - **Language strength** (count hedging words like "helped with", "participated in", "was involved" vs strong words like "led", "drove", "delivered")
+   - **Category coverage** (are some people's narratives missing entire competency areas?)
+
+4. Flag discrepancies:
+   - "Sarah's narrative cites 12 contributions; Alex's cites 4 over the same period"
+   - "You used 'led' for Sarah's caching work but 'helped with' for Alex's equivalent API redesign"
+   - "Marcus's narrative has no 'Growth areas' section while others do"
+
+5. Present findings inline. Do not auto-correct — the manager decides what to adjust.
 
 ### Unreplied Tracker
 
@@ -172,6 +194,7 @@ Include wiki-links (`[[person-name]]`, `[[project-name]]`) in output so the user
 - **Missing vault files are not errors.** If a person file, project file, or meeting file doesn't exist when reading, skip that data source and proceed with available data. Note in the output what was unavailable: e.g., "No person file found for Sarah — showing only projects.yaml data." Never fail a briefing entirely because one file is missing.
 - **Scope boundaries.** Weekly Summary belongs to wrap-up. Monthly Update Generation (MBR/MTR/QBR) belongs to draft. Unified Dashboard is a static Dataview file, not a brief feature. Self-tracking (your own contributions) belongs to self-track. Performance narratives for direct reports belong here.
 - **Performance narrative is always saved.** Unlike other brief modes (which are read-only inline), performance narratives are saved to `Drafts/` because they aggregate significant data that the user will iterate on.
+- **Review Calibration compares across narratives** — it requires multiple existing drafts. Generate individual narratives first.
 
 ## Examples
 
@@ -309,3 +332,63 @@ Output:
 2. **Maya** — No 1:1 in 3 weeks, feedback gap at 47 days, no career development
    topics logged in 5 months. Prioritize reconnecting.
 ```
+
+### 1:1 Pattern Analysis
+
+User: "analyze my 1:1s with Sarah"
+
+Reads all sessions in `Meetings/1-1s/sarah-chen.md`. 8 sessions over 4 months.
+
+Output:
+```
+**1:1 Pattern Analysis — Sarah Chen** (8 sessions, Jan 15 – Apr 6)
+
+**Action item follow-through:**
+- You: 14 of 18 items completed before next session (78%)
+  Missed: "share API spec feedback" (carried 3 sessions), "review tech lead growth plan" (2 sessions)
+- Sarah: 22 of 25 items completed (88%)
+  Missed: "document caching approach" (carried 2 sessions)
+
+**Recurring topics (3+ sessions):**
+- API spec timeline: 6 of 8 sessions
+- Caching architecture: 4 sessions (resolved Apr 6)
+- Career growth / tech lead path: 3 sessions
+
+**Carry-forward rate:** 18% of prep items carry forward (slightly above typical)
+
+**Topic source balance:** 45% agent-generated, 35% carried, 20% user-added.
+Your 1:1s rely heavily on generated prep — consider adding your own topics
+to steer the conversation.
+
+**Feedback delivery:** Pending feedback appeared in 5 preps; checked off in 3 (60%).
+2 feedback items have been in prep for 3+ sessions without delivery.
+
+**Session gaps:** Consistent weekly cadence. No gaps exceeding 10 days.
+```
+
+### Performance Narrative
+
+User: "generate performance narrative for Sarah for H1"
+
+Reads: contributions log (Jan–Jun), sarah-chen.md (observations, recognition), project timelines mentioning Sarah, 1:1 meeting notes.
+
+Saves to `Drafts/[Self] Performance Narrative Sarah H1.md`:
+
+> ## Sarah Chen — H1 2026 Performance Narrative
+>
+> **Summary:** Sarah was the technical anchor for the auth migration — the highest-priority project in Platform this half. She delivered the API spec ahead of schedule, resolved a blocking caching architecture debate, and mentored two junior engineers through their first production deployments.
+>
+> **Strengths:**
+> - Technical leadership on auth migration: drove the API spec from requirements through final review, resolving competing input from Platform and Payments teams (Jan 20 – Mar 15)
+> - Incident ownership: took immediate ownership of the March 30 production outage, coordinated response across 3 teams (observation, Mar 30) [Inferred]
+> - Decision quality: proposed and defended Option B for token caching, backing the recommendation with latency benchmarks (meeting, Apr 6)
+>
+> **Growth areas:**
+> - Technical writing: API spec required 3 revision rounds; later docs improved (observation, Feb 12, Mar 28)
+> - Delegation: tendency to take on work rather than distribute to the team (observation, Mar 15)
+>
+> **Key contributions:** 8 tracked contributions this half, spanning unblocking-others (3), decisions-and-influence (3), documentation (2).
+>
+> 2 [Inferred] items flagged — verify before submitting.
+
+Output: "Performance narrative for Sarah saved to Drafts/. 2 [Inferred] items flagged for verification."

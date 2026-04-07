@@ -154,3 +154,36 @@ Output:
 > **Open questions:** Production token cardinality numbers, cache warming strategy.
 >
 > Ready to continue.
+
+### Switch
+
+```
+User is working on auth migration and says: "switch to platform API"
+
+1. **Park:** Saves current context to `_system/parked/auth-migration-work.md` (topic, referenced files, current state, next steps).
+2. **Load:** Reads `Projects/platform-api.md` — status: active, 8 open tasks (3 overdue), 1 active blocker (schema validation dependency).
+
+Output:
+> Parked 'Auth Migration Work'. Switching to Platform API.
+>
+> **[[platform-api]]** — active
+> - 8 open tasks (3 overdue), 1 blocker (schema validation, 5 days)
+> - Recent: Alex completed load test setup (Apr 4), Marcus started monitoring config (Apr 5)
+> - Next milestone: API v2 release targeting May 15
+>
+> Ready to work on Platform API. Resume auth migration anytime with 'resume auth migration'.
+```
+
+### List
+
+```
+User: "what's parked?"
+
+Output:
+> **Parked items:**
+> 1. **Auth Caching Design** — parked Apr 6. Designing caching layer, waiting on Sarah's spec.
+> 2. **Auth Migration Work** — parked Apr 6. Working on migration tasks, paused to switch projects.
+> 3. **Q2 Planning Notes** — parked Apr 3. Brainstorming Q2 priorities with James's input.
+>
+> Resume any with 'resume [topic]'.
+```
