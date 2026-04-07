@@ -642,6 +642,12 @@ calendar_event_types:                 # labels appended to prefix
   task: Task                          # → [Myna:Task]
   reminder: Reminder                  # → [Myna:Reminder]
 
+# MCP server names — maps abstract names to user's actual MCP servers
+mcp_servers:
+  email: gmail-mcp                    # optional — name of user's email MCP server
+  slack: slack-mcp                    # optional — name of user's Slack MCP server
+  calendar: gcal-mcp                  # optional — name of user's calendar MCP server
+
 # System settings
 prompt_logging: true                  # default: true — log prompts to _system/logs/
 ai_model: kiro-cli                    # reference only — not enforced by Myna
@@ -687,7 +693,7 @@ projects:
 
 triage:                               # optional — inbox classification config
   inbox_source: "INBOX"              # which email folder/label to read for triage
-  folders:
+  folders:                            # triage + custom folders — agent uses descriptions to classify
     - name: Reply
       description: "Needs a response from me"
     - name: FYI
@@ -696,7 +702,10 @@ triage:                               # optional — inbox classification config
       description: "Waiting on someone else"
     - name: Schedule
       description: "Needs a meeting or calendar action"
+    - name: Trainings                 # custom folder example — user adds as many as needed
+      description: "Training invitations, course materials, learning resources"
   draft_replies_folder: DraftReplies  # email folder for draft reply requests
+                                      # process skill skips this folder — handled by draft-replies skill only
 ```
 
 ### 3.3 people.yaml
@@ -774,6 +783,10 @@ tags:
   - name: platform
     type: project-based
     project: Platform API
+
+  - name: sarah-chen
+    type: person-based                 # tag files mentioning a person
+    person: Sarah Chen
 
   - name: from-email
     type: source-based                # tag based on data source
@@ -935,21 +948,31 @@ Approved items are written to destinations with [Verified] tag, removed from the
 
 ## 7. Obsidian CLI MCP Tool Surface
 
-The Obsidian CLI MCP provides structured vault operations. Skills use these tools instead of raw file I/O when Obsidian is running.
+The Obsidian CLI MCP wraps the Obsidian CLI to provide structured vault operations. Skills reference these tools by name. The MCP server implementation lives in `agents/mcp/obsidian-cli/`.
+
+### 7.0 Vault Operations
 
 | Tool | Purpose | Used by |
 |------|---------|---------|
-| search | Vault-wide search using Obsidian's index | brief (search), main agent (vault search, link find) |
-| tasks | List/query tasks via Tasks plugin | sync (open tasks), brief (queries), calendar (task data) |
-| daily-note | Create, read, append to daily notes | sync, wrap-up |
-| create-from-template | Create notes using Obsidian templates | main agent (new project/person files), sync (daily/weekly notes) |
-| read | Structured file read | All skills |
-| write | Structured file write (restricted to myna/ subfolder) | All skills that write to vault |
-| eval | Run JavaScript — Dataview queries, custom logic | brief (complex queries), dashboard generation |
+| read | Read a file's full content or a specific section (by heading) | All skills |
+| append | Append content to the end of a file, or after a specific heading | process, capture, wrap-up, self-track, sync (end-of-day), all skills that add entries |
+| prepend | Prepend content to a file or section. Used for newest-first ordering | sync (daily note re-run snapshots) |
+| write | Create a new file with content. Fails if file already exists — use append/prepend for existing files | sync (new daily/weekly notes), main agent (new project/person files), draft, park |
+| overwrite-section | Replace a specific section's content by heading. For structured metadata sections only | review (clearing processed items) |
+| move | Move or rename a file within the vault | Journal auto-archiving (sync moves old notes to Archive/) |
+| delete | Delete a file (restricted to `myna/` subfolder). Used sparingly | main agent (draft deletion) |
+| search | Vault-wide full-text search using Obsidian's index. Returns file paths and matching lines | brief, main agent (vault search, link find) |
+| tags | List all tags in the vault or find files with a specific tag | brief, auto-tagging verification |
+| backlinks | List all files that link to a given file | brief (person/project context discovery) |
+| property:get | Read a YAML frontmatter property from a file | All skills that check frontmatter (meeting type, draft state) |
+| property:set | Set a YAML frontmatter property on a file | Task completion (marking TODOs done), review-status updates |
+| tasks | Query tasks via Obsidian Tasks plugin — filter by status, project, type, due date | sync (open/overdue tasks), brief (queries), calendar (task data), wrap-up |
+| create-from-template | Create a note from an `_system/templates/` template file, substituting variables | main agent (new project/person files), sync (daily/weekly notes) |
+| eval | Run a Dataview query or JavaScript expression against the vault | brief (complex queries), dashboard generation |
 
-**Fallback:** When Obsidian isn't running, skills use raw file read/write operations. Template-based creation falls back to copying template content directly. Search falls back to grep-style text search. Task queries fall back to pattern-matching TODO syntax.
+**All write operations** (`append`, `prepend`, `write`, `overwrite-section`, `move`, `delete`) are restricted to paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes) at the tool level.
 
-**Write restriction:** The MCP write tool is restricted to paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes) at the tool level.
+**Fallback:** When Obsidian isn't running, the MCP server falls back to direct file I/O. `search` falls back to text search. `tasks` falls back to regex matching of TODO syntax. `backlinks` and `tags` fall back to scanning wiki-link and tag patterns. `create-from-template` falls back to copying template content with variable substitution. `eval` is unavailable in fallback mode — skills that use it degrade gracefully.
 
 ### 7.1 Abstract External MCP Operations
 
@@ -957,15 +980,16 @@ Skills that read from external sources (email, Slack, calendar) use these abstra
 
 | Operation | Used by | Parameters |
 |-----------|---------|-----------|
-| email.list_messages | process, triage | folder, since_date (optional) |
-| email.read_message | process, triage, brief | message_id |
-| email.move_message | process | message_id, destination_folder |
+| email.list_messages | process, triage, draft-replies | folder, since_date (optional) |
+| email.read_message | process, triage, draft-replies, brief, draft | message_id |
+| email.move_message | process, triage (step 3), draft-replies | message_id, destination_folder |
+| email.search_messages | brief (thread summary) | query, folder (optional), date_range (optional) |
 | slack.list_messages | process | channel, since_timestamp |
 | slack.read_thread | process, brief | channel, thread_id |
 | calendar.list_events | sync, prep-meeting, calendar | date_range |
 | calendar.create_event | calendar | title, start, end, description (never attendees) |
 
-These are abstract operations — they describe what Myna needs from external MCPs, not actual tool signatures. Exact tool names and parameters depend on which MCP servers the user has installed.
+These are abstract operations — they describe what Myna needs from external MCPs, not actual tool signatures. Exact tool names and parameters depend on which MCP servers the user has installed. Skills reference these by the abstract name; the adapter layer maps them to actual MCP tool calls at install time.
 
 ### 7.2 User Identity Matching
 
@@ -1114,14 +1138,7 @@ Nothing is silently dropped because the agent tried to pick "the best" destinati
 
 ### 9.6 Config-Driven Feature Behavior
 
-**Pattern:** Before any feature-specific behavior, check the feature toggle.
-
-```
-1. Read workspace.yaml features map
-2. Check if the relevant feature is enabled
-3. If disabled → silently skip. Don't mention the feature, don't suggest it, don't include its output
-4. If enabled → proceed
-```
+**Pattern:** Before any feature-specific behavior, check its toggle in the `features` map of workspace.yaml. Disabled features are **silently skipped** — not mentioned, not suggested, not included in output (daily notes, dashboards, briefings).
 
 Skills that cover multiple features check each feature's toggle independently. A skill can have some features active and others inactive.
 
