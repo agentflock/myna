@@ -9,9 +9,9 @@ Living task list. Updated by Claude as work progresses.
 This project has two first-class outputs:
 
 1. **Myna** — a working local-first AI assistant for tech professionals.
-2. **A methodology for having Claude autonomously build an agentic system end-to-end** — from feature ideas through architecture, foundations, reference agent, autonomous build, install, and ship, with concentrated human effort at design/synthesis points and minimal oversight during the autonomous middle.
+2. **A methodology for having Claude autonomously build an agentic system end-to-end** — from feature ideas through architecture, foundations, and autonomous build, with concentrated human effort at design points and minimal oversight during the build.
 
-The methodology lives across `docs/foundations.md`, `docs/architecture.md`, the phase operational guides in `docs/instructions/`, `docs/decisions.md` (D025–D037), and the recipes produced during Phases 2–4 (`build-agent.md`, `verify-agent.md`, `escalation-rules.md`). It is intended to be reusable for building other agentic systems on any capable LLM.
+The methodology lives across `docs/foundations.md`, `docs/architecture.md`, `docs/instructions/autonomous-build-plan.md`, `docs/decisions.md` (especially D025–D044), and `docs/dev-journal.md`. It is intended to be reusable for building other agentic systems on any capable LLM.
 
 Both Myna and the methodology ship. Process artifacts in this repo are treated as deliverables, not scaffolding. When updating a process artifact, the test is: "would this still make sense to someone using this playbook on a completely different agentic assistant?"
 
@@ -19,27 +19,20 @@ Both Myna and the methodology ship. Process artifacts in this repo are treated a
 
 ## Build Approach
 
-Myna is built via a **9-phase agent-first pipeline** (D030). Rationale and tradeoffs are settled across D025–D037.
-
-User involvement is concentrated at design phases (0, 4), user-involved manual phases (6, 7), and at Ship (8). Claude works autonomously in Phase 5. Other phases are mechanical (1) or moderately interactive (2, 3).
+Myna is built via a **4-phase pipeline**: Design, Build, Install, Ship (D044). The original 9-phase plan (D030) was collapsed after Phase 0 produced architecture and foundations thorough enough to skip the incremental SDLC/reference-agent/build-plan phases and go straight to autonomous building.
 
 | Phase | Goal | User involvement |
 |---|---|---|
-| 0 Architecture & Foundations | Design agents, routing, steering, configs, vault, foundations, pattern catalog, reference agent selection | Heavy |
-| 1 Skeletons | Mechanical scaffolding — create empty containers matching Phase 0 output | Light |
-| 2 Agent Build SDLC | Claude Code build harness — Writer/Reviewer/Refiner/Iterator skills + initial rules | Moderate |
-| 3 Reference Agent | Build one agent end-to-end using the Phase 2 SDLC; iterate the SDLC; capture learnings | Moderate |
-| 4 Autonomous Build Plan | Synthesize Phase 3 learnings; finalize `build-agent.md`, `verify-agent.md`, `escalation-rules.md`; run fresh-session acceptance test | Heavy |
-| 5 Autonomous Agent Build | Build all remaining agents autonomously + cross-agent structural lint after each | Minimal (escalations only) |
-| 6 Installation Script | Build Kiro CLI install tooling (D035); user-involved, not autonomous | Heavy |
-| 7 Manual Testing Plan | Design the manual testing plan document (D033); plan only — user executes post-ship | Heavy |
-| 8 Ship | README, setup guide, v1.0 tag. No open-source contribution model (D036) | Moderate |
+| 0 Design | Architecture, foundations, features, decisions, build plan | Heavy |
+| 1 Build | Autonomous build of all skills, agent, MCP server, steering files | Minimal (escalations only) |
+| 2 Install | Install tooling (D035); user-involved, not autonomous | Heavy |
+| 3 Ship | README, setup guide, testing plan, v1.0 tag | Moderate |
 
-**Done = Phase 8 complete** (D037). Real-world testing, bug fixing, open-source contribution model, and install support for other AI tools are all post-ship activities outside this pipeline.
+**Done = Phase 3 complete** (D037). Real-world testing, bug fixing, open-source contribution model, and install support for other AI tools are all post-ship activities outside this pipeline.
 
-**Reusability:** Phase 5 in isolation is the recipe for adding a new agent to an existing system. Foundations, architecture, the finalized recipe, and the reference agent are inherited from the initial build; the Phase 5 loop runs for the new work.
+**How Phase 1 works:** A Claude orchestrator session reads `docs/instructions/autonomous-build-plan.md` and spawns subagents — each subagent builds 1-3 components with 3 self-review rounds (coverage, quality, consistency). The orchestrator does lightweight checks between subagents and re-spawns on failure. Full details in the build plan.
 
-**Automated testing:** deliberately deferred (D033). Phase 5 uses only structural lint (grep/shell checks), not behavioral tests. The manual testing plan (Phase 7) and post-ship real-world use are the behavioral quality mechanisms for v1. Post-v1 work may design automated testing based on what real usage teaches.
+**Automated testing:** deliberately deferred (D033). The build uses only structural checks, not behavioral tests. A manual testing plan (Phase 3) and post-ship real-world use are the behavioral quality mechanisms for v1.
 
 ---
 
@@ -53,145 +46,80 @@ User involvement is concentrated at design phases (0, 4), user-involved manual p
 | M1-T02 | Set up `docs/decisions.md` | Done |
 | M1-T03 | Set up `docs/open-questions.md` | Done |
 | M1-T04 | Set up CLAUDE.md | Done |
-| M1-T05 | Create domain requirement skeletons | Done |
+| M1-T05 | Create domain feature skeletons | Done |
 | M1-T06 | Create `docs/features/cross-domain.md` | Done |
 | M1-T07 | Create `docs/features/non-functional.md` | Done |
 | M1-T08 | Create `docs/design-deliverables.md` | Done |
 | M1-T09 | Claude refines feature lists for all domains | Done |
 | M1-T10 | User reviews refined feature lists | Done |
-| M1-T10b | Finalize build approach from first principles (evolved into D025–D037 restructure across two ultrathink sessions) | Done |
+| M1-T10b | Finalize build approach from first principles (evolved into D025–D037, then D044 restructure) | Done |
 | — | Decisions D001–D029 captured during prior work | Done |
-| — | Decisions D030–D037 capturing the 9-phase agent-first pipeline | Done |
+| — | Decisions D030–D037 capturing the original 9-phase pipeline | Done |
+| — | Decisions D038–D043 captured during Phase 0 | Done |
 
 ---
 
 ## Task Tracker
 
-### Phase 0 — Architecture & Foundations
+### Phase 0 — Design
 
-> **Operational guide:** `docs/instructions/phase-0-architecture-foundations.md` — read before any P0 task.
->
-> **Goal:** Complete scaffolding — agent architecture + data foundations — that every downstream phase depends on.
+> **Goal:** Architecture, foundations, features, and autonomous build plan.
 
 | Task | Description | Status |
 |---|---|---|
-| P0-T01 | Foundations inventory: classify every item as [Settled]/[Derive]/[Gap] | Not started |
-| P0-T02 | Architecture design: agents, routing, steering, feature-to-agent mapping, Kiro CLI mapping | Not started |
-| P0-T03 | Write `docs/foundations.md` and `docs/architecture.md` | Not started |
-| P0-T04 | Reference agent selection | Not started |
-| P0-T05 | User review of all Phase 0 output | Not started |
+| P0-T01 | Write `docs/architecture.md` and `docs/foundations.md` | Done |
+| P0-T02 | User review and iterate on architecture + foundations | Done |
+| P0-T03 | Write `docs/instructions/autonomous-build-plan.md` | Done |
+| P0-T04 | Record D044, update roadmap | Done |
 
-### Phase 1 — Skeletons
+### Phase 1 — Build (Autonomous)
 
-> **Operational guide:** `docs/instructions/phase-1-skeletons.md`
+> **Operational guide:** `docs/instructions/autonomous-build-plan.md`
 >
-> **Goal:** Mechanical scaffolding — empty containers matching foundations.
+> **Goal:** Build all skills, steering files, main agent, and MCP server autonomously. Claude orchestrator spawns subagents per the build plan.
 
 | Task | Description | Status |
 |---|---|---|
-| P1-T01 | Create vault folder structure | Not started |
-| P1-T02 | Create file templates for every file type | Not started |
-| P1-T03 | Create 6 config files with schemas | Not started |
-| P1-T04 | Create agent bootstrap files (one per agent) | Not started |
-| P1-T05 | Create steering file skeletons | Not started |
-| P1-T06 | Obsidian CLI MCP wrapper stub | Not started |
-| P1-T07 | Verify skeleton matches foundations | Not started |
+| P1-T01 | Foundations revision | Not started |
+| P1-T02 | MCP server (Obsidian CLI wrapper) | Not started |
+| P1-T03 | Skill: capture | Not started |
+| P1-T04 | Skills: sync, wrap-up | Not started |
+| P1-T05 | Skills: triage, process | Not started |
+| P1-T06 | Skills: process-meeting, prep-meeting | Not started |
+| P1-T07 | Skill: brief | Not started |
+| P1-T08 | Skills: draft, draft-replies | Not started |
+| P1-T09 | Skill: calendar | Not started |
+| P1-T10 | Skills: review, self-track, park | Not started |
+| P1-T11 | Steering files (safety, conventions, output, system) | Not started |
+| P1-T12 | Main agent | Not started |
+| P1-T13 | Cross-skill audit | Not started |
 
-### Phase 2 — Agent Build SDLC
-
-> **Operational guide:** `docs/instructions/phase-2-agent-build-sdlc.md`
->
-> **Goal:** Claude Code build harness — Writer/Reviewer/Refiner/Iterator skills that automate the agent-build loop.
-
-| Task | Description | Status |
-|---|---|---|
-| P2-T01 | Define initial SDLC rules | Not started |
-| P2-T02 | Create Writer skill/subagent | Not started |
-| P2-T03 | Create Reviewer skill/subagent (fresh context) | Not started |
-| P2-T04 | Create Refiner skill/subagent | Not started |
-| P2-T05 | Create Iterator/Orchestrator | Not started |
-| P2-T06 | Smoke test the harness on a toy example | Not started |
-
-### Phase 3 — Reference Agent
-
-> **Operational guide:** `docs/instructions/phase-3-reference-agent.md`
->
-> **Goal:** Build one reference agent end-to-end using the Phase 2 SDLC. Iterate the SDLC as gaps surface. Capture learnings continuously.
-
-| Task | Description | Status |
-|---|---|---|
-| P3-T01 | First pass: run SDLC on reference agent | Not started |
-| P3-T02 | Iterate on the SDLC as gaps surface | Not started |
-| P3-T03 | Test the reference agent against Myna's own dev work | Not started |
-| P3-T04 | Capture learnings continuously | Not started |
-| P3-T05 | User review of reference agent | Not started |
-
-### Phase 4 — Autonomous Build Plan
-
-> **Operational guide:** `docs/instructions/phase-4-autonomous-build-plan.md`
->
-> **Goal:** Synthesize Phase 3 learnings into the finalized recipe. Run fresh-session acceptance test. Go/No-Go for Phase 5.
-
-| Task | Description | Status |
-|---|---|---|
-| P4-T01 | Finalize `docs/instructions/build-agent.md` | Not started |
-| P4-T02 | Finalize `docs/instructions/verify-agent.md` | Not started |
-| P4-T03 | Write `docs/instructions/escalation-rules.md` | Not started |
-| P4-T04 | Fresh-session methodology acceptance test | Not started |
-| P4-T05 | Go/No-Go decision for Phase 5 | Not started |
-
-### Phase 5 — Autonomous Agent Build
-
-> **Operational guide:** `docs/instructions/phase-5-autonomous-agent-build.md`
->
-> **Goal:** Build all remaining agents autonomously, one per session, with cross-agent structural lint after each. Minimal user involvement.
-
-| Task | Description | Status |
-|---|---|---|
-| P5-T01..TN | Build each remaining agent (count and ordering decided in Phase 0) | Not started |
-| P5-Lint | Final cross-agent structural lint pass | Not started |
-
-### Phase 6 — Installation Script
+### Phase 2 — Installation Script
 
 > **Operational guide:** `docs/instructions/phase-6-installation-script.md`
 >
-> **Goal:** Kiro CLI-targeted install tooling (v1 scope per D035). User-involved, not autonomous.
+> **Goal:** Install tooling that packages agent artifacts for the target AI tool (v1 targets Kiro CLI per D035).
 
 | Task | Description | Status |
 |---|---|---|
-| P6-T01 | Design the Kiro CLI install flow | Not started |
-| P6-T02 | Write the install script | Not started |
-| P6-T03 | Test on a clean environment | Not started |
-| P6-T04 | Document install flow | Not started |
-| P6-T05 | User final approval | Not started |
+| P2-T01 | Design the install flow | Not started |
+| P2-T02 | Write the install script | Not started |
+| P2-T03 | Test on a clean environment | Not started |
+| P2-T04 | Document install flow | Not started |
+| P2-T05 | User final approval | Not started |
 
-### Phase 7 — Manual Testing Plan
+### Phase 3 — Ship
 
-> **Operational guide:** `docs/instructions/phase-7-manual-testing-plan.md`
->
-> **Goal:** Design a manual testing plan document. No test execution in this phase — execution is a post-ship user activity (D033, D037).
+> **Goal:** Public v1.0 release. Manual testing plan + README + setup guide.
 
 | Task | Description | Status |
 |---|---|---|
-| P7-T01 | Inventory scenarios to cover | Not started |
-| P7-T02 | Draft expected behaviors per scenario | Not started |
-| P7-T03 | Design reporting format | Not started |
-| P7-T04 | User review and refinement | Not started |
-| P7-T05 | Write final testing plan document | Not started |
-
-### Phase 8 — Ship
-
-> **Operational guide:** `docs/instructions/phase-8-ship.md`
->
-> **Goal:** Public v1.0 release. Open-source contribution model is NOT in scope (deferred post-launch per D036).
-
-| Task | Description | Status |
-|---|---|---|
-| P8-T01 | README polish | Not started |
-| P8-T02 | Setup guide | Not started |
-| P8-T03 | Final consistency pass | Not started |
-| P8-T04 | v1.0 release tag and notes | Not started |
-| P8-T05 | Declare done | Not started |
+| P3-T01 | Write manual testing plan | Not started |
+| P3-T02 | README polish | Not started |
+| P3-T03 | Setup guide | Not started |
+| P3-T04 | Final consistency pass | Not started |
+| P3-T05 | v1.0 release tag and notes | Not started |
+| P3-T06 | Declare done | Not started |
 
 ---
 

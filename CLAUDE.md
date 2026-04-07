@@ -7,11 +7,11 @@ Myna is a local-first personal assistant for tech professionals. It's a set of A
 **This project has two first-class outputs, not one:**
 
 1. **Myna itself** — the working assistant.
-2. **A methodology for having Claude autonomously build an agentic system end-to-end** — from feature ideas through foundations, requirements, build, test, and fix, with concentrated human effort upfront and minimal oversight during the main build. The methodology lives in D025–D029, `docs/foundations.md`, `docs/instructions/*`, and the capture discipline. Intended to be reusable for building other agentic assistants on any capable LLM.
+2. **A methodology for having Claude autonomously build an agentic system end-to-end** — from feature ideas through architecture, foundations, and autonomous build, with concentrated human effort at design points and minimal oversight during the build. The methodology lives in `docs/foundations.md`, `docs/architecture.md`, `docs/instructions/autonomous-build-plan.md`, and `docs/decisions.md`. Intended to be reusable for building other agentic assistants on any capable LLM.
 
 Treat process artifacts (roadmap, decisions, foundations, instructions/\*, dev-journal) with the same care as product artifacts. Both ship. When updating any process artifact, ask: "would this still make sense to someone using this playbook to build a different agentic assistant?"
 
-**Status:** Idea refinement and requirements phase. Not yet in implementation.
+**Status:** Design complete (Phase 0). Ready for autonomous build (Phase 1).
 
 ## Key Documents
 
@@ -22,7 +22,7 @@ Treat process artifacts (roadmap, decisions, foundations, instructions/\*, dev-j
 | `docs/open-questions.md` | Unresolved questions — add here if you surface new ones |
 | `docs/roadmap.md` | Living task list, phase structure, backlog |
 | `docs/dev-journal.md` | Running log; see its header for entry triggers and format |
-| `docs/instructions/phase-{N}-{name}.md` | Operational guide for each build phase |
+| `docs/instructions/autonomous-build-plan.md` | Recipe for the autonomous build phase |
 
 Approved features for every domain live in `docs/features/{domain}.md` under the `## Features` section. This is the only authoritative source for what's being built.
 
@@ -31,10 +31,10 @@ Approved features for every domain live in `docs/features/{domain}.md` under the
 When the user says "start P{X}-T{Y}", "start phase N", "begin {task}", or similar task-kickoff phrasing:
 
 1. Look up the task in `docs/roadmap.md`.
-2. Read the phase operational guide at `docs/instructions/phase-{N}-{name}.md` — it contains the context reading list, phase rules, and per-task details. This is authoritative — do not improvise.
+2. For Phase 1 (Build): read `docs/instructions/autonomous-build-plan.md` — it contains the complete build recipe. For other phases: read the phase operational guide if one exists.
 3. Follow the guide's instructions from there.
 
-If the phase operational guide doesn't exist, stop and tell the user. Do not invent a reading list or rules on the fly.
+Do not invent a reading list or rules on the fly.
 
 ## Development Journal
 
@@ -42,7 +42,7 @@ If the phase operational guide doesn't exist, stop and tell the user. Do not inv
 
 ## Learning-Capture Discipline (D029)
 
-When the user corrects your direction or you discover a non-obvious pattern during build work, write it to the appropriate file **immediately**, not at the end of the session. Default target: `docs/instructions/build-feature.md`. Structural learnings → `docs/foundations.md`. Narrative → `docs/dev-journal.md`. Full routing table and rationale: D029.
+When the user corrects your direction or you discover a non-obvious pattern during build work, write it to the appropriate file **immediately**, not at the end of the session. Structural learnings → `docs/foundations.md`. Build recipe learnings → `docs/instructions/autonomous-build-plan.md`. Narrative → `docs/dev-journal.md`. Rationale: D029.
 
 **Test:** "If a fresh Claude session had only these files, would it succeed?" If no, the docs are incomplete — fix the docs, not the conversation.
 
@@ -65,25 +65,19 @@ When the user corrects your direction or you discover a non-obvious pattern duri
 
 ## Phase-Specific Instructions
 
-Build pipeline restructured on 2026-04-05 to a 9-phase agent-first structure — see D025 and D030–D037 and `docs/roadmap.md`. Every phase has an operational guide at `docs/instructions/phase-{N}-{name}.md` (read via the Starting a Task protocol above).
+Build pipeline is a **4-phase structure** (D044): Design (0), Build (1), Install (2), Ship (3). See `docs/roadmap.md`.
 
-**Content vs adapter layers (D038).** All artifacts in the table below — agent behaviors, steering, skills, foundations, templates — are authored as **tool-neutral files** (markdown + YAML). The install step (Phase 6) packages them for the target AI tool's runtime format and locations (Kiro CLI for v1). Do NOT embed tool-specific syntax or paths in content files — if something depends on how Kiro CLI loads agents, registers MCPs, or expects file locations, it belongs in the adapter, not the content.
+**Content vs adapter layers (D038).** All agent artifacts — skills, steering, main agent — are authored as **tool-neutral markdown files** under `agents/`. The install step (Phase 2) packages them for the target AI tool's runtime format (Kiro CLI for v1). Do NOT embed tool-specific syntax or paths in content files.
 
-Artifact ownership across phases:
-
-| Artifact | Populated in phase | Purpose |
+| Artifact | Phase | Purpose |
 |---|---|---|
-| `docs/foundations.md` + `docs/architecture.md` | 0 | Complete scaffolding: agents, routing, steering, data structures, patterns, feature-to-agent mapping |
-| vault folders, templates, config files, agent bootstraps, steering stubs, MCP wrapper stub | 1 | Empty but structured containers |
-| `.claude/` skills/subagents (Writer/Reviewer/Refiner/Iterator) | 2 | Claude Code build harness (not part of Myna runtime) |
-| `docs/instructions/agent-build-sdlc-rules.md` | 2 | Initial rules for the build harness |
-| Reference agent content + captured learnings | 3 | One agent fully built; learnings feed Phase 4 |
-| `docs/instructions/build-agent.md` | 4 | Finalized recipe for building an agent |
-| `docs/instructions/verify-agent.md` | 4 | Structural lint checks (NOT behavioral tests) |
-| `docs/instructions/escalation-rules.md` | 4 | Tripwires for stop-and-ask vs. proceed |
-| All remaining agents | 5 | Built autonomously using the Phase 4 recipe |
-| Install script (Kiro CLI) | 6 | Runnable installer; v1 targets Kiro CLI only per D035 |
-| `docs/testing-plan.md` | 7 | Manual testing plan (user executes post-ship) |
-| README, setup guide, v1.0 tag | 8 | Public release |
+| `docs/foundations.md` + `docs/architecture.md` | 0 Design | Architecture, data layer, patterns, feature-to-skill mapping |
+| `docs/instructions/autonomous-build-plan.md` | 0 Design | Recipe for autonomous build |
+| `agents/skills/*.md` (14 skill files) | 1 Build | Skill instructions (tool-neutral markdown) |
+| `agents/steering/*.md` (4 files) | 1 Build | Cross-cutting rules |
+| `agents/main.md` | 1 Build | Main agent prompt |
+| `agents/mcp/obsidian-cli/` | 1 Build | MCP server code |
+| Install script | 2 Install | Packages agents/ for Kiro CLI; creates vault structure |
+| README, setup guide, testing plan, v1.0 tag | 3 Ship | Public release |
 
-**Automated behavioral testing is NOT in the pipeline** (deferred per D033). Structural lint exists but is not testing. **Open-source contribution model is NOT in the pipeline** (deferred post-launch per D036). **Done = Phase 8 complete** (D037); real-world testing and bug fixing are post-ship activities outside the pipeline.
+**Automated behavioral testing is NOT in the pipeline** (deferred per D033). **Open-source contribution model is NOT in the pipeline** (deferred post-launch per D036). **Done = Phase 3 complete** (D037); real-world testing and bug fixing are post-ship activities outside the pipeline.

@@ -17,6 +17,12 @@ Each entry:
 
 ---
 
+### D044 — Collapse Phases 1-5 into autonomous subagent build
+**Date:** 2026-04-06
+**Context:** The original 9-phase pipeline (D030) included Skeletons (1), Agent Build SDLC (2), Reference Agent (3), Autonomous Build Plan (4), and Autonomous Agent Build (5) as separate phases. After Phase 0 produced thorough architecture and foundations documents — with detailed skill descriptions, complete templates, config schemas, pattern catalog, and data conventions — the intermediate phases became unnecessary. The user also lacked time for the manual reference-agent phase. The architecture and foundations are detailed enough to serve directly as the build specification.
+**Decision:** Phases 1-5 are collapsed into a single autonomous Build phase. The build plan (`docs/instructions/autonomous-build-plan.md`) replaces Phases 2-4 output (build-agent.md, verify-agent.md, escalation-rules.md). A Claude orchestrator spawns subagents — each builds 1-3 components (skills, steering files, MCP server, main agent) with 3 self-review rounds (coverage, quality, consistency). Foundations are revised first (before any skills are built on top). Cross-skill audit runs last. Vault scaffolding (Phase 1) is deferred to the install script. The pipeline is now 4 phases: Design (0), Build (1), Install (2), Ship (3).
+**Alternatives rejected:** Keep 9 phases (unnecessary overhead — Phase 0 output is detailed enough to skip incremental SDLC iteration). Skip self-review rounds (quality risk — the 3-round review protocol substitutes for the human review that the reference-agent phase would have provided). Build everything in one session (context window risk — subagent-per-component keeps each build focused).
+
 ### D042 — Config files are YAML, not markdown
 **Date:** 2026-04-05
 **Context:** The original design had config files as markdown (workspace.md, registry.md, etc.). During Phase 0, the user specified that config files should be YAML for cleaner machine parsing. Six files: workspace.yaml, projects.yaml, people.yaml, meetings.yaml, communication-style.yaml, tags.yaml.
