@@ -1,13 +1,14 @@
-Review Myna skills for overall quality — feature completeness, clarity, correctness, consistency, safety, edge cases, conciseness, and output usefulness. Skills-focused, runs in parallel to avoid context overload, approval gate before fixes.
+Review and fix Myna skills (Claude Code SKILL.md files) in one pass — frontmatter correctness, description quality, instruction clarity, tool declarations, feature completeness, safety, edge cases, conciseness, consistency, and output usefulness. Fixes issues directly, then generates a report of what was found and changed.
 
-This command is narrower than `/myna-improve` (skills only, no steering/main) and narrower than `/myna-review` (skills only, tuned dimensions), but broader than a prose-only tightening pass. Use this when you want a comprehensive quality pass on the skills set without re-auditing the rest of the agent artifacts.
+This command is narrower than `/myna-improve` (skills only, no steering/main) and narrower than `/myna-review` (skills only, tuned dimensions), but broader than a prose-only tightening pass. Use this when you want a comprehensive quality pass on the skills set. Expected to be long-running.
 
 ## Arguments
 
 $ARGUMENTS
 
 Parse for:
-- **Scope:** file paths, glob patterns, `--uncommitted`, or default to `agents/skills/*.md`
+- **Scope:** file paths, glob patterns, `--uncommitted`, or default to `agents/skills/myna-*/SKILL.md` (excludes steering skills)
+- `--include-steering` — also review `agents/skills/myna-steering-*/SKILL.md`
 - Anything else: error out with a note on valid usage
 
 ## Setup
@@ -15,7 +16,7 @@ Parse for:
 Read project context before reviewing:
 
 1. `CLAUDE.md` — ground rules
-2. `agents/steering/*.md` — all four steering files (safety, conventions, output, system)
+2. `agents/skills/myna-steering-*/SKILL.md` — all six steering skills (safety, conventions, output, system, memory, vault-ops). These are the cross-cutting rules. Feature skills should not duplicate what steering already covers.
 3. `docs/architecture.md` — skill inventory and "Features covered:" mapping. This is authoritative for what each skill owns.
 4. `docs/design/foundations.md` — skills section, canonical vault templates, shared destination formats
 5. `docs/decisions.md` — settled decisions. Pay attention to the Golden Rule, draft-never-send, no skill chaining, and anything marked deferred so you don't propose out-of-scope fixes.
@@ -25,208 +26,242 @@ Build a mental map of each in-scope skill → its owning feature(s) + the shared
 
 ## Scope resolution
 
-- No arguments → `agents/skills/*.md` (all skills)
+- No arguments → `agents/skills/myna-*/SKILL.md` (all feature skills, excludes steering)
+- `--include-steering` → also include `agents/skills/myna-steering-*/SKILL.md`
 - Paths or glob → resolve and review matching files
 - `--uncommitted` → only skills with uncommitted git changes under `agents/skills/`
 - If the resolved scope is empty, error out.
 
 ## Review methodology
 
-**If scope has 1–4 skills:** review them directly in the main context. Skip subagents — the parallel overhead isn't worth it for a small batch.
+**One subagent per skill.** Each skill gets its own dedicated reviewer subagent with full context. This prevents reviewers from rushing through later skills as their context fills up, and ensures every skill gets the same depth of attention whether it's the 1st or the 24th.
 
-**If scope has 5+ skills:** spawn parallel subagents so each reviewer holds only its slice plus the shared context. Spawn all subagents in a single message (multiple Agent tool calls in parallel), `subagent_type=general-purpose`.
+**If scope has 1–3 skills:** review them directly in the main context. Skip subagents — the overhead isn't worth it for a tiny batch.
 
-### Grouping rule
+**If scope has 4+ skills:** spawn one subagent per skill, all in parallel (multiple Agent tool calls in a single message), `subagent_type=general-purpose`, `model=sonnet`. Yes, this means 24 parallel subagents for a full review. That's fine — thoroughness matters more than speed. The command is expected to be long-running.
 
-Group skills so each subagent gets ~3 skills (4 max), biased toward domain cohesion so the reviewer only needs one or two feature files per group. Adjust groups to whatever the in-scope set actually contains. When all 15 skills are in scope, a natural grouping is:
-
-- Email/inbox: triage, process, draft-replies
-- Meetings: prep-meeting, process-meeting, calendar
-- Capture & drafts: capture, park, draft
-- Reflection: brief, review, wrap-up, self-track
-- Cross-cutting: sync, learn
+**Batch spawning limit:** If the number of skills exceeds what you can spawn in a single message, spawn them in batches. Wait for each batch to complete before spawning the next. Each batch should be as large as possible.
 
 ### Subagent task prompt
 
-Pass each subagent this exact prompt, substituting the skill list:
+Pass each subagent this exact prompt, substituting the skill path:
 
 ---
 
-Read-only quality review of Myna skill files. Do not edit anything. Return a structured findings report only.
+You are reviewing and fixing ONE Claude Code skill file. These are `SKILL.md` files with YAML frontmatter that Claude Code loads as persistent prompts.
 
-**Read for context first:**
+**Skill to review and fix:** {SKILL_PATH}
+
+Follow these steps IN ORDER. Do not skip any step.
+
+---
+
+**STEP 1: Read context files.**
+
+Read ALL of these before touching the skill:
 - `CLAUDE.md`
-- `agents/steering/*.md` — all four steering files
-- `docs/architecture.md` — skills section for the feature-to-skill mapping
-- `docs/design/foundations.md` — skills section and canonical shared-destination templates
-- `docs/features/{domain}.md` — only the feature files relevant to the skills you're reviewing
-- `docs/decisions.md` — skim for deferred features and any decisions affecting skills in your group
-
-**Skills to review:** {LIST}
-
-**Review criteria (evaluate each skill against all of these):**
-
-1. **Feature completeness** — The skill has executable steps for every feature assigned to it per architecture.md's "Features covered:" line. Cross-reference sub-features from `docs/features/*.md`. "Mentioned" is not enough — the procedure must tell Claude what to read, decide, and write.
-
-2. **Instruction clarity** — Claude can execute every step without guessing. No vague verbs ("determine the appropriate…", "handle this case"). Every branch has a decision criterion. No ambiguous pronouns.
-
-3. **Conciseness (Golden Rule)** — Every instruction line earns its place. Test: "Would Claude produce the same output without this line?" Lines teaching Claude to summarize, parse natural language, format markdown, or write professionally are violations. Lines specifying WHERE to read/write, WHEN to choose between options, and what NOT to do earn their place.
-
-4. **Correctness** — The procedure actually produces the right vault state. Read paths are correct. Write paths match canonical templates in foundations.md. File names, section names, and field names are accurate. Config field references are spelled correctly.
-
-5. **Cross-skill consistency** — Skills writing to the same vault destinations produce identical formatting. Check against foundations.md canonical templates. Key shared destinations: project timelines, person observations, contributions log, task TODOs, review queue entries, daily notes.
-
-6. **Safety** — Draft-never-send enforced (no path leads to sending). Vault-only writes (nothing outside the configured vault). No automatic skill chaining. Calendar three-layer protection. External content framed with delimiters before being passed to reasoning. Confirmation for bulk writes.
-
-7. **Edge cases** — First run (empty vault, no daily note, no person/project files). Missing referenced files. Ambiguous entity resolution (two people with the same first name). Empty MCP results. Bulk operations (5+ items). Re-run behavior (idempotent where it should be).
-
-8. **Output usefulness** — Would the skill's output genuinely help a tech professional manage their day? Specific and actionable, with counts, file links, and next-step framing? Or generic, verbose, and unhelpful? Check against `agents/steering/output.md` voice rules.
-
-**For each skill, produce:**
-
-```
-### {skill}.md
-
-Verdict: keep | trim | restructure | rework | incomplete
-Current line count: {N}
-Owning features: {list from architecture.md}
-
-Findings:
-1. [Completeness | Clarity | Conciseness | Correctness | Consistency | Safety | EdgeCase | Output] ({Critical|Important|Minor}) — {one-line issue} (lines X-Y)
-   Quoted text: "{the specific problem text}"
-   Grounded in: {steering file, feature spec, foundations template, or concrete reasoning}
-   Fix: {concrete change — specific enough that another Claude could implement it}
-2. ...
-
-Strengths: {1-2 bullets — patterns working well that must not regress}
-```
-
-**Then a cross-cutting section for the group:**
-
-- Rules duplicated across skills in this group that should move up to `agents/steering/*`
-- Shared-destination format drift (skills writing the same vault location in different formats)
-- Skills with overlapping responsibilities that need clarification
-- Template drift — where a skill invents its own structure instead of matching the rest
-
-**Rules for findings:**
-
-- Every finding must quote the specific problem text and cite concrete line numbers.
-- Every finding must be grounded in a steering file reference, a feature spec reference, a foundations template, or concrete reasoning. Vague criticism like "feels wordy" or "could be clearer" is not acceptable.
-- Do not propose features beyond v1 scope. Check `docs/decisions.md` for what's deferred.
-- Do not re-raise issues a previous cycle pushed back on.
-- If a skill is solid, say so in Strengths. Don't manufacture findings to appear thorough.
-- Calibrate severity honestly:
-  - **Critical** — breaks functionality, violates safety, corrupts vault data, feature completely missing
-  - **Important** — degrades quality significantly, Claude would struggle with the procedure, sub-feature missing
-  - **Minor** — polish, wording improvement, Golden Rule violation, slight inconsistency with no functional impact
-
-Return only the structured report. Do not edit files.
+- `agents/skills/myna-steering-*/SKILL.md` — all six steering skills
+- `docs/architecture.md` — find this skill's "Features covered:" line
+- `docs/design/foundations.md` — skills section, canonical vault templates
+- `docs/features/{domain}.md` — the feature file(s) for this skill (check architecture.md for the mapping)
+- `docs/decisions.md` — note deferred features so you don't add them
 
 ---
 
-## Consolidate findings
+**STEP 2: Read the skill file in full.** Read it top to bottom. Note the line count.
 
-After subagents return (or after a direct review), write the consolidated report to `docs/reviews/skills-polish-{NNN}.md`.
+---
 
-Cycle number: highest existing `skills-polish-*.md` + 1, starting at `001`. Create `docs/reviews/` if it doesn't exist.
+**STEP 3: Evaluate against each criterion below.** Go through them one by one. For each, write down your findings before moving to the next. Do not skip criteria even if the skill looks fine — write "no issues" for that criterion.
 
-**Report structure:**
+**Criterion 1 — Frontmatter correctness.** Valid YAML between `---` markers. Check each field:
+- `name:` — lowercase, hyphens only, matches directory name, max 64 chars
+- `description:` — present, under 250 chars, front-loads the use case, includes trigger keywords, differentiates from sibling skills
+- `user-invocable:` — `true` for user-facing, `false` for background/steering
+- `argument-hint:` — present for user-invocable skills, shows example syntax
+- No unknown fields. Valid fields: `name`, `description`, `user-invocable`, `argument-hint`, `disable-model-invocation`, `allowed-tools`, `model`, `effort`, `context`, `agent`, `paths`, `shell`, `hooks`
+- No missing fields (e.g., should it have `allowed-tools` for MCP operations?)
+
+**Criterion 2 — Instruction clarity.** Can Claude execute every step without guessing?
+- No vague verbs ("determine the appropriate…", "handle this case")
+- Every branch has a concrete decision criterion
+- No ambiguous pronouns ("update it" — what is "it"?)
+- File paths are specific (`_system/config/workspace.yaml`, not "the config file")
+- MCP tool usage is explicit (which MCP, what operation)
+- Instructions that contradict each other across sections
+- Steps that say "if X, do Y" without defining how to detect X
+- Implicit assumptions (assumes a config field exists without fallback)
+
+**Criterion 3 — Structure and conciseness.** Does the file work well as a Claude Code skill?
+- Most important constraints front-loaded, not buried at line 300+
+- Standing rules separated from sequential steps
+- Numbered lists for workflows, bullets for rules
+- Decision/trigger tables for multi-mode skills (verify correctness)
+- Worked examples present for complex procedures
+- File under 500 lines (flag sections that are bloated):
+  - Worked examples longer than the procedure they illustrate
+  - Edge cases Claude would handle by default
+  - Repeated explanations across sections
+  - "What this skill does NOT do" that restates the description
+- Golden Rule: would Claude produce the same output without this line? If yes, delete it.
+
+**Criterion 4 — Feature completeness.** Cross-reference architecture.md "Features covered:" with `docs/features/*.md`:
+- Does the skill have executable steps for every assigned feature?
+- "Mentioned" is not enough — the procedure must tell Claude what to read, decide, and write
+
+**Criterion 5 — Correctness.** Does the procedure produce the right vault state?
+- Read/write paths match canonical templates in foundations.md
+- File names, section names, field names are accurate
+- Config field references spelled correctly
+- Frontmatter templates match canonical format
+- Shared destination formatting matches other skills (check foundations.md)
+
+**Criterion 6 — Safety.** Check all of these:
+- Draft-never-send: no code path leads to sending/posting anything
+- Vault-only writes: nothing outside the configured vault path
+- No automatic skill chaining
+- Calendar three-layer protection (if applicable)
+- External content wrapped in safety delimiters before reasoning
+- Confirmation for bulk writes (5+ files)
+- No overly permissive tool declarations
+
+**Criterion 7 — Edge cases.** Are these handled?
+- First run (empty vault, no daily note, no person/project files)
+- Missing referenced files
+- Ambiguous entity resolution (two people with same name)
+- Empty MCP results
+- Bulk operations (5+ items)
+- Re-run idempotency
+- Missing config or disabled feature toggle
+
+**Criterion 8 — Output usefulness.** Check against `agents/skills/myna-steering-output/SKILL.md`:
+- Output is specific and actionable (counts, file links, next steps)
+- Not generic or verbose
+- User can figure out how to invoke the skill from description + argument-hint alone
+
+**Criterion 9 — Duplication with steering.** Compare against the six steering skills:
+- Flag any rules that duplicate what a steering skill already covers (cite which one)
+- These duplicates should be removed from the feature skill
+
+---
+
+**STEP 4: Fix every issue you found.**
+
+Work in priority order: Critical → Important → Minor. For each fix:
+1. Edit the skill file using the Edit tool.
+2. Re-read the changed section to verify it reads naturally.
+3. If you touched frontmatter, verify YAML is still valid.
+
+**Do NOT fix** (flag in your report instead):
+- Issues that would add features not in architecture.md's assignment for this skill
+- Deferred features from decisions.md
+- Rules that should be promoted to steering (note which steering skill)
+- Issues where the right fix is genuinely unclear
+
+---
+
+**STEP 5: Re-read the full skill file** after all edits. Verify it still makes sense as a whole. Note the new line count.
+
+---
+
+**STEP 6: Return your report** in this exact format:
 
 ```
-# Myna Skills Polish — Cycle {NNN}
+### {skill-directory-name}/SKILL.md
 
-**Date:** {YYYY-MM-DD}
-**Scope:** {description of what was reviewed}
-**Files reviewed:** {list}
+Lines: {old} → {new}
+Verdict: keep | trim | restructure | rework
 
-## Summary
+**Frontmatter:** {ok | list specific issues}
 
-| Skill | Current lines | Verdict | Critical | Important | Minor |
-|---|---|---|---|---|---|
-| ... |
+**Holistic assessment:**
+- Length: {right-sized | too long by ~N lines | too short}
+- Bloat spots: {line ranges, or "none"}
+- Ambiguity/contradiction spots: {line ranges, or "none"}
+- Structure: {well-organized | needs reorg — explain}
 
-Convergence: {CONVERGED (0 Critical + 0 Important) | CONTINUE — {n} blocking issues}
+**Findings:**
+1. [{criterion number}] ({Critical|Important|Minor}) **FIXED** — {one-line issue}
+   Was: "{original text}" (line N)
+   Now: "{new text or description of change}"
+2. [{criterion number}] ({Critical|Important|Minor}) **FLAGGED** — {one-line issue}
+   Text: "{problem text}" (line N)
+   Reason not fixed: {why}
+3. ...
 
-## Per-skill findings
+**Strengths:** {1-2 bullets}
 
-### {skill}.md
-{normalized findings from subagent reports — one block per skill, with issue IDs assigned by the consolidator: [C01], [I01], [M01]}
-
-## Cross-cutting patterns
-
-{patterns surfaced by multiple subagents — duplication, shared-destination drift, overlap, template drift}
-
-## Candidate promotions to steering
-
-{rules duplicated across skills that should move to agents/steering/*. Do not apply these in the fix phase — surface as a separate proposal for the user to approve separately.}
+**Cross-cutting notes:**
+- Steering duplicates: {list, or "none"}
+- Shared-destination drift: {list, or "none"}
+- Overlap with other skills: {list, or "none"}
 ```
 
-If two subagents disagree about the same skill, surface the disagreement in the consolidated report rather than silently picking one.
+**Rules:**
+- Quote specific text and cite original line numbers (before your edits)
+- Ground every finding in a concrete reference (steering skill, feature spec, foundations template, Claude Code best practice)
+- No vague criticism ("feels wordy"). Cite what's wrong and why.
+- Don't manufacture findings. If the skill is solid, say so.
+- Severity: **Critical** = breaks functionality, safety violation, skill undiscoverable. **Important** = Claude would struggle, sub-feature missing, significant bloat. **Minor** = polish, Golden Rule, slight inconsistency.
 
-## Approval gate
+---
 
-Do not apply fixes automatically. After saving the report:
+## After subagents complete
 
-1. Print the report path and the summary table.
-2. Print the top 3–5 most impactful findings inline (Critical first, then Important).
-3. Ask the user: "Approve all findings, approve a subset by ID, or skip to manual review?"
-4. Wait for the user's decision before editing any files.
+1. **Cross-skill consistency check.** Read every modified skill file. Check that skills writing to the same vault destinations still produce identical formatting. Fix any inconsistencies introduced by subagent edits.
 
-## Fix phase
+2. **Write the report** to `docs/reviews/skills-polish-{NNN}.md`. Cycle number: highest existing `skills-polish-*.md` + 1, starting at `001`. Create `docs/reviews/` if needed.
 
-Once the user has approved a fix list:
+   Report format:
+   ```
+   # Myna Skills Polish — Cycle {NNN}
 
-1. For each approved finding, in order (Critical → Important → Minor):
-   a. Read the affected skill file IN FULL.
-   b. Apply the concrete fix from the finding.
-   c. Re-read the changed section in context to verify it still reads naturally and doesn't contradict adjacent sections.
-   d. **Scope guardrail:** verify the fix is in scope for this command — one of the 8 review dimensions above. If the fix would add a feature not assigned to this skill in architecture.md, revert and flag it. If the fix would add a deferred feature, revert and flag it.
-   e. **Consistency check:** if the fix touches a shared vault destination, verify other skills writing to the same destination still match. If not, either widen the fix or flag the consistency issue for a separate pass.
-   f. Record old and new line count, and a one-line summary of what changed.
+   **Date:** {YYYY-MM-DD}
+   **Scope:** {what was reviewed}
+   **Skills reviewed:** {count}
 
-2. After all fixes are applied:
-   a. Run `bash scripts/lint-agents.sh`. If it fails, investigate and fix the root cause before finishing.
-   b. Re-read every modified file in full one more time for a final sanity check.
+   ## Summary
 
-## Commit
+   | Skill | Before | After | Fixed | Flagged | Verdict |
+   |---|---|---|---|---|---|
+   | {name} | {old lines} | {new lines} | {n} | {n} | {verdict} |
 
-Stage only the files modified during this run (skill files and the review report). Do not stage unrelated files.
+   Total: {fixed} fixed, {flagged} flagged across {n} skills
 
-Commit message format:
-```
-fix(agents): skills polish — {n} issues fixed across {n} skills
-```
+   ## Per-skill details
 
-Do not add Co-Authored-By lines.
+   {each subagent's report, consolidated}
 
-## Output
+   ## Flagged issues (need human decision)
 
-After committing, print:
+   {all FLAGGED items, grouped by reason}
+   ```
 
-```
-Myna Skills Polish — Cycle {NNN} complete
+3. **Lint check.** Run `bash scripts/lint-agents-1.sh` if it exists. Fix failures.
 
-Report: docs/reviews/skills-polish-{NNN}.md
-Lint: pass | fail
+4. **Commit.** Stage all modified skill files and the report file. One commit for the entire review+fix run:
+   ```
+   fix(agents): skills polish cycle {NNN} — {n} issues fixed across {n} skills
+   ```
+   Do not add Co-Authored-By lines.
 
-Issues addressed:
-- Critical: {fixed}/{found}
-- Important: {fixed}/{found}
-- Minor: {fixed}/{found}
+5. **Print summary** to the user:
+   ```
+   Myna Skills Polish — Cycle {NNN} complete
+   Report: docs/reviews/skills-polish-{NNN}.md
 
-Skills modified:
-- {skill}: {old lines} → {new lines} — {one-line summary of changes}
-- ...
-```
+   {fixed} issues fixed across {n} skills
+   {flagged} issues flagged for human review
 
-If any findings were flagged as out-of-scope during the fix phase, list them so the user knows what still needs attention.
+   Skills modified:
+   - {skill}: {old lines} → {new lines}
+   ```
 
 ## Rules
 
-- Skills only. Do not touch `agents/steering/*` or `agents/main.md` during the fix phase. If the review surfaces a steering or main-agent issue, list it under "Candidate promotions to steering" and leave it for the user.
-- Trust steering files. If a rule is already in `agents/steering/*`, flag duplicates in skills for removal rather than leaving both in place.
-- Golden Rule test for every candidate deletion: would Claude produce the same behavior without this line? If yes, it earns deletion. If no, it stays.
-- Never re-raise findings the user pushed back on in a previous `skills-polish-*.md` cycle without new evidence.
-- Do not invent new conventions during the fix phase. Match whatever the rest of the skills are doing.
-- Do not propose features beyond v1 scope. Check `docs/decisions.md` for what's deferred.
-- If the in-scope set is 1–4 skills, skip subagents entirely — review directly.
+- Do not touch steering skills unless `--include-steering` was passed. Flag steering issues instead.
+- If a rule duplicates a steering skill, remove it from the feature skill.
+- Golden Rule: would Claude behave the same without this line? If yes, delete it.
+- Do not invent new conventions. Match existing patterns.
+- Do not add features beyond v1 scope (check decisions.md).
+- If scope is 1–3 skills, skip subagents — review and fix directly.
