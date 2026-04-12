@@ -994,31 +994,42 @@ Approved items are written to destinations with [Verified] tag, removed from the
 
 ## 7. Myna Obsidian MCP Tool Surface
 
-The Myna Obsidian MCP wraps the Obsidian CLI to provide structured vault operations. Skills reference these tools by name. The MCP server implementation lives in `agents/mcp/myna-obsidian/`.
+The Myna Obsidian MCP wraps the Obsidian CLI to provide Obsidian-specific vault operations. The MCP server implementation lives in `agents/mcp/myna-obsidian/`.
 
-### 7.0 Vault Operations
+### 7.0 File I/O: Built-in Tools vs Obsidian MCP
 
-| Tool | Purpose | Used by |
-|------|---------|---------|
-| read | Read a file's full content or a specific section (by heading) | All skills |
-| append | Append content to the end of a file, or after a specific heading | myna-process-messages, myna-capture, myna-wrap-up, myna-self-track, myna-sync (end-of-day), all skills that add entries |
-| prepend | Prepend content to a file or section. Used for newest-first ordering | myna-sync (daily note re-run snapshots) |
-| write | Create a new file with content. Fails if file already exists — use append/prepend for existing files | myna-sync (new daily/weekly notes), main agent (new project/person files), myna-draft, myna-park |
-| overwrite-section | Replace a specific section's content by heading. For structured metadata sections only | myna-process-review-queue (clearing processed items) |
-| move | Move or rename a file within the vault | Journal auto-archiving (myna-sync moves old notes to Archive/) |
-| delete | Delete a file (restricted to `myna/` subfolder). Used sparingly | main agent (draft deletion) |
-| search | Vault-wide full-text search using Obsidian's index. Returns file paths and matching lines | myna-brief-*, main agent (vault search, link find) |
-| tags | List all tags in the vault or find files with a specific tag | myna-brief-*, auto-tagging verification |
-| backlinks | List all files that link to a given file | myna-brief-* (person/project context discovery) |
-| property_read | Read a YAML frontmatter property from a file | All skills that check frontmatter (meeting type, draft state) |
-| property_set | Set a YAML frontmatter property on a file | Task completion (marking TODOs done), review-status updates |
-| tasks | Query tasks via Obsidian Tasks plugin — filter by status, project, type, due date | myna-sync (open/overdue tasks), myna-brief-* (queries), myna-calendar (task data), myna-wrap-up |
-| create-from-template | Create a note from an `_system/templates/` template file, substituting variables | main agent (new project/person files), myna-sync (daily/weekly notes) |
-| eval | Run a Dataview query or JavaScript expression against the vault | myna-brief-* (complex queries), dashboard generation |
+Skills use **Claude Code's built-in tools for plain file I/O** — reading, writing, editing, searching, and finding files. The Obsidian MCP is reserved for operations that require Obsidian-specific features (Tasks plugin queries, indexed search, template substitution, Dataview, backlinks, tags).
 
-**All write operations** (`append`, `prepend`, `write`, `overwrite-section`, `move`, `delete`) are restricted to paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes) at the tool level.
+**Why:** Built-in tools are faster (no MCP roundtrip), simpler (no server dependency), and improve graceful degradation — basic vault operations work even when Obsidian isn't running.
 
-**Fallback:** When Obsidian isn't running, the MCP server falls back to direct file I/O. `search` falls back to text search. `tasks` falls back to regex matching of TODO syntax. `backlinks` and `tags` fall back to scanning wiki-link and tag patterns. `create-from-template` falls back to copying template content with variable substitution. `eval` is unavailable in fallback mode — skills that use it degrade gracefully.
+**Built-in tools for file I/O:**
+
+| Claude Code Tool | Replaces MCP tool | Purpose |
+|-----------------|-------------------|---------|
+| Read | `read` | Read any vault file |
+| Write | `write` | Create or overwrite a vault file |
+| Edit | `append`, `prepend`, `overwrite-section` | Append to, prepend to, or modify sections of a vault file |
+| Grep | (partial `search`) | Search file contents for patterns — near-duplicate detection, finding entries |
+| Glob | — | Find files by name pattern |
+
+**Obsidian MCP tools (used only for Obsidian-specific features):**
+
+| MCP Tool | Purpose | Why MCP is needed |
+|----------|---------|-------------------|
+| search | Vault-wide search using Obsidian's index | Metadata-aware, faster on large vaults than grep |
+| tasks | Query tasks via Obsidian Tasks plugin | Aggregates across files, understands task metadata, recurrence, completion state |
+| create-from-template | Create notes from `_system/templates/` with variable substitution | Uses Obsidian's template engine |
+| eval | Run Dataview queries or JavaScript expressions | Requires Obsidian's JavaScript engine |
+| backlinks | List files linking to a given file | Requires Obsidian's link graph |
+| tags | List tags or find files with a specific tag | Requires Obsidian's tag index |
+| move | Move or rename a file within the vault | Obsidian updates internal links automatically |
+| delete | Delete a file (restricted to `myna/` subfolder) | Obsidian updates backlinks on deletion |
+| property_read | Read a YAML frontmatter property | Obsidian's structured property access |
+| property_set | Set a YAML frontmatter property | Obsidian's structured property access |
+
+**Vault-only writes:** All write operations — whether via built-in tools or MCP — must target paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes). The steering safety rules enforce this at the instruction level; the MCP enforces it at the tool level for MCP operations.
+
+**Fallback:** When Obsidian isn't running, the MCP server falls back to direct file I/O for tools that support it. `search` falls back to text search. `tasks` falls back to regex matching of TODO syntax. `backlinks` and `tags` fall back to scanning wiki-link and tag patterns. `create-from-template` falls back to copying template content with variable substitution. `eval` is unavailable in fallback mode — skills that use it degrade gracefully. Built-in tool operations are unaffected since they don't depend on Obsidian.
 
 ### 7.1 External MCP Operations
 

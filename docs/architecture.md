@@ -786,6 +786,33 @@ Myna does NOT build MCPs for email, Slack, or calendar (D005). It connects to wh
 
 All MCP servers — both myna-obsidian and external ones — are registered with Claude Code via `claude mcp add`. MCP server names are configured in workspace.yaml so skills know which tool names to call. Skills call MCP tools directly by name (e.g., the tool names from the user's email MCP server). The `mcp_servers` map in workspace.yaml records the server names for reference.
 
+### MCP vs Built-in Tools
+
+Skills use Claude Code's **built-in tools for plain file I/O** — not the Obsidian MCP. The Obsidian MCP is reserved for operations that require Obsidian-specific features.
+
+**Use Claude Code built-in tools:**
+
+| Tool | For |
+|------|-----|
+| Read | Reading any vault file |
+| Write | Creating or overwriting vault files |
+| Edit | Appending to or modifying vault files |
+| Grep | Searching file contents (e.g., near-duplicate detection) |
+| Glob | Finding files by name pattern |
+
+**Use Obsidian MCP only for:**
+
+| MCP Tool | Why it can't be done with built-in tools |
+|----------|------------------------------------------|
+| `tasks` | Queries the Tasks plugin — aggregates across files, understands task metadata, recurrence, completion state |
+| `search` | Uses Obsidian's index — metadata-aware, faster on large vaults than grep |
+| `create_from_template` | Uses Obsidian's template system with variable substitution |
+| `eval` | Runs Dataview queries via Obsidian's JavaScript engine |
+| `backlinks` | Queries Obsidian's link graph |
+| `tags` | Queries Obsidian's tag index |
+
+**Why:** Built-in tools are faster (no MCP roundtrip), simpler (no server dependency), and improve graceful degradation — basic vault operations work even when Obsidian isn't running.
+
 ---
 
 ## 7. Feature Toggles
