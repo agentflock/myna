@@ -88,39 +88,49 @@ done
 [ "$c1" -eq 0 ] && pass "All artifacts self-contained"
 
 # ══════════════════════════════════════════════════════════════
-# 2. REQUIRED SKILL SECTIONS
-#    Every feature skill must have: Purpose, Triggers, Inputs,
-#    Procedure, Output, Rules
+# 2. SKILL STRUCTURE
+#    Every feature skill must have: YAML frontmatter (checked
+#    in §7), at least 3 H2 sections, and 50+ lines of content.
+#    Section names are free-form — skills choose their own
+#    structure. H1 heading is optional.
 # ══════════════════════════════════════════════════════════════
-header "2. Required skill sections"
-
-required_sections=("Purpose" "Triggers" "Inputs" "Procedure" "Output" "Rules")
+header "2. Skill structure"
 
 for f in "${feature_files[@]}"; do
   name="$(basename "$(dirname "$f")")"
-  missing=()
-  for section in "${required_sections[@]}"; do
-    grep -q "^## ${section}" "$f" || missing+=("$section")
-  done
-  if [ ${#missing[@]} -eq 0 ]; then
+  issues=()
+
+  # At least 3 H2 sections (minimal structure)
+  h2_count=$(grep -c '^## ' "$f" 2>/dev/null) || h2_count=0
+  [ "$h2_count" -lt 3 ] && issues+=("only ${h2_count} H2 sections (need ≥3)")
+
+  # Minimum 50 lines of content (frontmatter + body)
+  line_count=$(wc -l < "$f" | tr -d ' ')
+  [ "$line_count" -lt 50 ] && issues+=("only ${line_count} lines (need ≥50)")
+
+  if [ ${#issues[@]} -eq 0 ]; then
     pass "$name"
   else
-    fail "$name: missing — ${missing[*]}"
+    fail "$name: ${issues[*]}"
   fi
 done
 
 # ══════════════════════════════════════════════════════════════
 # 3. WORKED EXAMPLES
-#    Every feature skill must have at least one worked example.
+#    Every feature skill must have at least one worked example
+#    — either as a dedicated section heading or inline content.
 # ══════════════════════════════════════════════════════════════
 header "3. Worked examples"
 
 for f in "${feature_files[@]}"; do
   name="$(basename "$(dirname "$f")")"
+  # Check for Example/Worked heading OR inline example patterns
   if grep -qE '^##+ .*(Example|Worked)' "$f"; then
     pass "$name"
+  elif grep -qE '(User says|User:|Example:|→)' "$f"; then
+    pass "$name"
   else
-    fail "$name: no worked example section"
+    fail "$name: no worked example section or inline examples"
   fi
 done
 

@@ -161,7 +161,7 @@ All review commands use a 4-level severity model. Issue IDs are severity-prefixe
 
 | Severity | Code | Definition | Examples |
 |----------|------|------------|---------|
-| Critical | `[C01]` | Breaks functionality, safety violation, skill undiscoverable | Draft-never-send violated, description over 250 chars with no useful content, required SKILL.md section missing |
+| Critical | `[C01]` | Breaks functionality, safety violation, skill undiscoverable | Draft-never-send violated, description over 250 chars with no useful content, skill has fewer than 3 H2 sections or under 50 lines |
 | Important | `[I01]` | Claude would struggle or produce wrong output | Sub-feature with no executable steps, significant format drift from foundations.md, vague instruction with no decision criterion |
 | Minor | `[M01]` | Polish issue, no functional impact | Golden Rule violation (line Claude would follow by default), slight inconsistency, missing `argument-hint` |
 | Nitpick | `[N01]` | Cosmetic only | Style preference, extra space, slightly different example phrasing |
@@ -270,4 +270,4 @@ Default mode evaluates each issue against project context and can push back with
 
 `scripts/lint-agents.sh` is not a Claude Code command — it's a bash script that runs fast deterministic checks. `/myna-improve` runs it in Phase 0 and will not proceed to review cycles until lint passes. The manual pipeline expects the user to run lint first. `/myna-review`, `/myna-fix`, and `/myna-verify` each run lint at the end and record the result in their reports, but they don't block on lint failures.
 
-Lint checks that shipped artifacts are self-contained (no references to `foundations.md`, `architecture.md`, `decisions.md`, `docs/` paths, or decision IDs that don't exist at runtime), structurally complete (required SKILL.md sections, worked examples, frontmatter), and free of ambiguous safety keywords.
+Lint checks that shipped artifacts are self-contained (no references to `foundations.md`, `architecture.md`, `decisions.md`, `docs/` paths, or decision IDs that don't exist at runtime), structurally complete (minimum H2 sections, worked examples, frontmatter), and free of ambiguous safety keywords.

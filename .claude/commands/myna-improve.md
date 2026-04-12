@@ -60,7 +60,7 @@ Read the full output. The script exits non-zero if there are any FAIL items.
 For each FAIL item, go to the flagged file and fix the specific issue. Lint checks are mechanical — fixes are also mechanical. The checks are:
 
 1. **Self-containment:** No references to `foundations.md`, `architecture.md`, `decisions.md`, `docs/` paths, or decision IDs (`D001`–`D999`) in shipped artifacts. Remove or rewrite any such references — these docs don't exist at runtime.
-2. **Skill structure:** Every feature skill must have an H1 heading, at least 3 H2 sections, and 50+ lines of content. Section names are free-form — skills choose their own structure.
+2. **Skill structure:** Every feature skill must have at least 3 H2 sections and 50+ lines of content. Section names are free-form — skills choose their own structure. H1 heading is optional.
 3. **Worked examples:** Every feature skill must have either a heading containing "Example" or "Worked", or inline example content (patterns like "User says", "User:", "Example:", "→"). Add examples if missing.
 4. **Skill directory cross-reference:** Every skill listed in `agents/main.md`'s skill table must have a matching `agents/skills/{name}/SKILL.md`. Every skill directory must be listed in `agents/main.md`. Fix the gap in whichever direction is correct.
 5. **Steering skills:** All six `myna-steering-{safety,conventions,output,system,memory,vault-ops}/SKILL.md` files must exist. If missing, this is a structural problem — flag it rather than creating empty stubs.
@@ -324,7 +324,7 @@ Read `docs/reviews/fix-{NNN}.md`. For every item marked "Fixed":
 
 **Regression check:** For every skill that was modified in the Fix phase:
 - Confirm frontmatter is still valid YAML
-- Confirm skill structure is intact (H1 heading, at least 3 H2 sections, 50+ lines)
+- Confirm skill structure is intact (at least 3 H2 sections, 50+ lines)
 - Confirm no safety rules were accidentally removed or weakened
 - Confirm vault path patterns still match foundations.md
 
