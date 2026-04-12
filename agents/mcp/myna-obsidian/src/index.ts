@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Myna Obsidian CLI MCP Server
+ * Myna Obsidian MCP Server
  *
- * A thin MCP wrapper around the Obsidian CLI (`obsidian` command).
+ * Myna's vault interface — wraps the Obsidian CLI (`obsidian` command).
  * Each tool shells out to the corresponding CLI command via child_process.execFile.
  *
  * Prerequisites:
@@ -99,7 +99,7 @@ function ok(data: unknown): { content: Array<{ type: "text"; text: string }> } {
 // ---------------------------------------------------------------------------
 
 const server = new McpServer({
-  name: "obsidian-cli",
+  name: "myna-obsidian",
   version: "0.1.0",
 });
 

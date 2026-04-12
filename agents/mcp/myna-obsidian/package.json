@@ -1,7 +1,7 @@
 {
-  "name": "@myna/obsidian-cli-mcp",
+  "name": "@myna/obsidian-mcp",
   "version": "0.1.0",
-  "description": "MCP server wrapping the Obsidian CLI for vault operations",
+  "description": "MCP server for Myna's Obsidian vault operations",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
