@@ -101,7 +101,7 @@ User: "approve and assign to me"
 
 Write to `Projects/auth-migration.md`:
 ```
-- [x] Verify Platform team confirmed Mar 15 deadline 📅 2026-04-10 [project:: Auth Migration] [type:: task] [person:: {user.name}] [Verified] (review-work, Apr 5)
+- [ ] Verify Platform team confirmed Mar 15 deadline 📅 2026-04-10 [project:: Auth Migration] [type:: task] [person:: {user.name}] [Verified] (was Inferred, verified 2026-04-05)
 ```
 
 Continue to item 2.
