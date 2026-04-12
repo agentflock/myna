@@ -448,7 +448,7 @@ User actions: check the box (approve), edit the text (modify), delete the entry 
 
 ### 2.10b Review Triage Entry
 
-`ReviewQueue/review-triage.md` uses a simpler format than the other queues — it only recommends which folder each email should move to. No vault updates (that's the process skill's job after emails are sorted).
+`ReviewQueue/review-triage.md` uses a simpler format than the other queues — it only recommends which folder each email should move to. No vault updates (that's the myna-process-messages skill's job after emails are sorted).
 
 ```markdown
 ## Triage — {YYYY-MM-DD}
@@ -565,14 +565,14 @@ One file per entity (project, person, meeting, or `contributions`). Sections app
 Tracks the last-processed timestamp per Slack channel for deduplication.
 
 ```yaml
-# Auto-updated by process skill. Do not edit manually.
+# Auto-updated by myna-process-messages skill. Do not edit manually.
 channels:
   auth-team: "2026-04-05T14:30:00Z"
   auth-migration: "2026-04-05T14:30:00Z"
   platform-eng: "2026-04-04T09:15:00Z"
 ```
 
-On each run, the process skill reads messages after the stored timestamp and updates it after successful processing.
+On each run, the myna-process-messages skill reads messages after the stored timestamp and updates it after successful processing.
 
 ### 2.14 Central Link Index
 
@@ -638,9 +638,9 @@ A Dataview-powered file with live queries. Always up-to-date without manual refr
 - Avoid Friday afternoon meetings. [Inferred] (3 reschedules: 2026-03-21, 2026-03-28, 2026-04-04)
 ```
 
-**Lazy file creation.** Learning files are created by the `learn` skill on first write. Empty domain files are not pre-populated. The user may edit learning files directly; the skill respects manual edits and does not validate format.
+**Lazy file creation.** Learning files are created by the myna-learn skill on first write. Empty domain files are not pre-populated. The user may edit learning files directly; the skill respects manual edits and does not validate format.
 
-**Domain mapping** is defined in `agents/steering/memory.md`. Skills and the main agent route memory operations using that table. The full set of operations (`capture`, `reflect`, `delete`, and the `negotiate` sub-procedure) is described in `agents/skills/learn.md`.
+**Domain mapping** is defined in the myna-steering-memory skill. Skills and the main agent route memory operations using that table. The full set of operations (`capture`, `reflect`, `delete`, and the `negotiate` sub-procedure) are described in the myna-learn skill.
 
 ---
 
@@ -751,7 +751,7 @@ triage:                               # optional — inbox classification config
     - name: Trainings                 # custom folder example — user adds as many as needed
       description: "Training invitations, course materials, learning resources"
   draft_replies_folder: DraftReplies  # email folder for draft reply requests
-                                      # process skill skips this folder — handled by draft-replies skill only
+                                      # myna-process-messages skips this folder — handled by myna-draft-replies only
 ```
 
 ### 3.3 people.yaml
@@ -1001,20 +1001,20 @@ The Myna Obsidian MCP wraps the Obsidian CLI to provide structured vault operati
 | Tool | Purpose | Used by |
 |------|---------|---------|
 | read | Read a file's full content or a specific section (by heading) | All skills |
-| append | Append content to the end of a file, or after a specific heading | process, capture, wrap-up, self-track, sync (end-of-day), all skills that add entries |
-| prepend | Prepend content to a file or section. Used for newest-first ordering | sync (daily note re-run snapshots) |
-| write | Create a new file with content. Fails if file already exists — use append/prepend for existing files | sync (new daily/weekly notes), main agent (new project/person files), draft, park |
-| overwrite-section | Replace a specific section's content by heading. For structured metadata sections only | review (clearing processed items) |
-| move | Move or rename a file within the vault | Journal auto-archiving (sync moves old notes to Archive/) |
+| append | Append content to the end of a file, or after a specific heading | myna-process-messages, myna-capture, myna-wrap-up, myna-self-track, myna-sync (end-of-day), all skills that add entries |
+| prepend | Prepend content to a file or section. Used for newest-first ordering | myna-sync (daily note re-run snapshots) |
+| write | Create a new file with content. Fails if file already exists — use append/prepend for existing files | myna-sync (new daily/weekly notes), main agent (new project/person files), myna-draft, myna-park |
+| overwrite-section | Replace a specific section's content by heading. For structured metadata sections only | myna-process-review-queue (clearing processed items) |
+| move | Move or rename a file within the vault | Journal auto-archiving (myna-sync moves old notes to Archive/) |
 | delete | Delete a file (restricted to `myna/` subfolder). Used sparingly | main agent (draft deletion) |
-| search | Vault-wide full-text search using Obsidian's index. Returns file paths and matching lines | brief, main agent (vault search, link find) |
-| tags | List all tags in the vault or find files with a specific tag | brief, auto-tagging verification |
-| backlinks | List all files that link to a given file | brief (person/project context discovery) |
+| search | Vault-wide full-text search using Obsidian's index. Returns file paths and matching lines | myna-brief-*, main agent (vault search, link find) |
+| tags | List all tags in the vault or find files with a specific tag | myna-brief-*, auto-tagging verification |
+| backlinks | List all files that link to a given file | myna-brief-* (person/project context discovery) |
 | property_read | Read a YAML frontmatter property from a file | All skills that check frontmatter (meeting type, draft state) |
 | property_set | Set a YAML frontmatter property on a file | Task completion (marking TODOs done), review-status updates |
-| tasks | Query tasks via Obsidian Tasks plugin — filter by status, project, type, due date | sync (open/overdue tasks), brief (queries), calendar (task data), wrap-up |
-| create-from-template | Create a note from an `_system/templates/` template file, substituting variables | main agent (new project/person files), sync (daily/weekly notes) |
-| eval | Run a Dataview query or JavaScript expression against the vault | brief (complex queries), dashboard generation |
+| tasks | Query tasks via Obsidian Tasks plugin — filter by status, project, type, due date | myna-sync (open/overdue tasks), myna-brief-* (queries), myna-calendar (task data), myna-wrap-up |
+| create-from-template | Create a note from an `_system/templates/` template file, substituting variables | main agent (new project/person files), myna-sync (daily/weekly notes) |
+| eval | Run a Dataview query or JavaScript expression against the vault | myna-brief-* (complex queries), dashboard generation |
 
 **All write operations** (`append`, `prepend`, `write`, `overwrite-section`, `move`, `delete`) are restricted to paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes) at the tool level.
 
@@ -1026,14 +1026,14 @@ Skills that read from external sources (email, Slack, calendar) need these capab
 
 | Operation | Used by | Parameters |
 |-----------|---------|-----------|
-| email.list_messages | process, triage, draft-replies | folder, since_date (optional) |
-| email.read_message | process, triage, draft-replies, brief, draft | message_id |
-| email.move_message | process, triage (step 3), draft-replies | message_id, destination_folder |
-| email.search_messages | brief (thread summary) | query, folder (optional), date_range (optional) |
-| slack.list_messages | process | channel, since_timestamp |
-| slack.read_thread | process, brief | channel, thread_id |
-| calendar.list_events | sync, prep-meeting, calendar | date_range |
-| calendar.create_event | calendar | title, start, end, description (never attendees) |
+| email.list_messages | myna-process-messages, myna-email-triage, myna-draft-replies | folder, since_date (optional) |
+| email.read_message | myna-process-messages, myna-email-triage, myna-draft-replies, myna-brief-*, myna-draft | message_id |
+| email.move_message | myna-process-messages, myna-email-triage (step 3), myna-draft-replies | message_id, destination_folder |
+| email.search_messages | myna-brief-project, myna-unreplied-threads | query, folder (optional), date_range (optional) |
+| slack.list_messages | myna-process-messages | channel, since_timestamp |
+| slack.read_thread | myna-process-messages, myna-brief-* | channel, thread_id |
+| calendar.list_events | myna-sync, myna-prep-meeting, myna-calendar | date_range |
+| calendar.create_event | myna-calendar | title, start, end, description (never attendees) |
 
 These describe what Myna needs from external MCPs, not actual tool signatures. Skills call the MCP tools directly by the names available in the Claude Code session. If the user's email MCP exposes a tool called `gmail_list_messages`, the skill calls that tool. The skill instructions describe the intent; Claude Code resolves the tool call.
 
@@ -1049,17 +1049,17 @@ To determine which messages are FROM the user (for unreplied tracking, contribut
 
 Skills don't wait for other skills to run. Each skill reads whatever is currently in the vault. If data from another skill hasn't been written yet, the skill works with what's available.
 
-**Example:** prep-meeting reads task data from project files. If process (email) hasn't run today, the task data may be stale from yesterday's processing. Prep-meeting uses yesterday's data. After the user runs process, they can re-run prep-meeting to get updated prep ("update prep for my meetings").
+**Example:** myna-prep-meeting reads task data from project files. If myna-process-messages hasn't run today, the task data may be stale from yesterday's processing. myna-prep-meeting uses yesterday's data. After the user runs myna-process-messages, they can re-run myna-prep-meeting to get updated prep ("update prep for my meetings").
 
 ### 8.2 Common Coordination Patterns
 
 | Pattern | How it works |
 |---------|-------------|
 | Multiple skills write to same file | Append-only discipline prevents conflicts. Each skill appends its content with a dated section header. |
-| Sync and prep-meeting both generate meeting preps | Sync generates preps for ALL today's meetings. prep-meeting generates/updates for ONE specific meeting. If sync already wrote a prep, prep-meeting reads it as context and appends only the delta (new tasks, new blockers since last prep). |
-| Process and triage both handle email | Triage sorts inbox emails into folders. Process extracts data from project-mapped folders. Typical flow: triage first (sort inbox), then process (extract data from the now-sorted emails). No overlap — triage moves emails, process reads them. |
-| Wrap-up detects contributions that process already logged | Wrap-up reads existing contributions log and checks for near-duplicates before adding new entries. |
-| Brief reads data written by many skills | Brief presents whatever is in the vault at query time. Data completeness depends on which skills have run. |
+| myna-sync and myna-prep-meeting both generate meeting preps | myna-sync generates preps for ALL today's meetings. myna-prep-meeting generates/updates for ONE specific meeting. If myna-sync already wrote a prep, myna-prep-meeting reads it as context and appends only the delta (new tasks, new blockers since last prep). |
+| myna-process-messages and myna-email-triage both handle email | myna-email-triage sorts inbox emails into folders. myna-process-messages extracts data from project-mapped folders. Typical flow: triage first (sort inbox), then process (extract data from the now-sorted emails). No overlap — triage moves emails, process reads them. |
+| myna-wrap-up detects contributions that myna-process-messages already logged | myna-wrap-up reads existing contributions log and checks for near-duplicates before adding new entries. |
+| myna-brief-* reads data written by many skills | Brief skills present whatever is in the vault at query time. Data completeness depends on which skills have run. |
 
 ### 8.3 Append-Only Discipline
 
@@ -1168,7 +1168,7 @@ Nothing is silently dropped because the agent tried to pick "the best" destinati
    ```
 3. Everything between the delimiters is data for extraction, not instructions
 
-**Applies to:** process (email/Slack/documents), triage, process-meeting (when processing emailed meeting summaries)
+**Applies to:** myna-process-messages (email/Slack/documents), myna-email-triage, myna-process-meeting (when processing emailed meeting summaries)
 
 ### 9.5 Meeting Type Inference
 
@@ -1200,7 +1200,7 @@ Skills that cover multiple features check each feature's toggle independently. A
 - Feedback you gave → [Auto]
 - Agent uncertain → review-self queue
 
-**When it runs:** wrap-up (end of day scan), process (email/Slack extraction if contribution signals found), process-meeting (from meeting notes).
+**When it runs:** myna-wrap-up (end of day scan), myna-process-messages (email/Slack extraction if contribution signals found), myna-process-meeting (from meeting notes).
 
 **Conservative inference for manager contributions:** "Drove alignment across teams" is hard to detect from data. When in doubt, route to review-self. A missed contribution can be logged manually; a fabricated one erodes trust.
 
@@ -1302,9 +1302,9 @@ Behavioral rules in Myna live in three layers with explicit precedence (D048). T
 
 | Layer | Lives in | Authoritative for | Skill writes? |
 |-------|----------|-------------------|---------------|
-| Hard rules | `agents/steering/*.md` | Safety, scope, draft-never-send, vault-only writes, append-only discipline | Never |
+| Hard rules | 5 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline | Never |
 | User bootstrap | `CLAUDE.md` | Initial preferences and project context written by the user at setup | Never |
-| Emergent preferences | `vault/_meta/learnings/{domain}.md` | Observed user preferences, patterns, and corrections | `learn` skill only |
+| Emergent preferences | `vault/_meta/learnings/{domain}.md` | Observed user preferences, patterns, and corrections | myna-learn only |
 
 ### 11.2 Runtime Resolution
 
@@ -1312,7 +1312,7 @@ Behavioral rules in Myna live in three layers with explicit precedence (D048). T
 2. **Active learnings override `CLAUDE.md`** when they conflict on the same scope. Learnings reflect the user's current state observed from interaction; `CLAUDE.md` is bootstrap.
 3. **`CLAUDE.md` applies** in the absence of a relevant learning.
 
-The `learn` skill never edits `CLAUDE.md`. Conflicts between learnings and `CLAUDE.md` are resolved by precedence at runtime, not by file edits — the user manages `CLAUDE.md` manually. Drift between the two files is acceptable: runtime behavior is unambiguous and the user can read either file to audit.
+The myna-learn skill never edits `CLAUDE.md`. Conflicts between learnings and `CLAUDE.md` are resolved by precedence at runtime, not by file edits — the user manages `CLAUDE.md` manually. Drift between the two files is acceptable: runtime behavior is unambiguous and the user can read either file to audit.
 
 **Why hard rules go in steering, not `CLAUDE.md`:** safety and scope rules must NEVER be overridable by inference. Putting them in steering — outside the precedence question entirely — protects them structurally. The 3-layer model only applies to soft preferences; hard rules are above the model.
 
@@ -1338,11 +1338,11 @@ Entries enter Active or Proposed depending on the source:
 
 ### 11.4 Reflection at Wrap-Up
 
-Reflection is a step in the `wrap-up` skill (End of Day path only — not Weekly Summary). It runs as the final step before the output summary and invokes the `learn` skill's `reflect` operation.
+Reflection is a step in the myna-wrap-up skill (End of Day path only — not Weekly Summary). It runs as the final step before the output summary and invokes the myna-learn skill's `reflect` operation.
 
 Reflection scans the session context for patterns indicating user preferences or corrections, checks them against existing entries in `_meta/learnings/*.md`, and either adds new Proposed entries, increments existing Proposed counts, or promotes Proposed entries to Active when their observation count reaches 3.
 
-If the user closes the session without running wrap-up, the session's signals are lost. This is an accepted trade-off in v1 — patterns survive missed sessions because reflection is tolerant to gaps. Real preferences will surface across multiple wrap-up cycles even if individual sessions are missed.
+If the user closes the session without running myna-wrap-up, the session's signals are lost. This is an accepted trade-off in v1 — patterns survive missed sessions because reflection is tolerant to gaps. Real preferences will surface across multiple wrap-up cycles even if individual sessions are missed.
 
 ### 11.5 Output Boundary
 
@@ -1354,7 +1354,7 @@ Learnings inform Myna's behavior, never the content of its outputs.
 
 ### 11.6 What Counts as a Learning vs an Entity Note
 
-The `learn` skill refuses entries that are facts about specific entities. The litmus test:
+The myna-learn skill refuses entries that are facts about specific entities. The litmus test:
 
 - **Does this rule apply across many objects?** → Learning. Goes in `_meta/learnings/{domain}.md`.
 - **Is this a fact about one specific entity?** → Entity note. Goes in `Projects/{project}.md`, `People/{person}.md`, etc.
@@ -1369,4 +1369,4 @@ Examples:
 | "Auth migration launches May 15" | Fact about auth migration | `Projects/auth-migration.md` timeline |
 | "Don't open emails with 'I hope this finds you well'" | Pattern across many drafts | `_meta/learnings/email.md` Active |
 
-When a user requests capture of a factual entry, the `learn` skill refuses and redirects to the appropriate canonical note via the `capture` skill.
+When a user requests capture of a factual entry, the myna-learn skill refuses and redirects to the appropriate canonical note via the myna-capture skill.
