@@ -4,22 +4,20 @@
 
 Myna is a set of AI agent instructions that turn Claude Code into a personal assistant for tech professionals. The user types natural language prompts inside Claude Code. Myna reads from external sources (email, Slack, calendar) via MCP servers and writes exclusively to a local Obsidian vault under a single `myna/` subfolder. All agent instructions are plain markdown — readable by any LLM, but designed and tested for Claude Code (D045, D046).
 
-Architecturally, Myna is one main agent with 14 skills. The main agent handles routing, always-on safety rules, and simple operations. Skills handle feature-specific workflows and are loaded on demand (progressive disclosure — only their name and description are in context until activated). Cross-cutting rules live in steering files that are always loaded. Config lives in 6 YAML files read at session start.
+Architecturally, Myna is one main agent with 24 skills. The main agent handles routing and simple operations. Cross-cutting rules live in 5 steering skills, preloaded via the subagent's `skills:` frontmatter field. Feature skills are loaded on demand (progressive disclosure — only their name and description are in context until activated). Config lives in 6 YAML files read at session start.
 
 There are no subagents in v1. No automatic skill chaining — each skill outputs its result and tells the user what to do next if a follow-up action is needed.
 
 ### How Myna Runs on Claude Code
 
-Claude Code uses a project-level `CLAUDE.md` file as its entry point — instructions loaded automatically at session start. Myna's install script (Phase 2) generates this file, which:
+Myna uses Claude Code's native agent and skills mechanisms:
 
-1. **Loads the main agent** — includes `agents/main.md` content (identity, routing logic, always-on rules, direct operations)
-2. **Loads steering files** — includes the 4 steering files (safety, conventions, output, system) as always-on context
-3. **Provides skill directory** — lists skill names, descriptions, and file paths so the main agent can route and Claude Code can read the full skill file on demand
-4. **Loads config** — includes an instruction for Claude to read all `.yaml` files in `{vault_path}/myna/_system/config/` at session start to load user configuration
+1. **Main agent** — `~/.claude/agents/myna.md` contains identity, routing logic, and direct operations. Frontmatter lists steering skills via the `skills:` field for preloading.
+2. **Steering skills** — 5 skills with `user-invocable: false` preloaded at startup via the agent's `skills:` field. Always in context.
+3. **Feature skills** — 24 skills in `~/.claude/skills/myna-*/SKILL.md`. Only names and descriptions in context at startup. Full content loaded on demand when invoked.
+4. **Config** — 6 YAML files read at session start from `{vault_path}/myna/_system/config/`
 
-MCP servers (obsidian-cli and any external servers like email, Slack, calendar) are registered with Claude Code via `claude mcp add` and are available as tools in every session. Skills call MCP tools directly by name.
-
-When a skill is activated, the main agent instructs Claude Code to read the full skill file using Claude Code's built-in file reading capability. The file path is listed in the skill directory within CLAUDE.md. This is a simple file read — no special plugin or skill-loading mechanism is needed.
+MCP servers (myna-obsidian and any external servers like email, Slack, calendar) are registered with Claude Code via `claude mcp add` and are available as tools in every session. Skills call MCP tools directly by name.
 
 ---
 
@@ -29,44 +27,127 @@ When a skill is activated, the main agent instructs Claude Code to read the full
 
 | # | Skill | One-liner | Example trigger |
 |---|-------|-----------|-----------------|
-| 1 | sync | Start or refresh your day | "sync" |
-| 2 | process | Extract data from email, Slack, or documents | "process my email" |
-| 3 | triage | Classify and sort inbox emails | "triage my inbox" |
-| 4 | prep-meeting | Prepare for a meeting | "prep for my 1:1 with Sarah" |
-| 5 | process-meeting | Process notes after a meeting | "done with 1:1 with Sarah" |
-| 6 | brief | Get a briefing or summary | "brief me on Sarah" |
-| 7 | capture | Log data to the vault | "capture: auth migration unblocked" |
-| 8 | draft | Write professional content | "draft reply to James" |
-| 9 | calendar | Time blocks, reminders, task breakdown | "reserve 2 hours Thursday" |
-| 10 | wrap-up | Close out the day or week | "wrap up" |
-| 11 | review | Process review queue items | "review my queue" |
-| 12 | self-track | Generate self-review documents | "build my promo case" |
-| 13 | park | Save and resume context | "park this" |
-| 14 | draft-replies | Process draft requests from email folder | "process my draft replies" |
+| 1 | myna-sync | Start or refresh your day | "sync" |
+| 2 | myna-plan | Planning advice (ephemeral, no vault writes) | "what should I focus on?" |
+| 3 | myna-wrap-up | Close out the day | "wrap up" |
+| 4 | myna-weekly-summary | Generate weekly summary | "weekly summary" |
+| 5 | myna-email-triage | Sort inbox emails into folders | "triage my inbox" |
+| 6 | myna-process-messages | Extract data from email, Slack, or documents | "process my email" |
+| 7 | myna-draft-replies | Process draft requests from email folder | "process my draft replies" |
+| 8 | myna-prep-meeting | Prepare for a meeting | "prep for my 1:1 with Sarah" |
+| 9 | myna-process-meeting | Process notes after a meeting | "done with 1:1 with Sarah" |
+| 10 | myna-brief-person | Person briefing | "brief me on Sarah" |
+| 11 | myna-brief-project | Project status summary | "catch me up on auth migration" |
+| 12 | myna-team-health | Team health dashboard | "how is my team doing?" |
+| 13 | myna-unreplied-threads | Check what's waiting on you or others | "what am I waiting on?" |
+| 14 | myna-blockers | Scan for blockers across projects | "what's blocked?" |
+| 15 | myna-1on1-analysis | Cross-session 1:1 pattern analysis | "1:1 trends with Sarah" |
+| 16 | myna-performance-narrative | Generate performance docs and calibrate reviews | "build Sarah's review narrative" |
+| 17 | myna-draft | Write professional content | "draft reply to James" |
+| 18 | myna-rewrite | Fix, restyle, or rewrite a message | "rewrite this for my VP" |
+| 19 | myna-capture | Log data to the vault | "capture: auth migration unblocked" |
+| 20 | myna-calendar | Time blocks, reminders, task breakdown | "reserve 2 hours Thursday" |
+| 21 | myna-self-track | Log contributions and generate self-review docs | "build my promo case" |
+| 22 | myna-park | Save and resume context | "park this" |
+| 23 | myna-learn | Emergent memory: capture, reflect, delete | "remember that I prefer terse drafts" |
+| 24 | myna-process-review-queue | Process review queue items | "review my queue" |
+
+**Post-launch (deferred):**
+- `myna-brief-thread` — Thread Summary
+- `myna-review-calibration` — Review Calibration (standalone; folded into myna-performance-narrative for v1)
+- `myna-pre-read` — Pre-Read Preparation
 
 ### Skill Details
 
-#### 1. sync
+#### 1. myna-sync
 
-Sets up or refreshes your day. Creates the daily note (or prepends a new snapshot if re-run), generates meeting prep files for today's meetings, surfaces overdue tasks, delegation alerts, blocker flags, review queue count, and upcoming milestones. Suggests priorities and flags over-commitment. Auto-archives old journal notes.
+Sets up or refreshes your day. Creates the daily note (or prepends a new snapshot if re-run), generates meeting prep files for today's meetings, surfaces overdue tasks, delegation alerts, blocker flags, review queue count, and upcoming milestones. Also creates tomorrow's daily note when invoked with "plan tomorrow". Auto-archives old journal notes.
 
-**Features covered:** Morning Sync, Daily Note, Weekly Note (created on first sync of the week), Planning (plan day, priority coaching, week optimization), Journal auto-archiving
+**Features covered:** Morning Sync, Daily Note, Weekly Note (created on first sync of the week), Plan Tomorrow, Journal auto-archiving
 
-**Example invocations:** "sync", "good morning", "set up my day", "plan my day", "plan tomorrow", "what should I focus on today?", "priority coaching", "week optimization"
+**Example invocations:** "sync", "good morning", "set up my day", "plan tomorrow"
 
 **Reads:** calendar MCP, workspace.yaml, projects.yaml, people.yaml, meetings.yaml, existing daily note, task items across project files, review queue files, person files, previous meeting files (for carry-forward)
 
-**Writes:** `Journal/DailyNote-{date}.md` (daily note), `Journal/WeeklyNote-{date}.md` (weekly note), `Meetings/` prep files
+**Writes:** `Journal/DailyNote-{date}.md`, `Journal/WeeklyNote-{date}.md`, `Meetings/` prep files
 
-**Example:** User says "sync" → reads calendar (4 meetings, 2 hrs total), open tasks (2 overdue, 5 hrs estimated), delegation alerts (1 overdue from Marcus) → creates daily note with Capacity Check (5 hrs focus time vs 6 hrs task effort — over-capacity), Immediate Attention, Today's Meetings (linked to prep files), priority suggestions (top 3: API spec review due tomorrow, delegation follow-ups, MBR draft deferred twice) → generates prep for each meeting → "Sync complete (8:30 AM). 4 meetings, 2 overdue tasks, 1 overdue delegation, 5 items in review queue. Top priority: API spec review (due tomorrow)."
+**Example:** User says "sync" → reads calendar (4 meetings, 2 hrs total), open tasks (2 overdue, 5 hrs estimated), delegation alerts (1 overdue from Marcus) → creates daily note with Capacity Check, Immediate Attention, Today's Meetings → generates prep for each meeting → "Sync complete (8:30 AM). 4 meetings, 2 overdue tasks, 1 overdue delegation, 5 items in review queue."
 
 ---
 
-#### 2. process
+#### 2. myna-plan
 
-Extracts structured data from email, Slack, or pasted documents and routes each item to the right vault destination. A single input can produce entries for multiple destinations — a project timeline update, a person observation, a task, and a contribution all from one email. Three-layer deduplication prevents reprocessing.
+Provides ephemeral planning advice without writing to the vault. Analyzes your current workload, meetings, and tasks to suggest priorities. Supports day planning, priority coaching, and week optimization.
 
-**Features covered:** Email Processing, Messaging Processing, Document Processing, Deduplication (3 layers), Meeting Summaries from Email (detected and dual-path routed), Unreplied Tracker (populated as byproduct)
+**Features covered:** Planning: plan day, priority coaching, week optimization (ephemeral inline advice, no vault writes)
+
+**Example invocations:** "what should I focus on today?", "priority coaching", "week optimization", "plan my week", "am I over-committed?"
+
+**Reads:** daily note, calendar MCP, task items, project files, workspace.yaml
+
+**Writes:** inline output only (no vault writes)
+
+**Example:** User says "what should I focus on?" → analyzes: 3 meetings (2 hrs), 6 hrs task effort, 5 hrs focus time → "You're slightly over-capacity. Top 3 priorities: (1) API spec review — due tomorrow, blocks Sarah, (2) delegation follow-ups — Marcus overdue, (3) MBR draft — deferred twice. Consider moving the MBR to Thursday when you have a lighter calendar."
+
+---
+
+#### 3. myna-wrap-up
+
+Closes out the day. Compares planned vs actual, logs contributions, moves unfinished items to tomorrow, then invokes myna-learn's reflection to scan the session for behavioral patterns.
+
+**Features covered:** End of Day Wrap-Up, contribution detection, carry-forward, reflection (invokes myna-learn)
+
+**Example invocations:** "wrap up", "end of day", "close out today"
+
+**Reads:** daily note (sync snapshots), task items, project timelines, meeting files processed today, contributions log
+
+**Writes:** daily note (End of Day section), tomorrow's daily note (unfinished items), `Journal/contributions-{week}.md` (detected contributions), `ReviewQueue/review-self.md` (uncertain contributions)
+
+**Contribution detection:** Explicit completions → [Auto]. Interpreted influence → [Inferred]. Uncertain → review-self queue.
+
+**Example:** User says "wrap up" → compares morning plan against current state → "Completed: API spec review, 2/3 delegation follow-ups. Not started: MBR draft (moved to tomorrow). Contributions: API spec review [Auto], cache question resolution [Inferred]. 1 uncertain contribution in review-self."
+
+---
+
+#### 4. myna-weekly-summary
+
+Generates a weekly summary and team health snapshot (for managers). Synthesizes the week's daily notes, contributions, decisions, and task status into a structured weekly review.
+
+**Features covered:** Weekly Summary, team health snapshot (managers)
+
+**Example invocations:** "weekly summary", "how was my week?", "week in review"
+
+**Reads:** daily notes for the week, contributions log, project timelines, meeting files, task items, team files (managers)
+
+**Writes:** `Journal/WeeklyNote-{date}.md` (Weekly Summary section), `Team/` health snapshots (managers)
+
+**Example:** User says "weekly summary" → scans 5 daily notes → "Week summary: 3 projects progressed, 12 tasks completed, 2 carried. Key decisions: cache architecture (Auth Migration), Q3 staffing plan. 2 blocked items. Team health: Sarah on track, Alex overloaded (8 open, 3 overdue)."
+
+---
+
+#### 5. myna-email-triage
+
+Sorts inbox emails into folders. Triage is purely about classification — it never touches the vault. Three-step flow: (1) agent reads inbox and writes folder recommendations, (2) user edits in Obsidian, (3) user says "process triage" to move emails to their assigned folders.
+
+**Features covered:** Email Triage (3-step: recommend → user edits → process)
+
+**Example invocations:** "triage my inbox", "process my inbox", "sort my inbox", "process triage"
+
+**Reads:** email MCP (inbox), projects.yaml (project folders, triage folders, custom folders with descriptions)
+
+**Writes:** `ReviewQueue/review-triage.md` (step 1). Step 3 moves emails to folders via email MCP.
+
+**Folder recommendations draw from:** project folders (projects.yaml), triage folders (Reply/, FYI/, Follow-Up/), and custom folders with user-provided descriptions. After triage, user runs "process my email" to extract vault data.
+
+**Example:** User says "triage my inbox" → reads 30 emails, matches against project folders and custom descriptions → writes review-triage.md with folder recommendations → "30 emails triaged. Edit review-triage.md, then say 'process triage' to move them."
+
+---
+
+#### 6. myna-process-messages
+
+Extracts structured data from email, Slack, or pasted documents and routes each item to the right vault destination. A single input can produce entries for multiple destinations. Three-layer deduplication prevents reprocessing. Populates unreplied tracker as a byproduct.
+
+**Features covered:** Email Processing, Messaging Processing, Document Processing, Deduplication (3 layers), Meeting Summaries from Email, Unreplied Tracker (populated as byproduct)
 
 **Example invocations:** "process my email", "process my messages", "process my communications", "process this doc: [paste]"
 
@@ -74,72 +155,51 @@ Extracts structured data from email, Slack, or pasted documents and routes each 
 
 **Writes:** project timelines, task items in project files, person files, `Journal/contributions-{week}.md`, review queues, `_system/sources/`, `_system/logs/audit.md`
 
-**Deduplication layers:**
-1. **Move to Processed/** — email-specific. After processing, move email to a processed folder. Two modes configured in workspace.yaml: **per-project** (default) moves to `{project-folder}/Processed/`, **common** moves all processed emails to one shared folder (e.g., `Processed/`). Next run skips processed emails.
-2. **Quote stripping** — strip quoted content before extraction. Only process new content.
-3. **Near-duplicate detection** — before writing an entry, read the target file and review queue. If a similar entry already exists (same action + same entity from the same source thread), skip it and inform the user.
+**Deduplication layers:** (1) Move to Processed/ — email-specific, configurable per-project or common mode. (2) Quote stripping — only process new content. (3) Near-duplicate detection — skip entries already in the target file.
 
-For Slack: store last-processed timestamp per channel in `_system/logs/processed-channels.md`.
+**DraftReplies folder:** Skips the folder configured as `draft_replies_folder` in projects.yaml — handled by myna-draft-replies.
 
-**DraftReplies folder:** The process skill skips the folder configured as `draft_replies_folder` in projects.yaml — that folder is handled by the separate `draft-replies` skill.
-
-**Example:** User says "process my email" → reads 12 new emails from Auth Migration folder → email from Sarah about API timeline produces: timeline update [Auto], task "Review API spec by Friday" [Auto] (explicit owner, date, action), recognition entry [Inferred] (agent interpreted praise) → moves processed emails to Processed/ → "Processed 12 emails from 3 folders. 8 items written directly, 2 in review queue."
+**Example:** User says "process my email" → reads 12 new emails → decomposes into timeline updates, tasks, recognition, observations → moves to Processed/ → "Processed 12 emails from 3 folders. 8 items written directly, 2 in review queue."
 
 ---
 
-#### 3. triage
+#### 7. myna-draft-replies
 
-Sorts inbox emails into folders. Triage is purely about classification — it never touches the vault. Three-step flow: (1) agent reads inbox and writes folder recommendations, (2) user edits in Obsidian, (3) user says "process triage" to move emails to their assigned folders.
+Processes a configured email folder where the user has forwarded emails with drafting instructions. Reads the original thread as context and the user's forwarded message as instructions for what to draft.
 
-**Features covered:** Email Triage (all 3 steps)
+**Features covered:** Email Draft Reply (DraftReplies folder path), Follow-Up Meeting Draft (via forwarded email)
 
-**Example invocations:** "triage my inbox", "process my inbox", "sort my inbox", "process triage"
+**Example invocations:** "process my draft replies", "any draft requests?", "check my drafts folder"
 
-**Reads:** email MCP (inbox), projects.yaml (project folders, triage folders, custom folders with descriptions)
+**Reads:** email MCP (configured `draft_replies_folder` from projects.yaml), communication-style.yaml, person files (audience tier), project files
 
-**Writes:** `ReviewQueue/review-triage.md` (step 1). Step 3 ("process triage") moves emails to their approved folders via email MCP — nothing else.
+**Writes:** `Drafts/` (e.g., `[Email] Reply to vendor.md`). Moves processed emails to `{draft_replies_folder}/Processed/`.
 
-**Inbox source:** Configured in projects.yaml under `triage.inbox_source`. If not configured, triage is unavailable.
-
-**Folder recommendations draw from three sources:**
-- **Project folders** from projects.yaml — agent recommends which project an email belongs to (e.g., "Auth Migration/")
-- **Triage folders** — built-in classification (Reply/, FYI/, Follow-Up/) or user-defined categories
-- **Custom folders** — user-defined folders with descriptions (e.g., "Trainings" → "training invitations, course materials, learning resources"). Agent uses the descriptions to match emails.
-
-**After triage:** emails are now in folders. To extract vault data from them, the user runs "process my email" → the process skill picks up emails in project-mapped folders. Triage and process are completely separate — triage sorts, process extracts.
-
-**Example:** User says "triage my inbox" → reads 30 inbox emails, reads project folders and custom folder descriptions from config → writes to review-triage.md: each email gets a recommended folder (Auth Migration/, Reply/, Trainings/, FYI/) with reasoning → "30 emails triaged. Edit review-triage.md in Obsidian, then say 'process triage' to move them."
+**Example:** User forwards a vendor proposal to DraftReplies with note "decline politely, keep door open for Q4" → reads original thread, creates diplomatic decline draft in `Drafts/` → "Draft created. 1 email processed from DraftReplies."
 
 ---
 
-#### 4. prep-meeting
+#### 8. myna-prep-meeting
 
-Generates or updates meeting prep for a specific meeting or all remaining meetings today. Includes conversation coaching for sensitive items (pending feedback, overdue delegations, escalations). Meeting type inferred from calendar data (D022).
+Generates or updates meeting prep for a specific meeting or all remaining meetings today. Includes conversation coaching for sensitive items. Meeting type inferred from calendar data (D022).
 
 **Features covered:** Meeting File Prep section, meeting type inference, conversation coaching
 
-**Example invocations:** "prep for my 1:1 with Sarah", "prep for my remaining meetings", "update prep for my meetings", "add topic to standup: [topic]"
+**Example invocations:** "prep for my 1:1 with Sarah", "prep for my remaining meetings", "update prep for my meetings"
 
-**Reads:** calendar MCP, person files, project files, task items, meeting history (previous sessions for carry-forward), communication-style.yaml, meetings.yaml
+**Reads:** calendar MCP, person files, project files, task items, meeting history (carry-forward), communication-style.yaml, meetings.yaml
 
 **Writes:** `Meetings/1-1s/{person}.md`, `Meetings/Recurring/{name}.md`, or `Meetings/Adhoc/{name}.md` — Prep section
 
-**Meeting type determines prep depth:**
-- **1:1:** follow-through check (did YOU complete your action items?), recent contributions, pending feedback with coaching suggestions, career development context, personal notes
-- **Project meeting:** open tasks, recent timeline entries, dependency status, blockers
-- **Standup:** your updates, overdue delegations, team blockers
-- **Design/doc review:** document link, related decisions, pre-read prep
-- **Cross-team:** open dependencies, what you're waiting on, recent comms with attendees
+**Meeting type determines prep depth:** 1:1 (follow-through, pending feedback, coaching), project meeting (tasks, timeline, blockers), standup (updates, delegations), design review (doc link, decisions), cross-team (dependencies, recent comms).
 
-All prep items are checkboxes the user checks off during the meeting. Coaching suggestions only appear for sensitive items (not every checkbox).
-
-**Example:** User says "prep for my 1:1 with Sarah" → generates prep: follow-through check (completed 2/3 action items — missed one listed), pending feedback with coaching suggestion, carry-forward items from last session, personal note ("training for marathon") → all as checkboxes.
+**Example:** User says "prep for my 1:1 with Sarah" → generates prep: follow-through check, pending feedback with coaching suggestion, carry-forward items, personal notes → all as checkboxes.
 
 ---
 
-#### 5. process-meeting
+#### 9. myna-process-meeting
 
-Reads a meeting file (Prep + Notes) after the meeting and routes extracted data to the vault. Checked prep items are resolved, unchecked items carry forward, notes are decomposed into tasks, decisions, observations, recognition, contributions.
+Reads a meeting file (Prep + Notes) after the meeting and routes extracted data to the vault. Checked prep items resolved, unchecked items carry forward, notes decomposed into tasks, decisions, observations, recognition, contributions.
 
 **Features covered:** Process Meeting, Universal Done (meeting path)
 
@@ -149,157 +209,213 @@ Reads a meeting file (Prep + Notes) after the meeting and routes extracted data 
 
 **Writes:** project timelines, task items, person files, `Journal/contributions-{week}.md`, review queues, `_system/sources/`
 
-**Meeting-type-aware processing:** 1:1s emphasize observations and feedback. Standups emphasize blockers and status. Design reviews emphasize decisions and alternatives.
-
-**Example:** User says "done with 1:1 with Sarah" → reads meeting file → checked prep items marked resolved → unchecked items carried to next session → "Sarah to draft API spec by Friday" → task [Auto] with `type:: delegation`, `person:: Sarah` → "Go with Option B for caching" → timeline entry [Auto] → "Processed 1:1 with Sarah. 3 tasks, 1 decision, 1 observation."
+**Example:** User says "done with 1:1 with Sarah" → checked items marked resolved → unchecked carried → "Sarah to draft API spec by Friday" → task [Auto] → "Go with Option B" → timeline entry [Auto] → "Processed 1:1 with Sarah. 3 tasks, 1 decision, 1 observation."
 
 ---
 
-#### 6. brief
+#### 10. myna-brief-person
 
-Synthesizes information about a person, project, team, thread, or document and presents it inline. Reads across multiple vault files to produce a focused summary.
+Synthesizes everything Myna knows about a person: role, shared projects, open items, pending feedback, 1:1 history, and personal notes. Reads across multiple vault files to produce a focused summary.
 
-**Features covered:** Person Briefing, Project Status Summary (quick and full modes), Thread Summary, Team Health Overview (point-in-time snapshot), Unreplied Tracker queries, Blocker Detection surfacing
+**Features covered:** Person Briefing (role, shared projects, open items, pending feedback, 1:1 history, personal notes)
 
-**Example invocations:** "brief me on Sarah", "catch me up on auth migration", "catch me up quick on [project]", "summarize this thread", "how is my team doing?", "what am I waiting on?", "what's blocked?"
+**Example invocations:** "brief me on Sarah", "what do I know about Sarah?", "Sarah overview"
 
-**Reads:** person files, project files, meeting files, task items, email/Slack threads (via MCP), contributions log, team files, Obsidian search MCP
+**Reads:** person files, project files, meeting files (1-1s/), task items, contributions log
 
 **Writes:** inline output (not saved unless user asks)
 
-**Project Status has two modes:**
-- **Quick:** "catch me up quick" → 3-5 bullet TL;DR (status, top blocker, next milestone)
-- **Full:** "catch me up" → complete status with timeline, all blockers, task breakdown, upcoming meetings
-
-**Example:** User says "brief me on Sarah" → reads Sarah's person file, shared projects, meeting history, open tasks → output inline: role/team, 3 active shared projects with status, last 1:1 (March 28 — 2 carry-forward items), open items between you (1 delegated task, 1 thing she's waiting on from you), pending feedback, personal notes.
+**Example:** User says "brief me on Sarah" → role/team, 3 active shared projects with status, last 1:1 (March 28 — 2 carry-forward items), open items between you, pending feedback, personal notes.
 
 ---
 
-#### 7. capture
+#### 11. myna-brief-project
 
-Routes user-entered data to the right vault destinations. Handles quick multi-destination capture, targeted logging (observations, contributions, recognition), task creation and recurring tasks, notes, and link saving. Updates project status and scratchpad sections.
+Summarizes a project's current status. Two modes: quick (3-5 bullet TL;DR) and full (complete status with timeline, blockers, task breakdown, upcoming meetings).
 
-**Features covered:** Quick Capture, Observations & Feedback Logging (user-typed path), Recognition Tracking (user-typed path), Task Management (add, recurring tasks), Link Manager (save path), Project File Management (adding content, status changes), Person File Management (adding notes/observations)
+**Features covered:** Project Status Summary (quick and full modes)
 
-**Example invocations:** "capture: [anything]", "observation about Sarah: ...", "note about Sarah: ...", "add task: ...", "create recurring task: ...", "save link: [url]", "update status of auth migration to paused"
+**Example invocations:** "catch me up on auth migration", "catch me up quick on [project]", "project status: [project]"
 
-**Reads:** projects.yaml, people.yaml, existing vault files (dedup check before writing observations)
+**Reads:** project files, task items, meeting files, email threads (via MCP), contributions log
 
-**Writes:** person files, project files/timelines, task items, `Journal/contributions-{week}.md`, `_system/links.md`, entity link sections, review queues
+**Writes:** inline output (not saved unless user asks)
 
-**Quick Capture routing:** "capture: Sarah did a great job handling the incident, auth migration is unblocked" → decomposes into: recognition for Sarah [Auto] → person file, timeline update [Auto] → project file, contribution [Inferred] → contributions log. One input, multiple destinations, each with its own provenance marker.
-
-**Task creation:**
-- "add task: review Sarah's design doc by Friday" → creates formatted TODO in the right project file
-- "create recurring task: weekly status update" → task with recurrence syntax
+**Example:** User says "catch me up quick on auth migration" → "Auth Migration: On track. API spec review due Friday. 1 blocker (dependency on Platform API). Next milestone: staging deploy April 15."
 
 ---
 
-#### 8. draft
+#### 12. myna-team-health
 
-Produces polished professional writing. Covers all draft types (email replies, follow-ups, status updates, recognition, meeting invites), message rewrites, conversation prep, and monthly/quarterly reports.
+Point-in-time dashboard for all direct reports. Shows open tasks, overdue items, feedback gaps, attention gaps, and last 1:1 date for each person. For managers only.
 
-**Features covered:** Email Draft Reply (conversation trigger path), Follow-Up Email, Follow-Up Meeting Draft, Message Rewriting (fix/tone/rewrite), Structured Draft (status/escalation), Recognition Draft, Help Me Say No, Difficult Conversation Prep, Monthly Update Generation (MBR/MTR/QBR)
+**Features covered:** Team Health Overview (point-in-time dashboard for all directs)
 
-**Example invocations:** "draft reply to ...", "rewrite this for my VP", "fix this message", "status update for auth migration", "escalate this blocker", "draft recognition for Sarah", "help me say no to ...", "help me prepare for [conversation]", "draft follow-up email for [meeting]", "draft follow-up meeting invite", "monthly update"
+**Example invocations:** "how is my team doing?", "team health", "team overview"
+
+**Reads:** person files (directs), task items, meeting files, team files, contributions log
+
+**Writes:** inline output (not saved unless user asks)
+
+**Example:** User says "how is my team doing?" → table: Sarah (5 open, 1 overdue, 12-day feedback gap, last 1:1 Apr 2), Alex (8 open, 3 overdue, 45-day feedback gap, last 1:1 Mar 28).
+
+---
+
+#### 13. myna-unreplied-threads
+
+Queries unreplied email and Slack threads. Two directions: waiting on you (threads you haven't responded to) and waiting on them (threads where you're waiting for a reply).
+
+**Features covered:** Unreplied Tracker queries (waiting on you vs waiting on them)
+
+**Example invocations:** "what am I waiting on?", "what's waiting for me?", "unreplied threads", "who owes me a reply?"
+
+**Reads:** email MCP, Slack MCP, person files, workspace.yaml (user identity for sender matching)
+
+**Writes:** inline output
+
+**Example:** User says "what am I waiting on?" → scans threads → "Waiting on 3 replies: Sarah (API spec, 2 days), Alex (infra proposal, 5 days), James (budget approval, 1 week)."
+
+---
+
+#### 14. myna-blockers
+
+Scans all active projects for blockers — items marked as blockers in project timelines, tasks with dependency type, and overdue items blocking downstream work.
+
+**Features covered:** Blocker Detection (scan all active projects)
+
+**Example invocations:** "what's blocked?", "show me blockers", "any blockers across projects?"
+
+**Reads:** project files, task items, meeting files
+
+**Writes:** inline output
+
+**Example:** User says "what's blocked?" → scans active projects → "2 blockers: Auth Migration (API dependency, waiting on Platform team since Apr 3), Onboarding Flow (design review not scheduled, blocks implementation)."
+
+---
+
+#### 15. myna-1on1-analysis
+
+Cross-session statistical analysis of 1:1 meetings with a specific person. Surfaces trends in topics discussed, action item completion rates, carry-forward patterns, feedback cadence, and relationship health over time.
+
+**Features covered:** 1:1 Pattern Analysis (cross-session statistical analysis)
+
+**Example invocations:** "1:1 trends with Sarah", "analyze my 1:1s with Alex", "1:1 patterns"
+
+**Reads:** meeting files (1-1s/), person files, task items, contributions log
+
+**Writes:** inline output
+
+**Example:** User says "1:1 trends with Sarah" → analyzes last 8 sessions → "Trend: action item completion improved (60% → 85%). Recurring topic: API spec (4 of last 6 sessions). Career development hasn't come up in 3 sessions. Average carry-forward: 1.5 items."
+
+---
+
+#### 16. myna-performance-narrative
+
+Generates performance narrative documents from vault data — observations, contributions, meeting history, and project outcomes for a specific person. Also provides review calibration: flags gaps, checks consistency, and highlights items that may be over- or under-weighted.
+
+**Features covered:** Performance Narrative generation + Review Calibration
+
+**Example invocations:** "build Sarah's review narrative", "performance summary for Sarah", "calibrate Sarah's review", "draft Sarah's performance review"
+
+**Reads:** person files (observations, recognition, pending feedback), project files, meeting history (1-1s/), contributions log
+
+**Writes:** `Drafts/` (narrative docs with [Self] prefix)
+
+**Example:** User says "build Sarah's review narrative" → compiles: 12 observations (8 strengths, 4 growth areas), 5 recognition entries, 3 project contributions → narrative with evidence links → calibration check: "Growth area 'documentation' has only 1 observation — consider gathering more data. Strength 'incident response' is well-evidenced (3 observations, 1 recognition)."
+
+---
+
+#### 17. myna-draft
+
+Produces polished professional writing. Covers drafts triggered by conversation context — email replies, follow-ups, status updates, recognition, meeting invites, conversation prep, and monthly reports. Does not handle message rewrites (see myna-rewrite).
+
+**Features covered:** Email Draft Reply (conversation path), Follow-Up Email, Follow-Up Meeting Draft, Structured Draft (status/escalation), Recognition Draft, Help Me Say No, Difficult Conversation Prep, Monthly Update (MBR/MTR/QBR)
+
+**Example invocations:** "draft reply to James", "status update for auth migration", "draft recognition for Sarah", "help me say no to ...", "help me prepare for [conversation]", "monthly update"
 
 **Reads:** communication-style.yaml, person files (audience tier), project files, meeting files, email threads (via MCP), contributions log
 
-**Writes:** `Drafts/` (prefixed filenames like `[Email] Reply to James.md`), inline output.
+**Writes:** `Drafts/` (prefixed filenames like `[Email] Reply to James.md`), inline output
 
-**Rewrite modes:**
-- **Fix:** grammar and spelling only. Preserves structure and voice.
-- **Tone:** adjusts tone for target audience. User's content stays recognizable.
-- **Rewrite:** treats input as rough notes. Full restructure. Output may look different from input.
+**BLUF is contextual, not automatic.** Use BLUF for structured professional communications. Don't force it on casual messages or recognition notes.
 
-**BLUF is contextual, not automatic.** Use BLUF (Bottom Line Up Front) for structured professional communications — status updates, escalations, emails to leadership. Don't force BLUF on casual Slack messages, recognition notes, or conversational replies where it would feel stiff. The agent uses judgment based on content type, audience tier, and channel.
-
-**Drafts are just files.** Saved to `Drafts/` with type-prefixed filenames. User deletes the file when done. No lifecycle state tracking in v1.
-
-**Example:** User says "status update for auth migration for my VP" → reads project file (timeline, tasks, blockers) → produces executive-length BLUF: bottom line, 3 progress bullets, 1 risk, next steps → shown inline. "Say 'save' to write to Drafts/."
+**Example:** User says "status update for auth migration for my VP" → reads project file → executive-length BLUF: bottom line, 3 progress bullets, 1 risk, next steps → "Say 'save' to write to Drafts/."
 
 ---
 
-#### 9. calendar
+#### 18. myna-rewrite
+
+Transforms an existing message. Three modes: fix (grammar only), tone (adjust for audience), rewrite (full restructure from rough notes). Input is user-provided text; output is the transformed version.
+
+**Features covered:** Message Rewriting (fix/tone/rewrite modes)
+
+**Example invocations:** "rewrite this for my VP", "fix this message", "adjust the tone to be more diplomatic", "clean up this Slack message"
+
+**Reads:** communication-style.yaml, person files (audience tier)
+
+**Writes:** inline output. User can say "save" to write to `Drafts/`.
+
+**Modes:** Fix preserves structure and voice. Tone adjusts for target audience while keeping content recognizable. Rewrite treats input as rough notes and fully restructures.
+
+**Example:** User says "rewrite this for my VP" + pastes rough message → detects audience tier (upward), applies executive preset → concise, BLUF-structured rewrite → shown inline.
+
+---
+
+#### 19. myna-capture
+
+Routes user-entered data to the right vault destinations. Handles quick multi-destination capture, targeted logging (observations, contributions, recognition), task creation and recurring tasks, notes, and link saving.
+
+**Features covered:** Quick Capture, Observations & Feedback Logging, Recognition Tracking, Task Management (add, recurring), Link Manager, Project/Person File Management
+
+**Example invocations:** "capture: [anything]", "observation about Sarah: ...", "add task: ...", "create recurring task: ...", "save link: [url]", "update status of auth migration to paused"
+
+**Reads:** projects.yaml, people.yaml, existing vault files (dedup check)
+
+**Writes:** person files, project files/timelines, task items, `Journal/contributions-{week}.md`, `_system/links.md`, review queues
+
+**Quick Capture routing:** "capture: Sarah did a great job, auth migration unblocked" → recognition for Sarah [Auto] → person file, timeline update [Auto] → project file, contribution [Inferred] → contributions log. One input, multiple destinations.
+
+**Example:** User says "add task: review Sarah's design doc by Friday" → creates formatted TODO in the right project file with due date and priority.
+
+---
+
+#### 20. myna-calendar
 
 Creates time blocks, reminders, and follow-up meeting drafts on the calendar. Also handles task breakdown. All calendar writes are personal events only — never with attendees.
 
 **Features covered:** Time Block Planning, Calendar Reminders, Task Breakdown
 
-**Example invocations:** "reserve 2 hours Thursday for the design doc", "reserve 3 hours this week for deep work", "remind me about the design review at 2pm", "block focus time tomorrow morning", "break down [task]"
+**Example invocations:** "reserve 2 hours Thursday for the design doc", "remind me about the design review at 2pm", "block focus time tomorrow morning", "break down [task]"
 
-**Reads:** calendar MCP (for finding free slots), task items, project files, workspace.yaml (work hours, timezone)
+**Reads:** calendar MCP (free slots), task items, project files, workspace.yaml (work hours, timezone)
 
 **Writes:** calendar events (personal only, no attendees — D003 three-layer protection), task files (subtasks from breakdown)
 
-**Calendar events use three-layer protection (D003):**
-1. Agent instruction: never add attendees, always use configured prefix
-2. Pre-tool check: rejects calls with attendees or missing prefix (where AI tool supports hooks)
-3. Explicit confirmation: shows all parameters before creating
+**Three-layer calendar protection (D003):** (1) Agent instruction: never add attendees. (2) Pre-tool check: rejects calls with attendees or missing prefix. (3) Explicit confirmation: shows all parameters before creating.
 
-**Example:** User says "reserve 2 hours Thursday for the design doc" → reads calendar, finds 9-11am free → shows: "[Myna:Focus] Design doc review, Thursday 9:00-11:00 AM. Create this event?" → user confirms → event created.
+**Example:** User says "reserve 2 hours Thursday for the design doc" → finds 9-11am free → "[Myna:Focus] Design doc review, Thursday 9:00-11:00 AM. Create this event?" → confirmed → created.
 
 ---
 
-#### 10. wrap-up
+#### 21. myna-self-track
 
-Closes out the day. Compares planned vs actual, logs contributions, moves unfinished items to tomorrow. Also generates weekly summaries.
+Logs your contributions and generates self-review documents from them. Handles both input (logging what you did) and output (brag docs, self-reviews, promo packets, queries).
 
-**Features covered:** End of Day Wrap-Up, Weekly Summary
+**Features covered:** Contributions Tracking, Self-Narrative Generation (brag doc, self-review, promo packet), Contribution Queries, Self-calibration
 
-**Example invocations:** "wrap up", "weekly summary"
-
-**Reads:** daily note (sync snapshots), task items, project timelines, meeting files processed today, contributions log
-
-**Writes:** daily note (End of Day section), tomorrow's daily note (unfinished items), `Journal/contributions-{week}.md` (detected contributions), `ReviewQueue/review-self.md` (uncertain contributions), `Journal/WeeklyNote-{date}.md` (weekly summary)
-
-**Contribution detection:** Scans completed work for items worth tracking. Explicit completions (task done, decision logged) → [Auto]. Interpreted influence (agent thinks you contributed) → [Inferred]. Uncertain → review-self queue.
-
-**Example:** User says "wrap up" → compares morning Immediate Attention against current state → "Completed: API spec review, 2/3 delegation follow-ups. Not started: MBR draft (moved to tomorrow). Contributions: API spec review [Auto], cache question resolution [Inferred]. 1 uncertain contribution in review-self."
-
----
-
-#### 11. review
-
-Processes review queue items. Two interaction modes: the user can work through items interactively in chat, or edit the queue files directly in Obsidian and then tell the assistant to process approved items.
-
-**Features covered:** Review Queue processing (review-work, review-people, review-self)
-
-**Example invocations:** "review my queue", "process review queue", "what's in my queue?", "process approved items"
-
-**Reads:** `ReviewQueue/review-work.md`, `ReviewQueue/review-people.md`, `ReviewQueue/review-self.md`
-
-**Writes:** destination files (approved items with [Verified] tag), `ReviewQueue/processed-{YYYY-MM-DD}.md` (audit trail of processed items). Approved items are removed from the active queue file and appended to the dated processed file.
-
-**Two interaction modes:**
-- **Chat mode:** User says "review my queue" → assistant presents items one by one or in batch. User approves, edits, skips, or discards through conversation.
-- **File mode:** User opens queue files in Obsidian, checks the items they've verified, then says "process my queue" → assistant processes only checked items, leaves unchecked items for later.
-
-**Example (chat):** User says "review my queue" → "5 items across 3 queues. (1) Task 'review caching approach' — can't determine owner. (2) Timeline entry — conflicting signals..." → User: "approve 1, assign to me. discard 2. approve the rest."
-
-**Example (file):** User checks 3 of 5 items in review-work.md in Obsidian, then says "process my queue" → assistant writes the 3 checked items to their destinations, moves them to `processed-2026-04-06.md`, leaves the 2 unchecked items in the queue.
-
----
-
-#### 12. self-track
-
-Logs your contributions and generates self-review documents from them. Handles both the input side (logging what you did) and the output side (brag docs, self-reviews, promo packets, queries).
-
-**Features covered:** Contributions Tracking (user-typed path), Self-Narrative Generation (brag doc, self-review, promo packet), Contribution Queries, Self-calibration mode
-
-**Example invocations:** "log contribution: led the auth migration design review", "I unblocked the platform team on the API issue", "what did I do this quarter?", "draft my self-review for H1", "build my promo case", "am I underselling myself?", "what feedback did I give this quarter?", "show my contributions from March"
+**Example invocations:** "log contribution: led the auth migration design review", "what did I do this quarter?", "draft my self-review for H1", "build my promo case", "am I underselling myself?"
 
 **Reads:** `Journal/contributions-{week}.md`, project timelines, person files, meeting files
 
 **Writes:** `Journal/contributions-{week}.md` (logging), `Drafts/` (self-review docs with [Self] prefix), inline output
 
-**Self-calibration:** Compares draft claims against contributions log. Flags claims without evidence, contributions not included, and language weaker than evidence supports.
+**Self-calibration:** Compares draft claims against contributions log. Flags claims without evidence, missing contributions, and weak language.
 
-**Example:** User says "what feedback did I give this quarter?" → filters contributions by coaching/feedback category → "8 feedback entries: 3 for Sarah (growth areas), 2 for Alex (recognition), 3 for Marcus (coaching on incident response). Last feedback to Maya: 47 days ago."
+**Example:** User says "what feedback did I give this quarter?" → filters contributions → "8 feedback entries: 3 for Sarah, 2 for Alex, 3 for Marcus. Last feedback to Maya: 47 days ago."
 
 ---
 
-#### 13. park
+#### 22. myna-park
 
 Saves working context for later resumption. The parked file must be detailed enough that a new session can resume with zero context loss.
 
@@ -307,31 +423,49 @@ Saves working context for later resumption. The parked file must be detailed eno
 
 **Example invocations:** "park this", "resume auth migration", "resume" (shows list), "switch to [project]", "what's parked?"
 
-**Reads:** current conversation context, vault files referenced in conversation, project files (for switch)
+**Reads:** current conversation context, vault files referenced in conversation, project files
 
 **Writes:** `_system/parked/{topic}.md`
 
-**Parked file contents:** topic name, one-line summary, every referenced file (with wiki-links), full discussion summary, current state, next steps, open questions, key constraints, timestamp.
+**Parked file contents:** topic, one-line summary, referenced files (wiki-linked), discussion summary, current state, next steps, open questions, key constraints, timestamp.
 
-**Example:** User says "park this" → saves: topic ("auth caching design"), files referenced, discussion summary (3 approaches explored, rejected Redis, leaning in-memory with TTL), current state (waiting on Sarah's spec), next steps, open questions → "Parked. Resume with 'resume auth caching'."
+**Example:** User says "park this" → saves topic, files, discussion state, next steps → "Parked. Resume with 'resume auth caching'."
 
 ---
 
-#### 14. draft-replies
+#### 23. myna-learn
 
-Processes a configured email folder where the user has forwarded emails with drafting instructions. For each email: reads the original thread as context and the user's forwarded message as instructions for what to draft (reply, decline, meeting invite, etc.).
+Manages Myna's emergent memory — behavioral preferences observed across sessions. Supports capture (save a new preference), reflect (scan session for patterns), delete (remove a wrong rule), and negotiate (handle pushback on a promoted rule).
 
-**Features covered:** Email Draft Reply (DraftReplies folder trigger path), Follow-Up Meeting Draft (when requested via forwarded email)
+**Features covered:** Emergent memory: capture, reflect, delete, negotiate
 
-**Example invocations:** "process my draft replies", "any draft requests?", "check my drafts folder"
+**Example invocations:** "remember that I prefer terse drafts", "forget that rule about Friday meetings", "what have you learned?", "show my learnings"
 
-**Reads:** email MCP (configured `draft_replies_folder` from projects.yaml), communication-style.yaml, person files (audience tier), project files
+**Reads:** `_meta/learnings/*.md`
 
-**Writes:** `Drafts/` (e.g., `[Email] Reply to vendor.md`). Moves processed emails to `{draft_replies_folder}/Processed/`.
+**Writes:** `_meta/learnings/*.md` (Active and Proposed entries with provenance markers)
 
-**How it works:** The user replies to (or forwards) an email, addressing it to a configured alias (e.g., `sid+drafts@company.com`). An email client rule moves it to the DraftReplies folder. The email has two parts: (1) the user's message to the alias — this is the drafting instruction (e.g., "decline politely, suggest next quarter"), and (2) the original thread below — this is context. The skill separates the two: the message addressed to the alias is the instruction, everything below is the source thread to draft against.
+**Invocation paths:** Explicit user statement ("remember that...") → Active entry with [User] marker. Main agent detection of clear directive → Active with [Auto]. Reflection during myna-wrap-up → Proposed with [Inferred]. Promotion to Active after 3 reflection-pass observations.
 
-**Example:** User forwards a vendor proposal email to DraftReplies with note "say no, we're committed to the current vendor through Q3, keep the door open for Q4" → skill reads the original proposal thread, creates a diplomatic decline draft in `Drafts/`, creates TODO "review and send decline to [vendor]" → "Draft created. 1 email processed from DraftReplies."
+**Example:** User says "remember that I prefer bullet points over paragraphs in status updates" → writes to `_meta/learnings/email.md` Active section with [User] marker → "Noted: prefer bullet points in status updates."
+
+---
+
+#### 24. myna-process-review-queue
+
+Processes review queue items. Two interaction modes: work through items interactively in chat, or edit queue files in Obsidian and tell the assistant to process approved items.
+
+**Features covered:** Review Queue processing (review-work, review-people, review-self)
+
+**Example invocations:** "review my queue", "process review queue", "what's in my queue?", "process approved items"
+
+**Reads:** `ReviewQueue/review-work.md`, `ReviewQueue/review-people.md`, `ReviewQueue/review-self.md`
+
+**Writes:** destination files (approved items with [Verified] tag), `ReviewQueue/processed-{YYYY-MM-DD}.md` (audit trail)
+
+**Two modes:** Chat mode (items presented one by one, user approves/edits/skips/discards) and file mode (user checks items in Obsidian, then "process my queue" processes checked items only).
+
+**Example:** User says "review my queue" → "5 items across 3 queues. (1) Task — can't determine owner. (2) Timeline entry — conflicting signals..." → User: "approve 1, assign to me. discard 2. approve the rest."
 
 ---
 
@@ -343,9 +477,9 @@ These operations are simple enough that the main agent handles them without acti
 - **Link find:** "find link: MBR Jan" → searches `_system/links.md` and entity link sections
 - **Task completion:** "done with [task]" → marks TODO as complete (simple metadata update, no skill needed)
 - **Draft deletion:** "delete the MBR draft" → removes the draft file from Drafts/.
-- **Universal Done routing:** "done with X" → resolves X via fuzzy name resolution. If meeting → activates process-meeting. If task → marks complete directly. If draft → updates state directly. If ambiguous → asks (never guesses between a meeting and a task with similar names).
-- **Inbox routing:** "process my inbox", "sort my inbox", "what's in my inbox?" → always routes to triage, not process. Inbox = unsorted email that needs classification first.
-- **Planning routing:** "what should I focus on today?", "plan my day" → routes to sync. Calendar-specific requests ("reserve time", "remind me", "block focus time") → routes to calendar skill.
+- **Universal Done routing:** "done with X" → resolves X via fuzzy name resolution. If meeting → activates myna-process-meeting. If task → marks complete directly. If draft → updates state directly. If ambiguous → asks (never guesses between a meeting and a task with similar names).
+- **Inbox routing:** "process my inbox", "sort my inbox", "what's in my inbox?" → always routes to myna-email-triage, not myna-process-messages. Inbox = unsorted email that needs classification first.
+- **Planning routing:** Calendar-specific requests ("reserve time", "remind me", "block focus time") → routes to myna-calendar. General planning ("what should I focus on?", "plan my day") → routes to myna-plan. Day setup ("sync", "good morning") → routes to myna-sync.
 - **File creation from template:** "create project file for auth migration" → reads projects.yaml, creates `Projects/auth-migration.md` from template. Same for person files. Simple enough for the main agent.
 
 ---
@@ -356,36 +490,51 @@ Myna runs as **one main agent** with three layers of instructions:
 
 ### Main Agent Prompt
 
-The always-loaded system prompt. Kept lean to leave room for tool outputs and conversation. Contains:
+The lean agent body at `~/.claude/agents/myna.md`. Contains:
 
 - **Identity:** who Myna is, what it does
-- **Routing logic:** how to match user requests to skills. Includes handling for Universal Done, ambiguous requests, and fallback to "ask the user"
-- **Always-on rules:** draft-never-send, vault-only writes, never-assume-always-ask, fuzzy name resolution
-- **Voice:** no AI tells, no hedging, concise and direct. Write like a sharp colleague.
-- **Simple operations:** vault search, link find, task completion, draft state updates, project/person file creation from template
+- **Routing logic:** supplementary guidance for edge cases — Universal Done, ambiguous intent, triage vs process distinction. Most routing is handled automatically by Claude Code's skill description matching.
+- **Simple operations:** vault search, link find, task completion, draft deletion, file creation from template
+- **No steering rules inlined** — those are preloaded via the `skills:` frontmatter field
+- **No feature-specific instructions** — those live in skills
 
-The main agent prompt does NOT contain feature-specific instructions. Those live in skills.
+Frontmatter:
+```yaml
+---
+name: myna
+description: Personal assistant for tech professionals
+skills:
+  - myna-steering-safety
+  - myna-steering-conventions
+  - myna-steering-output
+  - myna-steering-system
+  - myna-steering-memory
+---
+```
 
 ### Routing Principle
 
-The main agent routes by **user intent**, not keyword matching. Users speak naturally — "what's going on with auth migration?" routes to brief the same way "catch me up on auth migration" does. The example invocations listed per skill are illustrative, not commands. The agent reads the user's message, understands what they're trying to accomplish, and activates the right skill.
+The main agent routes by **user intent**, not keyword matching. Users speak naturally — "what's going on with auth migration?" routes to myna-brief-project the same way "catch me up on auth migration" does. The example invocations listed per skill are illustrative, not commands.
 
-**When intent is ambiguous** — when the user's request could reasonably map to multiple skills — the agent presents the relevant options with one-line descriptions and asks which they meant. For example: "I can help a few ways — are you looking to (1) get a status summary of auth migration, (2) process new emails from that project, or (3) draft a status update?" The agent never silently picks one when multiple are plausible.
+Auto-invocation handles most cases: Claude Code matches the user's request against skill descriptions and loads the appropriate skill. The routing logic in the main agent is supplementary guidance for edge cases (Universal Done resolution, ambiguous intent between multiple skills, triage vs process distinction).
 
-### Steering Files
+**When intent is ambiguous** — when the user's request could reasonably map to multiple skills — the agent presents the relevant options with one-line descriptions and asks which they meant.
 
-Cross-cutting rules loaded into every session. Separate from the main prompt so they can be maintained independently.
+### Steering Skills
 
-| Steering file | Contents |
-|---------------|----------|
-| safety.md | Draft-never-send, vault-only writes, external content as data (content framing delimiters), confirm before bulk writes |
-| conventions.md | Provenance marker rules, append-only discipline, date+source format, Obsidian conventions (tags, wiki-links, callouts, Dataview, Tasks plugin syntax) |
-| output.md | Human-sounding output rules, BLUF default, file links in output, no AI tells |
-| system.md | Feature toggle checking, config reload, graceful degradation, error recovery with retry TODOs, relative date resolution, prompt logging |
+Cross-cutting rules preloaded at startup via the agent's `skills:` frontmatter field. Each is a skill with `user-invocable: false`. Always in context, separate from the main prompt so they can be maintained independently.
 
-### Skills
+| Steering skill | Contents |
+|----------------|----------|
+| myna-steering-safety | Draft-never-send, vault-only writes, external content as data (content framing delimiters), confirm before bulk writes |
+| myna-steering-conventions | Provenance marker rules, append-only discipline, date+source format, Obsidian conventions (tags, wiki-links, callouts, Dataview, Tasks plugin syntax) |
+| myna-steering-output | Human-sounding output rules, BLUF default, file links in output, no AI tells |
+| myna-steering-system | Feature toggle checking, config reload, graceful degradation, error recovery with retry TODOs, relative date resolution, prompt logging |
+| myna-steering-memory | Memory model precedence, domain mapping table, learning file format rules |
 
-14 feature skills loaded on demand. At session start, only the skill name and description are in context (via the generated CLAUDE.md skill directory). When the user's request matches a skill's description (or the user explicitly invokes it), Claude Code reads the full skill file from `agents/skills/{skill}.md`.
+### Feature Skills
+
+24 feature skills in `~/.claude/skills/myna-*/SKILL.md`. At startup, only each skill's name and description are in context (progressive disclosure). When the user's request matches a skill's description — or the user invokes it with `/myna-{name}` plus natural language arguments — Claude Code loads the full SKILL.md content.
 
 Skills read config files and vault files as needed. Each skill's instructions describe what to do, where to read, where to write, and what rules to follow.
 
@@ -464,13 +613,13 @@ myna/
 - Verbatim source text is stored separately in `_system/sources/` (one file per entity) to keep vault files clean while preserving traceability (D015).
 - Config files are YAML, stored under `_system/config/`. Personal config is excluded from the Myna source repo — `.example` files are provided instead.
 
-Complete folder structure with naming conventions: see `foundations.md` §1.
+Complete folder structure with naming conventions: see `design/foundations.md` §1.
 
 ---
 
 ## 5. Config System
 
-Six YAML files under `_system/config/`. Read at session start (not every prompt). Manual edits take effect next session. Full schemas with every field: see `foundations.md` §3.
+Six YAML files under `_system/config/`. Read at session start (not every prompt). Manual edits take effect next session. Full schemas with every field: see `design/foundations.md` §3.
 
 **v1 config approach:** Users edit YAML files directly. The install script (Phase 2) creates the folder structure and drops `.example` config files with sample data as reference. Interactive setup wizard and natural language config management ("add project: ...") are deferred to post-launch (D043).
 
@@ -609,7 +758,7 @@ tags:
 
 ## 6. MCP Integration
 
-### Obsidian CLI MCP (shipped by Myna)
+### Myna Obsidian MCP (shipped by Myna)
 
 The only MCP Myna builds. A thin wrapper around Obsidian CLI (D008) that exposes vault operations:
 
@@ -631,11 +780,11 @@ Myna does NOT build MCPs for email, Slack, or calendar (D005). It connects to wh
 
 | MCP | Used by | Required |
 |-----|---------|----------|
-| Email | process, triage, draft (reading threads), brief (thread summary) | No — features gracefully degrade |
-| Slack | process, brief (thread summary) | No |
-| Calendar | sync, prep-meeting, calendar (reading schedule, creating events) | No |
+| Email | myna-process-messages, myna-email-triage, myna-draft-replies, myna-draft (reading threads), myna-brief-person, myna-brief-project, myna-unreplied-threads | No — features gracefully degrade |
+| Slack | myna-process-messages, myna-unreplied-threads | No |
+| Calendar | myna-sync, myna-prep-meeting, myna-calendar (reading schedule, creating events) | No |
 
-All MCP servers — both obsidian-cli and external ones — are registered with Claude Code via `claude mcp add`. MCP server names are configured in workspace.yaml so skills know which tool names to call. Skills call MCP tools directly by name (e.g., the tool names from the user's email MCP server). The `mcp_servers` map in workspace.yaml records the server names for reference.
+All MCP servers — both myna-obsidian and external ones — are registered with Claude Code via `claude mcp add`. MCP server names are configured in workspace.yaml so skills know which tool names to call. Skills call MCP tools directly by name (e.g., the tool names from the user's email MCP server). The `mcp_servers` map in workspace.yaml records the server names for reference.
 
 ---
 
@@ -671,20 +820,20 @@ features:
 
 ## 8. Review Queue
 
-Four markdown files in `ReviewQueue/`. Each is a checklist the user can edit in Obsidian or process through the review skill.
+Four markdown files in `ReviewQueue/`. Each is a checklist the user can edit in Obsidian or process through the myna-process-review-queue skill.
 
 | Queue file | Contains | Populated by |
 |------------|----------|-------------|
-| review-work.md | Ambiguous tasks, decisions, blockers, delegations, timeline entries | process, process-meeting, capture |
-| review-people.md | Ambiguous observations, recognition | process, process-meeting, capture |
-| review-self.md | Uncertain contribution candidates | wrap-up, process, process-meeting |
-| review-triage.md | Email triage folder recommendations | triage |
+| review-work.md | Ambiguous tasks, decisions, blockers, delegations, timeline entries | myna-process-messages, myna-process-meeting, myna-capture |
+| review-people.md | Ambiguous observations, recognition | myna-process-messages, myna-process-meeting, myna-capture |
+| review-self.md | Uncertain contribution candidates | myna-wrap-up, myna-process-messages, myna-process-meeting |
+| review-triage.md | Email triage folder recommendations | myna-email-triage |
 
 **Key principle (D024):** most items skip the queue via provenance markers. The queue is reserved for genuinely ambiguous items — things the agent can't confidently write with [Auto] or [Inferred]. If the queue is consistently full of obvious items, confidence thresholds need tuning.
 
 **Processing flow:** approve → write to destination with [Verified] tag. Edit → modify then approve. Skip → leave for later. Discard → remove.
 
-Full routing rules and examples: see `foundations.md` §6.
+Full routing rules and examples: see `design/foundations.md` §6.
 
 ---
 
@@ -707,7 +856,7 @@ Every agent-written entry carries one of four markers. Tag + compact source at e
 
 **Litmus test:** Would two reasonable people read this differently? If yes → review queue instead of [Inferred].
 
-Full decision framework, per-domain examples, and placement rules: see `foundations.md` §4.
+Full decision framework, per-domain examples, and placement rules: see `design/foundations.md` §4.
 
 ---
 
@@ -715,30 +864,30 @@ Full decision framework, per-domain examples, and placement rules: see `foundati
 
 Information flows between vault domains through skills. Here are the primary flows:
 
-### Email/Slack → Vault (process skill)
+### Email/Slack → Vault (myna-process-messages)
 ```
-Email MCP → process → project timelines (Projects/)
-                    → task items (Projects/)
-                    → person files (People/)
-                    → contributions log (Journal/contributions-{week}.md)
-                    → review queues (ReviewQueue/)
-                    → source files (_system/sources/)
+Email MCP → myna-process-messages → project timelines (Projects/)
+                                  → task items (Projects/)
+                                  → person files (People/)
+                                  → contributions log (Journal/contributions-{week}.md)
+                                  → review queues (ReviewQueue/)
+                                  → source files (_system/sources/)
 ```
 
-### Meeting → Vault (process-meeting skill)
+### Meeting → Vault (myna-process-meeting)
 ```
-Meeting file (Meetings/) → process-meeting → project timelines
-                                           → task items
-                                           → person files
-                                           → contributions log
-                                           → review queues
+Meeting file (Meetings/) → myna-process-meeting → project timelines
+                                                 → task items
+                                                 → person files
+                                                 → contributions log
+                                                 → review queues
 ```
 
 ### Daily cycle
 ```
-Morning: sync → reads calendar, tasks, queues → writes daily note, meeting preps
-During day: capture, process, meetings → writes across vault
-Evening: wrap-up → reads daily note, tasks → writes end-of-day, contributions, tomorrow's note
+Morning: myna-sync → reads calendar, tasks, queues → writes daily note, meeting preps
+During day: myna-capture, myna-process-messages, meetings → writes across vault
+Evening: myna-wrap-up → reads daily note, tasks → writes end-of-day, contributions, tomorrow's note
 ```
 
 ### Cross-domain coordination
@@ -747,10 +896,10 @@ When one skill depends on data another skill manages:
 
 | Scenario | How it works |
 |----------|-------------|
-| prep-meeting needs task data from process | prep-meeting reads task items directly from project files. If process hasn't run yet, task data may be stale — prep-meeting uses whatever is in the vault. No dependency ordering required. |
-| wrap-up needs meeting data from process-meeting | Same pattern — wrap-up reads whatever is in the vault. If meetings haven't been processed yet, wrap-up won't detect contributions from those meetings. User can re-run wrap-up after processing. |
-| brief needs data from all domains | brief reads across the vault. Data completeness depends on what skills have run. Brief presents whatever is available. |
-| sync generates meeting preps that prep-meeting also generates | sync generates preps for ALL today's meetings. prep-meeting generates for ONE specific meeting. If sync already created a prep, prep-meeting reads it as context and updates (appends delta). |
+| myna-prep-meeting needs task data from myna-process-messages | myna-prep-meeting reads task items directly from project files. If myna-process-messages hasn't run yet, task data may be stale — myna-prep-meeting uses whatever is in the vault. No dependency ordering required. |
+| myna-wrap-up needs meeting data from myna-process-meeting | Same pattern — myna-wrap-up reads whatever is in the vault. If meetings haven't been processed yet, myna-wrap-up won't detect contributions from those meetings. User can re-run myna-wrap-up after processing. |
+| myna-brief-* needs data from all domains | Brief skills read across the vault. Data completeness depends on what skills have run. Brief presents whatever is available. |
+| myna-sync generates meeting preps that myna-prep-meeting also generates | myna-sync generates preps for ALL today's meetings. myna-prep-meeting generates for ONE specific meeting. If myna-sync already created a prep, myna-prep-meeting reads it as context and updates (appends delta). |
 
 **No dependency ordering.** Each skill reads whatever is currently in the vault. Skills are not aware of whether other skills have run. If data is stale or missing, the skill works with what's available and the output reflects that. The user controls sequencing by choosing when to invoke each skill.
 
@@ -758,43 +907,99 @@ When one skill depends on data another skill manages:
 
 ## 11. Claude-First, Not Claude-Only (D046)
 
-Myna v1 targets Claude Code as its runtime (D045). Agent instructions can reference Claude Code capabilities directly — how CLAUDE.md is loaded, how MCP servers are registered, how skills are activated by reading files.
+Myna v1 targets Claude Code as its runtime (D045). Agent instructions can reference Claude Code capabilities directly — native skills mechanism, MCP server registration, subagent frontmatter.
 
 All agent content — skills, steering, main agent, config schemas — is plain markdown and YAML. This makes it inherently readable by any capable LLM. If someone wants to run Myna on Gemini, Codex, or another tool in the future, they can read the markdown files and write their own wiring. That's an open-source community contribution, not something we architect for upfront.
 
-**What the install script produces for Claude Code:**
+**Install is fully decoupled from the cloned repo (D049).** The repo is build-time only. After `./install.sh` finishes, nothing in the repo path is load-bearing at runtime — the cloned repo can be deleted. Users invoke Myna with `claude --agent myna` from any working directory.
+
+**What the install script produces:**
 
 | Source artifact | Install output |
 |----------------|---------------|
-| Main agent (`agents/main.md`) | Included in generated CLAUDE.md |
-| Steering files (`agents/steering/*.md`) | Included in generated CLAUDE.md |
-| Skill files (`agents/skills/*.md`) | Referenced in CLAUDE.md skill directory; Claude reads on demand |
-| MCP server (`agents/mcp/obsidian-cli/`) | Registered via `claude mcp add` |
-| Config templates | `.example` files copied to vault `_system/config/` |
+| Main agent (`agents/main.md`) | Installed to `~/.claude/agents/myna.md` with path placeholders substituted. Frontmatter lists steering skills for preloading via the `skills:` field. |
+| Steering skills (`agents/skills/myna-steering-*/SKILL.md`, 5 files) | Copied to `~/.claude/skills/myna-steering-*/SKILL.md`. Preloaded at session start via the agent's `skills:` field. |
+| Feature skills (`agents/skills/myna-*/SKILL.md`, 24 files) | Copied to `~/.claude/skills/myna-*/SKILL.md`. Loaded on demand via Claude Code's native progressive disclosure. |
+| MCP server source (`agents/mcp/myna-obsidian/`) | Copied to `~/.myna/mcp/myna-obsidian/`, `npm install && npm run build` run there, registered via `claude mcp add` pointing at the built `dist/index.js`. |
+| Config `.example` files | Copied to `<vault>/<subfolder>/_system/config/` alongside starter `.yaml` files (only created if missing). |
+| Install manifest | `~/.myna/install-manifest.json` records all paths written, for a future uninstall command. |
+| Version file | `~/.myna/version` records the installed version for upgrade checks. |
 
-The previous two-layer architecture (content layer + adapter layer, D038) has been superseded. See D046 for rationale.
+**What the install script never touches:**
+
+- The repo's `CLAUDE.md` (developer project instructions — different audience, separate file from the runtime agent prompt).
+- Existing vault config YAML files (`workspace.yaml`, `projects.yaml`, etc.) — `.example` files are always refreshed but user-edited configs are preserved.
+
+**Subagent frontmatter** includes `name`, `description`, and `skills` (listing the 5 steering skills for preloading). Other fields (`model`, `tools`, `mcpServers`, `permissionMode`, `memory`) are omitted so Myna inherits session defaults. Users can override any of these by editing `~/.claude/agents/myna.md` directly.
+
+**Invocation model:** Global subagent. `claude --agent myna` works from any directory. Update flow: `git pull && ./install.sh` re-copies skills, rebuilds the MCP, and regenerates the agent file; vault configs are preserved.
+
+The previous two-layer architecture (content layer + adapter layer, D038) has been superseded. See D046 for rationale. The previous project-CLAUDE.md install model (D047) has been superseded by D049.
 
 ---
 
 ## 12. Draft-Never-Send
 
-Myna drafts all outbound communications but never sends them. Every draft requires the user to manually copy and send outside of Myna. The only external write is personal calendar events with no attendees (D003). This rule is in the safety steering file and checked by every skill that produces outbound content.
+Myna drafts all outbound communications but never sends them. Every draft requires the user to manually copy and send outside of Myna. The only external write is personal calendar events with no attendees (D003). This rule is in the myna-steering-safety skill and checked by every skill that produces outbound content.
 
 ---
 
 ## 13. Reference Skill Selection
 
-**Reference skill: capture.**
+**Reference skill: myna-capture.**
 
-The `capture` skill is built first in Phase 1 because it exercises the most representative patterns while being fully testable locally.
+The `myna-capture` skill is built first in Phase 1 because it exercises the most representative patterns while being fully testable locally.
 
-**Why capture:**
+**Why myna-capture:**
 
 1. **Covers the projects-and-tasks domain** (aligned with D026) — task management, project file updates, project timeline writes
 2. **Exercises all core patterns:** multi-destination routing (quick capture goes to multiple destinations), provenance markers (all four types — user-typed [User], explicit data [Auto], inferred [Inferred], ambiguous → review queue), fuzzy name resolution, append-only discipline, cross-domain writes (observations → People/, tasks → Projects/, contributions → Journal/)
 3. **Testable locally with no MCP dependency** — user types observations, tasks, and captures using Myna's own development work as test data (D027)
 4. **Covers the "process paste" pattern** — Quick Capture with pasted external content exercises the external-content-as-data treatment, covering the pattern D026 identified as needing explicit exercise
 5. **Immediately useful** — the user can start tracking Myna development tasks, observations, and contributions right away
-6. **Patterns transfer to other skills** — the multi-destination routing and provenance tagging patterns established here are reused by process (email/Slack extraction), process-meeting (meeting note extraction), and wrap-up (contribution detection)
+6. **Patterns transfer to other skills** — the multi-destination routing and provenance tagging patterns established here are reused by myna-process-messages (email/Slack extraction), myna-process-meeting (meeting note extraction), and myna-wrap-up (contribution detection)
 
-**Alternative considered:** process-meeting — exercises the extraction pipeline more heavily but is a narrower workflow (single meeting → vault). Capture exercises more pattern diversity (task creation, observation logging, link saving, project updates, contribution tracking) in addition to the core routing/provenance patterns.
+**Alternative considered:** myna-process-meeting — exercises the extraction pipeline more heavily but is a narrower workflow (single meeting → vault). myna-capture exercises more pattern diversity (task creation, observation logging, link saving, project updates, contribution tracking) in addition to the core routing/provenance patterns.
+
+---
+
+## 14. Memory Model
+
+Myna maintains three layers of behavioral rules with explicit precedence (D048). The layers are loaded together at session start and compose at runtime.
+
+### Three Layers
+
+| Layer | Lives in | Authoritative for | Skill writes? |
+|-------|----------|-------------------|---------------|
+| Hard rules | 5 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline | Never |
+| User bootstrap | `CLAUDE.md` | Initial preferences and project context written by the user at setup | Never |
+| Emergent preferences | `vault/_meta/learnings/{domain}.md` | Observed user preferences, patterns, and corrections | myna-learn only |
+
+### Runtime Precedence
+
+1. **Hard rules in steering ALWAYS win.** Immutable at runtime; cannot be overridden by any learning or `CLAUDE.md` entry.
+2. **Active learnings override `CLAUDE.md`** when they conflict on the same scope. Learnings reflect the user's current state observed from interaction; `CLAUDE.md` is bootstrap.
+3. **`CLAUDE.md` applies** in the absence of a relevant learning.
+
+The myna-learn skill never touches `CLAUDE.md`. Conflicts between learnings and `CLAUDE.md` are resolved by precedence at runtime, not by file edits — the user manages `CLAUDE.md` manually. The full resolution rule and the domain mapping table that skills use both live in the myna-steering-memory skill.
+
+### Learnings as a Content Type
+
+Learnings are stored as plain markdown under `vault/_meta/learnings/{domain}.md` with one file per domain (`email`, `meetings`, `tasks`, `people`, `general`). Each file has two sections:
+
+- **Active** — entries that take effect immediately. Loaded at session start and applied to behavior throughout the session.
+- **Proposed** — entries observed but not yet confirmed. Dormant until promoted.
+
+Entries use the standard provenance markers (`[User]`, `[Auto]`, `[Inferred]`, `[Verified]`) per myna-steering-conventions. Promotion happens when a Proposed entry's observation count reaches 3 across reflection passes (not in-session occurrences) or when the user explicitly confirms it. Per reflection pass, each pattern increments by at most +1, which prevents one bad day from auto-promoting a wrong rule.
+
+### Reflection and Capture
+
+The myna-learn skill exposes three operations: `capture` (write a new entry), `reflect` (look back over the session for patterns), and `delete` (remove a wrong entry). Capture runs from two paths — explicit user statement ("remember that...") or main agent in-the-moment detection of a clear directive. Reflection runs as the final step of myna-wrap-up and is the only path that promotes Proposed entries to Active. Natural-language intent recognition is preferred over keyword matching: the main agent invokes myna-learn when the user expresses save / recall / forget intent in any phrasing.
+
+In v1, only the main agent (and myna-wrap-up's reflection step) invokes myna-learn. Other skills do not capture learnings directly — capture is centralized through the main agent recognizing user intent. This avoids scattering capture logic across 24 skills before we know what kinds of detection are worth building.
+
+### Output Boundary
+
+Learnings inform Myna's behavior, never the content of its outputs. Drafts, replies, briefings, prep docs, and other user-facing text never reference learnings. The only context where learning content appears in conversational output is when the user explicitly asks Myna to summarize or list its current learnings — and only to the user, never to a third party via Myna's drafts.
+
+See the myna-learn skill for the full operation set, file format, examples, and the negotiation sub-procedure for handling user pushback on a promotion.
