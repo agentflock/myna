@@ -4,7 +4,7 @@
 
 Myna is a set of AI agent instructions that turn Claude Code into a personal assistant for tech professionals. The user types natural language prompts inside Claude Code. Myna reads from external sources (email, Slack, calendar) via MCP servers and writes exclusively to a local Obsidian vault under a single `myna/` subfolder. All agent instructions are plain markdown — readable by any LLM, but designed and tested for Claude Code (D045, D046).
 
-Architecturally, Myna is one main agent with 24 skills. The main agent handles routing and simple operations. Cross-cutting rules live in 5 steering skills, preloaded via the subagent's `skills:` frontmatter field. Feature skills are loaded on demand (progressive disclosure — only their name and description are in context until activated). Config lives in 6 YAML files read at session start.
+Architecturally, Myna is one main agent with 24 skills. The main agent handles routing and simple operations. Cross-cutting rules live in 6 steering skills, preloaded via the subagent's `skills:` frontmatter field. Feature skills are loaded on demand (progressive disclosure — only their name and description are in context until activated). Config lives in 6 YAML files read at session start.
 
 There are no subagents in v1. No automatic skill chaining — each skill outputs its result and tells the user what to do next if a follow-up action is needed.
 
@@ -13,11 +13,11 @@ There are no subagents in v1. No automatic skill chaining — each skill outputs
 Myna uses Claude Code's native agent and skills mechanisms:
 
 1. **Main agent** — `~/.claude/agents/myna.md` contains identity, routing logic, and direct operations. Frontmatter lists steering skills via the `skills:` field for preloading.
-2. **Steering skills** — 5 skills with `user-invocable: false` preloaded at startup via the agent's `skills:` field. Always in context.
+2. **Steering skills** — 6 skills with `user-invocable: false` preloaded at startup via the agent's `skills:` field. Always in context.
 3. **Feature skills** — 24 skills in `~/.claude/skills/myna-*/SKILL.md`. Only names and descriptions in context at startup. Full content loaded on demand when invoked.
 4. **Config** — 6 YAML files read at session start from `{vault_path}/myna/_system/config/`
 
-MCP servers (myna-obsidian and any external servers like email, Slack, calendar) are registered with Claude Code via `claude mcp add` and are available as tools in every session. Skills call MCP tools directly by name.
+External MCP servers (email, Slack, calendar) are registered with Claude Code via `claude mcp add` and are available as tools in every session. Skills call MCP tools directly by name. Vault operations use Claude Code's built-in tools guided by the `myna-steering-vault-ops` steering skill — no MCP server required for vault access.
 
 ---
 
@@ -509,6 +509,7 @@ skills:
   - myna-steering-output
   - myna-steering-system
   - myna-steering-memory
+  - myna-steering-vault-ops
 ---
 ```
 
@@ -531,6 +532,7 @@ Cross-cutting rules preloaded at startup via the agent's `skills:` frontmatter f
 | myna-steering-output | Human-sounding output rules, BLUF default, file links in output, no AI tells |
 | myna-steering-system | Feature toggle checking, config reload, graceful degradation, error recovery with retry TODOs, relative date resolution, prompt logging |
 | myna-steering-memory | Memory model precedence, domain mapping table, learning file format rules |
+| myna-steering-vault-ops | Vault file I/O patterns, task query patterns (grep-based), frontmatter parsing, backlink/tag search, template creation, daily/weekly note path conventions |
 
 ### Feature Skills
 
@@ -758,21 +760,11 @@ tags:
 
 ## 6. MCP Integration
 
-### Myna Obsidian MCP (shipped by Myna)
+### Vault Operations (built-in tools + steering skill)
 
-The only MCP Myna builds. A thin wrapper around Obsidian CLI (D008) that exposes vault operations:
+Myna does NOT ship an MCP server for vault operations. Skills interact with the vault using Claude Code's built-in tools (Read, Write, Edit, Grep, Glob). The `myna-steering-vault-ops` steering skill provides patterns for common vault queries — task lookups, frontmatter parsing, backlink/tag searches, template creation, and daily note path resolution.
 
-| Tool | Purpose |
-|------|---------|
-| search | Vault-wide search using Obsidian's index |
-| tasks | List/query tasks via the Tasks plugin |
-| daily-note | Create, read, append to daily notes |
-| create-from-template | Create notes using Obsidian templates |
-| read | Structured file read |
-| write | Structured file write (restricted to myna/ subfolder) |
-| eval | Run JavaScript (Dataview queries, custom logic) |
-
-Falls back to raw file read/write if Obsidian isn't running. The MCP is lightweight — easy to update as Obsidian releases new CLI features.
+This makes Myna a pure markdown system with no runtime dependencies beyond Claude Code. Obsidian is the user's editor, not a required runtime component.
 
 ### External MCPs (user-provided)
 
@@ -784,34 +776,7 @@ Myna does NOT build MCPs for email, Slack, or calendar (D005). It connects to wh
 | Slack | myna-process-messages, myna-unreplied-threads | No |
 | Calendar | myna-sync, myna-prep-meeting, myna-calendar (reading schedule, creating events) | No |
 
-All MCP servers — both myna-obsidian and external ones — are registered with Claude Code via `claude mcp add`. MCP server names are configured in workspace.yaml so skills know which tool names to call. Skills call MCP tools directly by name (e.g., the tool names from the user's email MCP server). The `mcp_servers` map in workspace.yaml records the server names for reference.
-
-### MCP vs Built-in Tools
-
-Skills use Claude Code's **built-in tools for plain file I/O** — not the Obsidian MCP. The Obsidian MCP is reserved for operations that require Obsidian-specific features.
-
-**Use Claude Code built-in tools:**
-
-| Tool | For |
-|------|-----|
-| Read | Reading any vault file |
-| Write | Creating or overwriting vault files |
-| Edit | Appending to or modifying vault files |
-| Grep | Searching file contents (e.g., near-duplicate detection) |
-| Glob | Finding files by name pattern |
-
-**Use Obsidian MCP only for:**
-
-| MCP Tool | Why it can't be done with built-in tools |
-|----------|------------------------------------------|
-| `tasks` | Queries the Tasks plugin — aggregates across files, understands task metadata, recurrence, completion state |
-| `search` | Uses Obsidian's index — metadata-aware, faster on large vaults than grep |
-| `create_from_template` | Uses Obsidian's template system with variable substitution |
-| `eval` | Runs Dataview queries via Obsidian's JavaScript engine |
-| `backlinks` | Queries Obsidian's link graph |
-| `tags` | Queries Obsidian's tag index |
-
-**Why:** Built-in tools are faster (no MCP roundtrip), simpler (no server dependency), and improve graceful degradation — basic vault operations work even when Obsidian isn't running.
+External MCP servers are registered with Claude Code via `claude mcp add`. MCP server names are configured in workspace.yaml so skills know which tool names to call. Skills call MCP tools directly by name (e.g., the tool names from the user's email MCP server). The `mcp_servers` map in workspace.yaml records the server names for reference.
 
 ---
 
@@ -945,9 +910,8 @@ All agent content — skills, steering, main agent, config schemas — is plain 
 | Source artifact | Install output |
 |----------------|---------------|
 | Main agent (`agents/main.md`) | Installed to `~/.claude/agents/myna.md` with path placeholders substituted. Frontmatter lists steering skills for preloading via the `skills:` field. |
-| Steering skills (`agents/skills/myna-steering-*/SKILL.md`, 5 files) | Copied to `~/.claude/skills/myna-steering-*/SKILL.md`. Preloaded at session start via the agent's `skills:` field. |
+| Steering skills (`agents/skills/myna-steering-*/SKILL.md`, 6 files) | Copied to `~/.claude/skills/myna-steering-*/SKILL.md`. Preloaded at session start via the agent's `skills:` field. |
 | Feature skills (`agents/skills/myna-*/SKILL.md`, 24 files) | Copied to `~/.claude/skills/myna-*/SKILL.md`. Loaded on demand via Claude Code's native progressive disclosure. |
-| MCP server source (`agents/mcp/myna-obsidian/`) | Copied to `~/.myna/mcp/myna-obsidian/`, `npm install && npm run build` run there, registered via `claude mcp add` pointing at the built `dist/index.js`. |
 | Config `.example` files | Copied to `<vault>/<subfolder>/_system/config/` alongside starter `.yaml` files (only created if missing). |
 | Install manifest | `~/.myna/install-manifest.json` records all paths written, for a future uninstall command. |
 | Version file | `~/.myna/version` records the installed version for upgrade checks. |
@@ -957,9 +921,9 @@ All agent content — skills, steering, main agent, config schemas — is plain 
 - The repo's `CLAUDE.md` (developer project instructions — different audience, separate file from the runtime agent prompt).
 - Existing vault config YAML files (`workspace.yaml`, `projects.yaml`, etc.) — `.example` files are always refreshed but user-edited configs are preserved.
 
-**Subagent frontmatter** includes `name`, `description`, and `skills` (listing the 5 steering skills for preloading). Other fields (`model`, `tools`, `mcpServers`, `permissionMode`, `memory`) are omitted so Myna inherits session defaults. Users can override any of these by editing `~/.claude/agents/myna.md` directly.
+**Subagent frontmatter** includes `name`, `description`, and `skills` (listing the 6 steering skills for preloading). Other fields (`model`, `tools`, `mcpServers`, `permissionMode`, `memory`) are omitted so Myna inherits session defaults. Users can override any of these by editing `~/.claude/agents/myna.md` directly.
 
-**Invocation model:** Global subagent. `claude --agent myna` works from any directory. Update flow: `git pull && ./install.sh` re-copies skills, rebuilds the MCP, and regenerates the agent file; vault configs are preserved.
+**Invocation model:** Global subagent. `claude --agent myna` works from any directory. Update flow: `git pull && ./install.sh` re-copies skills and regenerates the agent file; vault configs are preserved.
 
 The previous two-layer architecture (content layer + adapter layer, D038) has been superseded. See D046 for rationale. The previous project-CLAUDE.md install model (D047) has been superseded by D049.
 
@@ -998,7 +962,7 @@ Myna maintains three layers of behavioral rules with explicit precedence (D048).
 
 | Layer | Lives in | Authoritative for | Skill writes? |
 |-------|----------|-------------------|---------------|
-| Hard rules | 5 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline | Never |
+| Hard rules | 6 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline, vault tool patterns | Never |
 | User bootstrap | `CLAUDE.md` | Initial preferences and project context written by the user at setup | Never |
 | Emergent preferences | `vault/_meta/learnings/{domain}.md` | Observed user preferences, patterns, and corrections | myna-learn only |
 

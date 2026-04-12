@@ -992,44 +992,53 @@ Approved items are written to destinations with [Verified] tag, removed from the
 
 ---
 
-## 7. Myna Obsidian MCP Tool Surface
+## 7. Vault Operations
 
-The Myna Obsidian MCP wraps the Obsidian CLI to provide Obsidian-specific vault operations. The MCP server implementation lives in `agents/mcp/myna-obsidian/`.
+Myna does NOT ship an MCP server for vault operations. Skills interact with the vault using Claude Code's built-in tools (Read, Write, Edit, Grep, Glob). The `myna-steering-vault-ops` steering skill provides the full pattern library for common vault queries. This makes Myna a pure markdown system — no runtime dependencies beyond Claude Code. Obsidian is the user's editor, not a required runtime component.
 
-### 7.0 File I/O: Built-in Tools vs Obsidian MCP
+### 7.0 File I/O: Built-in Tools
 
-Skills use **Claude Code's built-in tools for plain file I/O** — reading, writing, editing, searching, and finding files. The Obsidian MCP is reserved for operations that require Obsidian-specific features (Tasks plugin queries, indexed search, template substitution, Dataview, backlinks, tags).
+| Claude Code Tool | Purpose |
+|-----------------|---------|
+| Read | Read any vault file |
+| Write | Create or overwrite a vault file |
+| Edit | Append to, prepend to, or modify sections of a vault file |
+| Grep | Search file contents for patterns — task queries, near-duplicate detection, backlink/tag lookups |
+| Glob | Find files by name pattern |
 
-**Why:** Built-in tools are faster (no MCP roundtrip), simpler (no server dependency), and improve graceful degradation — basic vault operations work even when Obsidian isn't running.
+**Task queries via Grep:**
 
-**Built-in tools for file I/O:**
+| Query | Pattern |
+|-------|---------|
+| Open tasks | `- \[ \]` |
+| Completed tasks | `- \[x\]` |
+| Filter by project | `\[project:: {name}\]` in task line |
+| Filter by type | `\[type:: {type}\]` (task, delegation, dependency, reply-needed, retry) |
+| Filter by person | `\[person:: {name}\]` |
+| Overdue detection | `📅 {date}` — compare against today |
+| Pending review | `\[review-status:: pending\]` |
+| Recurrence | `🔁 every {interval}` |
+| Priority | `⏫` (high), `🔼` (medium), `🔽` (low) |
 
-| Claude Code Tool | Replaces MCP tool | Purpose |
-|-----------------|-------------------|---------|
-| Read | `read` | Read any vault file |
-| Write | `write` | Create or overwrite a vault file |
-| Edit | `append`, `prepend`, `overwrite-section` | Append to, prepend to, or modify sections of a vault file |
-| Grep | (partial `search`) | Search file contents for patterns — near-duplicate detection, finding entries |
-| Glob | — | Find files by name pattern |
+**Frontmatter operations:** Read the file, parse YAML between `---` markers. Set a property: Edit the specific property line.
 
-**Obsidian MCP tools (used only for Obsidian-specific features):**
+**Backlink queries:** Grep for `\[\[filename\]\]` or `\[\[filename\|` across the vault.
 
-| MCP Tool | Purpose | Why MCP is needed |
-|----------|---------|-------------------|
-| search | Vault-wide search using Obsidian's index | Metadata-aware, faster on large vaults than grep |
-| tasks | Query tasks via Obsidian Tasks plugin | Aggregates across files, understands task metadata, recurrence, completion state |
-| create-from-template | Create notes from `_system/templates/` with variable substitution | Uses Obsidian's template engine |
-| eval | Run Dataview queries or JavaScript expressions | Requires Obsidian's JavaScript engine |
-| backlinks | List files linking to a given file | Requires Obsidian's link graph |
-| tags | List tags or find files with a specific tag | Requires Obsidian's tag index |
-| move | Move or rename a file within the vault | Obsidian updates internal links automatically |
-| delete | Delete a file (restricted to `myna/` subfolder) | Obsidian updates backlinks on deletion |
-| property_read | Read a YAML frontmatter property | Obsidian's structured property access |
-| property_set | Set a YAML frontmatter property | Obsidian's structured property access |
+**Tag queries:** Grep for `#tagname` (word boundary aware). List all tags: Grep for `#[a-zA-Z][\w-]*` across vault, unique.
 
-**Vault-only writes:** All write operations — whether via built-in tools or MCP — must target paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes). The steering safety rules enforce this at the instruction level; the MCP enforces it at the tool level for MCP operations.
+**Template creation:** Read template from `_system/templates/{type}.md`, substitute `{{name}}`, `{{date}}`, `{{project}}` variables, write the new file. If template doesn't exist, create a minimal file with frontmatter and appropriate tag.
 
-**Fallback:** When Obsidian isn't running, the MCP server falls back to direct file I/O for tools that support it. `search` falls back to text search. `tasks` falls back to regex matching of TODO syntax. `backlinks` and `tags` fall back to scanning wiki-link and tag patterns. `create-from-template` falls back to copying template content with variable substitution. `eval` is unavailable in fallback mode — skills that use it degrade gracefully. Built-in tool operations are unaffected since they don't depend on Obsidian.
+**Daily/weekly note paths:**
+- Daily note: `Journal/DailyNote-{YYYY-MM-DD}.md`
+- Weekly note: `Journal/WeeklyNote-{YYYY-MM-DD}.md` (Monday date)
+- Contributions: `Journal/contributions-{YYYY-MM-DD}.md` (Monday date)
+- Archive: `Journal/Archive/`
+
+**File move (for journal archiving):** Use Bash with `mv` command to move files within the vault.
+
+**Vault-only writes:** All write operations must target paths under the configured `myna/` subfolder. This enforces D011 (vault-only writes). The myna-steering-safety skill enforces this at the instruction level.
+
+The full pattern library with examples lives in `myna-steering-vault-ops`.
 
 ### 7.1 External MCP Operations
 
@@ -1313,7 +1322,7 @@ Behavioral rules in Myna live in three layers with explicit precedence (D048). T
 
 | Layer | Lives in | Authoritative for | Skill writes? |
 |-------|----------|-------------------|---------------|
-| Hard rules | 5 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline | Never |
+| Hard rules | 6 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline, vault tool patterns | Never |
 | User bootstrap | `CLAUDE.md` | Initial preferences and project context written by the user at setup | Never |
 | Emergent preferences | `vault/_meta/learnings/{domain}.md` | Observed user preferences, patterns, and corrections | myna-learn only |
 
