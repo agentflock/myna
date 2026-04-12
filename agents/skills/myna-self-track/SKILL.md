@@ -81,8 +81,9 @@ week_start: {YYYY-MM-DD}
 
 4. Append the entry:
 ```
-- [{YYYY-MM-DD} | capture] **{category}:** {description} [User]
+- [{YYYY-MM-DD} | capture] **{category}:** {description}[; impact: {impact}] [User]
 ```
+Include `; impact: {impact}` only when the user states the impact explicitly. Omit when not mentioned.
 
 5. Confirm: "Logged: [{category}] {description}"
 

@@ -316,7 +316,7 @@ User: "Prep me for a conversation with Alex about repeatedly missing sprint comm
 **How:**
 1. Determine type: MBR (Monthly Business Review), MTR (Monthly Tech Review), or QBR (Quarterly Business Review). Ask if unclear.
 2. Read all project files in `Projects/` — extract timeline entries from the past month (or past quarter for QBR).
-3. Read `Journal/contributions-{week}.md` files for the relevant period.
+3. Read `Journal/contributions-{YYYY-MM-DD}.md` files for the relevant period (Monday-dated weekly files).
 4. Compile: progress per project, key decisions, blockers resolved vs outstanding, contribution highlights.
 5. For QBR: add month-over-month trend analysis — what's improved, what's persisted, what's new.
 6. Audience: ask user for audience (self, leadership, team) and apply appropriate depth.

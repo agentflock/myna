@@ -31,7 +31,7 @@ When the user says "capture: [text]", decompose the input into its components an
 | Observation about a person (strength, growth area) | `People/{person-slug}.md` → Observations section |
 | Project update, decision, blocker, risk | `Projects/{project-slug}.md` → Timeline section |
 | Task or action item | `Projects/{project-slug}.md` or daily note (if no project) |
-| Your own contribution | `Journal/contributions-{week-monday}.md` |
+| Your own contribution | `Journal/contributions-{YYYY-MM-DD}.md` (Monday date) |
 | Personal note unrelated to projects/people | Daily note or user specifies |
 | Ambiguous destination | Review queue (`ReviewQueue/review-work.md` or `review-people.md`) |
 
@@ -76,7 +76,7 @@ When the user says "capture: [text]", decompose the input into its components an
 - [2026-04-05 | capture] **{strength|growth-area|contribution}:** {observation} [Auto] (capture, 2026-04-05)
 ```
 
-**Contributions log** (`Journal/contributions-{monday-date}.md`):
+**Contributions log** (`Journal/contributions-{YYYY-MM-DD}.md` — Monday date):
 ```
 - [2026-04-05 | capture] **{category}:** {description} [Inferred] (capture, 2026-04-05)
 ```
@@ -88,7 +88,7 @@ User: "capture: Sarah did a great job handling the auth incident, and the auth m
 Decompose:
 - Recognition for Sarah (explicit) → `People/sarah-chen.md` Recognition section → `[Auto]`
 - Auth migration unblocked (explicit project update) → `Projects/auth-migration.md` Timeline → `[Auto]`
-- Your contribution (handled the incident — inferred; user didn't explicitly say they were involved) → check `self_tracking` toggle → if enabled, `Journal/contributions-{week}.md` → `[Inferred]`
+- Your contribution (handled the incident — inferred; user didn't explicitly say they were involved) → check `self_tracking` toggle → if enabled, `Journal/contributions-{YYYY-MM-DD}.md` (Monday date) → `[Inferred]`
 
 Writes:
 1. `People/sarah-chen.md` — Recognition: `- [2026-04-05 | capture] Great handling of auth incident — resolved within SLA [Auto] (capture, 2026-04-05)`
