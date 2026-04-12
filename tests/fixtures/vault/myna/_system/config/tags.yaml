@@ -1,0 +1,68 @@
+tags:
+  - name: atlas-migration
+    type: project-based
+    project: Atlas Migration
+
+  - name: phoenix-platform
+    type: project-based
+    project: Phoenix Platform
+
+  - name: compass
+    type: project-based
+    project: Compass v1
+
+  - name: helix-research
+    type: project-based
+    project: Helix Research
+
+  - name: bridge-integration
+    type: project-based
+    project: Bridge Integration
+
+  - name: aurora-dashboard
+    type: project-based
+    project: Aurora Dashboard
+
+  - name: sentinel-security
+    type: project-based
+    project: Sentinel Security
+
+  - name: urgent
+    type: keyword-based
+    keywords: [urgent, critical, ASAP, blocker, P0, P1]
+
+  - name: hiring
+    type: keyword-based
+    keywords: [interview, candidate, hiring, onboarding, offer, debrief]
+
+  - name: incident
+    type: keyword-based
+    keywords: [incident, outage, postmortem, rollback, SEV1, SEV2]
+
+  - name: security
+    type: keyword-based
+    keywords: [CVE, vulnerability, security, pentest, audit]
+
+  - name: sarah-carter
+    type: person-based
+    person: Sarah Carter
+
+  - name: marcus-walker
+    type: person-based
+    person: Marcus Walker
+
+  - name: rachel-davis
+    type: person-based
+    person: Rachel Davis
+
+  - name: from-email
+    type: source-based
+    source: email
+
+  - name: from-slack
+    type: source-based
+    source: slack
+
+  - name: from-meeting
+    type: source-based
+    source: meeting

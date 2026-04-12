@@ -1,0 +1,105 @@
+projects:
+  - name: Atlas Migration
+    aliases: [atlas, AM, atlas-mig]
+    status: active
+    email_folders:
+      - "Atlas Migration/"
+    slack_channels:
+      - atlas-team
+      - atlas-migration
+    description: "Migrating the legacy auth service to the new internal OAuth2 platform"
+    key_people:
+      - Sarah Carter
+      - Alex Thompson
+
+  - name: Phoenix Platform
+    aliases: [phoenix, PP]
+    status: active
+    email_folders:
+      - "Phoenix/"
+    slack_channels:
+      - phoenix-eng
+      - phoenix-ingestion
+    description: "New internal data platform — ingestion, query layer, and downstream analytics"
+    key_people:
+      - Marcus Walker
+      - Alex Thompson
+
+  - name: Compass v1
+    aliases: [compass]
+    status: complete
+    email_folders:
+      - "Compass/"
+    slack_channels:
+      - compass-launch
+    description: "Customer onboarding rewrite — shipped March 2026"
+    key_people:
+      - Sarah Carter
+      - Rachel Davis
+
+  - name: Helix Research
+    aliases: [helix]
+    status: active
+    email_folders:
+      - "Helix/"
+    slack_channels:
+      - helix-research
+    description: "Exploratory spike on vector search for the recommendation pipeline"
+    key_people:
+      - Laura Hayes
+
+  - name: Bridge Integration
+    aliases: [bridge, BI]
+    status: active
+    email_folders:
+      - "Bridge/"
+    slack_channels:
+      - bridge-integration
+      - payments-platform
+    description: "Cross-team integration between Platform auth and Payments merchant APIs"
+    key_people:
+      - Rachel Davis
+      - Emily Parker
+      - Sarah Carter
+
+  - name: Aurora Dashboard
+    aliases: [aurora, AD]
+    status: active
+    email_folders:
+      - "Aurora/"
+    slack_channels:
+      - aurora-dashboard
+    description: "Internal analytics dashboard for engineering leadership — Nate's first lead project"
+    key_people:
+      - Nate Brooks
+      - Laura Hayes
+
+  - name: Sentinel Security
+    aliases: [sentinel, SS]
+    status: active
+    email_folders:
+      - "Sentinel/"
+    slack_channels:
+      - sentinel-security
+      - platform-sec
+    description: "Q2 security hardening pass across Platform services — partnered with Security team"
+    key_people:
+      - Chris Wilson
+      - Sarah Carter
+
+triage:
+  inbox_source: "INBOX"
+  folders:
+    - name: Reply
+      description: "Needs a response from me"
+    - name: FYI
+      description: "Informational, no action needed"
+    - name: Follow-Up
+      description: "Waiting on someone else"
+    - name: Schedule
+      description: "Needs a meeting or calendar action"
+    - name: Trainings
+      description: "Training invitations, course materials, learning resources"
+    - name: Hiring
+      description: "Candidate pipelines, interview debriefs, offer discussions"
+  draft_replies_folder: DraftReplies

@@ -1,0 +1,31 @@
+# Optional overrides. Most meetings need no entry — type inferred from calendar.
+meetings:
+  - name: Atlas Standup
+    aliases: [atlas standup, atlas daily, atlas sync]
+    type: recurring
+    project: Atlas Migration
+
+  - name: Platform Weekly
+    aliases: [platform sync, platform weekly sync, platform team weekly]
+    type: recurring
+    project: Phoenix Platform
+
+  - name: Eng Leads Sync
+    aliases: [eng leads, leads sync, engineering leads]
+    type: recurring
+
+  - name: Atlas Caching Design Review
+    aliases: [caching review, atlas design, caching design]
+    type: adhoc
+    project: Atlas Migration
+    debrief_type: design-review
+
+  - name: Bridge Integration Kickoff
+    aliases: [bridge kickoff, bridge integration kickoff]
+    type: adhoc
+    project: Bridge Integration
+
+  - name: Sentinel Q2 Planning
+    aliases: [sentinel planning, q2 security planning]
+    type: adhoc
+    project: Sentinel Security

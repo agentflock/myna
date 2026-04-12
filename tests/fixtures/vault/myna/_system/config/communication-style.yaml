@@ -1,0 +1,17 @@
+default_preset: professional
+
+presets_per_tier:
+  upward: executive
+  peer: conversational
+  direct: coaching
+  cross-team: diplomatic
+
+sign_off: "Thanks"
+difficult_message_approach: direct-but-kind
+
+email_preferences:
+  max_length: medium
+  greeting_style: first-name
+messaging_preferences:
+  formality: casual
+  emoji_usage: minimal

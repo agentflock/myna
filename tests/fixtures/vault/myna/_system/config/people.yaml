@@ -1,0 +1,127 @@
+people:
+  - display_name: Sarah Carter
+    full_name: Sarah Carter
+    aliases: [SC, scarter, sarah-c]
+    email: sarah.carter@acme.io
+    slack_handle: scarter
+    relationship_tier: direct
+    role: Senior Software Engineer
+    team: Platform
+    feedback_cycle_days: 21
+    birthday: "04-14"
+    work_anniversary: "2023-06-01"
+
+  - display_name: Sarah Mitchell
+    full_name: Sarah Mitchell
+    aliases: [SM, smitchell, sarah-m]
+    email: sarah.mitchell@acme.io
+    slack_handle: smitchell
+    relationship_tier: cross-team
+    role: Senior Product Manager
+    team: Growth
+
+  - display_name: Alex Thompson
+    full_name: Alex Thompson
+    aliases: [AT, athompson]
+    email: alex.thompson@acme.io
+    slack_handle: athompson
+    relationship_tier: peer
+    role: Principal Engineer
+    team: Infrastructure
+
+  - display_name: Marcus Walker
+    full_name: Marcus Walker
+    aliases: [MW, mwalker]
+    email: marcus.walker@acme.io
+    slack_handle: mwalker
+    relationship_tier: direct
+    role: Software Engineer II
+    team: Platform
+    work_anniversary: "2024-09-15"
+
+  - display_name: Rachel Davis
+    full_name: Rachel Davis
+    aliases: [RD, rdavis]
+    email: rachel.davis@acme.io
+    slack_handle: rdavis
+    relationship_tier: direct
+    role: Senior Software Engineer
+    team: Platform
+    birthday: "07-22"
+    work_anniversary: "2021-11-03"
+
+  - display_name: James Miller
+    full_name: James Miller
+    aliases: [james-m, JM]
+    email: james.miller@acme.io
+    slack_handle: jmiller
+    relationship_tier: upward
+    role: VP Engineering
+    team: Engineering Leadership
+
+  - display_name: David Clark
+    full_name: David Clark
+    aliases: [DC, dclark, david-c]
+    email: david.clark@acme.io
+    slack_handle: dclark
+    relationship_tier: upward
+    role: Director of Engineering
+    team: Engineering Leadership
+
+  - display_name: Jessica Ryan
+    relationship_tier: peer
+
+  - display_name: Jake Anderson
+    full_name: Jake Anderson
+    email: jake.anderson@vectorvendor.com
+    relationship_tier: cross-team
+    role: Principal Solutions Engineer
+    team: VectorVendor (external)
+
+  - display_name: Emily Parker
+    full_name: Emily Parker
+    aliases: [EP, eparker]
+    email: emily.parker@acme.io
+    slack_handle: eparker
+    relationship_tier: cross-team
+    role: Senior Product Manager
+    team: Payments
+
+  - display_name: Chris Wilson
+    full_name: Chris Wilson
+    aliases: [CW, cwilson]
+    email: chris.wilson@acme.io
+    slack_handle: cwilson
+    relationship_tier: peer
+    role: Senior Security Engineer
+    team: Security
+
+  - display_name: Nate Brooks
+    full_name: Nate Brooks
+    aliases: [NB, nbrooks]
+    email: nate.brooks@acme.io
+    slack_handle: nbrooks
+    relationship_tier: direct
+    role: Software Engineer I
+    team: Platform
+    work_anniversary: "2025-12-08"
+
+  - display_name: Laura Hayes
+    full_name: Laura Hayes
+    aliases: [LH, lhayes]
+    email: laura.hayes@acme.io
+    slack_handle: lhayes
+    relationship_tier: direct
+    role: Senior Data Scientist
+    team: Platform
+    birthday: "10-03"
+    work_anniversary: "2022-03-14"
+
+  - display_name: Megan O'Brien
+    full_name: Megan O'Brien
+    aliases: [MO, mobrien]
+    email: megan.obrien@acme.io
+    slack_handle: mobrien
+    relationship_tier: peer
+    role: HR Business Partner
+    team: People Operations
