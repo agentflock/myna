@@ -205,11 +205,45 @@ For each calendar event today, if `features.meeting_prep` is enabled:
    - One-off → `Meetings/Adhoc/{meeting-slug}.md`
    - Check `meetings.yaml` for manual overrides
 
-2. If the meeting file doesn't exist, create it with the appropriate template (see foundations.md §2.3–2.5).
+2. If the meeting file doesn't exist, create it. Check `_system/templates/` for a matching template file (e.g., `meeting-1-1.md`, `meeting-recurring.md`, `meeting-adhoc.md`). If a template exists, use it; if not, create a minimal file:
+
+   For **1:1 meetings** (`Meetings/1-1s/{person-slug}.md`):
+   ```markdown
+   ---
+   type: 1-1
+   person: [[{person-slug}]]
+   ---
+   #meeting #1-1
+   ```
+
+   For **recurring meetings** (`Meetings/Recurring/{slug}.md`):
+   ```markdown
+   ---
+   type: recurring
+   project: {project-name or null}
+   ---
+   #meeting #recurring
+   ```
+
+   For **adhoc meetings** (`Meetings/Adhoc/{slug}.md`):
+   ```markdown
+   ---
+   type: adhoc
+   ---
+   #meeting #adhoc
+   ```
+
+   Then append the session section below.
 
 3. If the file exists, check whether a prep section for today's date already exists. If yes, skip (don't duplicate). If no, append a new session section.
 
-4. Prep content varies by meeting type — generate the appropriate content per the meeting type rules in myna-prep-meeting. For myna-sync, generate a minimal prep (carry-forwards, open action items, recent project context). Full deep prep (feedback coaching, career context, etc.) is available on demand via myna-prep-meeting.
+4. For myna-sync, generate **minimal prep** — enough to orient the user before the meeting without the full depth that myna-prep-meeting provides:
+   - Carry-forward items: unchecked items from the previous session's Prep section (if the meeting file exists)
+   - Open action items between you and attendees: Grep project files for `[person:: {attendee-name}]` open tasks
+   - Recent project context: last 2–3 timeline entries from the relevant project file
+   - For 1:1s only: a reminder of the last 1:1 date and count of carry-forward items
+
+   Full deep prep (pending feedback, coaching suggestions, career topics, personal notes) is available on demand via myna-prep-meeting. Add a note at the top of the Prep section: "Basic prep from sync. Say 'prep for [meeting]' for full prep."
 
 Meeting file is wiki-linked in the daily note's Today's Meetings section.
 

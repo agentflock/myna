@@ -68,7 +68,9 @@ The prefix comes from workspace.yaml `calendar_event_prefix` (default: `[Myna]`)
 
 **Step 4: Create the event**
 
-Only after explicit user confirmation. Call the calendar MCP's create_event tool with:
+Only after explicit user confirmation. Before calling the calendar MCP tool, verify: (a) no attendees field is populated, (b) event title includes the configured prefix. If either check fails, stop and report the issue rather than proceeding.
+
+Call the calendar MCP's create_event tool with:
 - `title`: `{prefix}:{type_label} {purpose}`
 - `start`: ISO datetime
 - `end`: ISO datetime
@@ -149,13 +151,15 @@ Write these as tasks in the project file? (yes / edit first / cancel)
 
 **Step 3: Write subtasks (on confirmation)**
 
-Append subtasks to the relevant project file's `## Open Tasks` section as Obsidian Tasks plugin TODOs:
+Append subtasks directly after the `## Open Tasks` section header in the relevant project file (before the Dataview block, not inside it). Use Obsidian Tasks plugin TODO format:
 
 ```
-- [ ] {subtask description} 📅 {date if suggested} [project:: {project}] [type:: task] [Auto] (capture, {YYYY-MM-DD})
+- [ ] {subtask description} 📅 {YYYY-MM-DD if suggested} [project:: {project}] [type:: task] [Auto] (capture, {YYYY-MM-DD})
 ```
 
-If no project file is found, write to the current daily note instead.
+If no project file is found, append them to the current daily note's `## Morning Focus` section (or at the end of the file if Morning Focus doesn't exist).
+
+Tasks go in the project file, not the Dataview query block — the Dataview query will automatically pick them up.
 
 **Step 4: Optionally schedule**
 

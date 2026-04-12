@@ -110,6 +110,8 @@ Completed {N} tasks. Carried {M} to next week.
 - If delegation overdue: "{Person}'s {task} is {N} days overdue. Is it blocked? Did the priority change?"
 - If low meeting count: "Lighter meeting week — did you get the deep work time you needed, or did other things fill it?"
 - If high meeting count: "Heavy meeting week ({N} hrs). What would you protect next week for focused work?"
+- If time allocation imbalanced (e.g., most hours in meetings, few tasks completed): "You spent {N} hrs in meetings this week and completed {M} tasks. Is that the balance you wanted?"
+- If overdue delegations persist across the week: "You had {N} overdue delegations at the start of the week. {M} are still open. What's blocking resolution?"
 - General: "What would have made this week better?"
 ```
 
@@ -117,7 +119,21 @@ Completed {N} tasks. Carried {M} to next week.
 
 ## Step 6: Team Health Snapshot (Managers Only)
 
-If `features.team_health` is enabled and `user.role` is `engineering-manager`, append a team health snapshot to `Team/{team-slug}.md`. If no team file exists, create it using the template from foundations.md §2.11.
+If `features.team_health` is enabled and `user.role` is `engineering-manager`, append a team health snapshot to `Team/{team-slug}.md`. The team slug comes from the team name in people.yaml (e.g., "Platform" → `platform.md`). If no team file exists, create it with:
+```markdown
+---
+created: {YYYY-MM-DD}
+---
+#team
+
+## Overview
+**Team:** {team name}
+**Members:** {wiki-links to direct reports}
+
+## Timeline
+
+## Health Snapshots
+```
 
 Append under `## Health Snapshots`:
 
@@ -219,7 +235,7 @@ Write team health table to both weekly note and `Team/platform-team.md`. Mention
 
 ## Edge Cases
 
-**Weekly note doesn't exist:** Create it using the template from foundations.md §2.7, then append the summary.
+**Weekly note doesn't exist:** Create it with frontmatter (`week_start: {YYYY-MM-DD}`) and `#weekly` tag. Add empty `## Week Capacity`, `## Weekly Goals`, and `## Carry-Forwards` sections, then append the summary.
 
 **No daily notes for the week (notes not written or lost):** Work from what's available in project files and contributions log. Note in summary: "Note: daily notes not found for this week — summary based on project timelines and contributions log only."
 

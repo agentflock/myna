@@ -32,7 +32,7 @@ Also read:
 
 ## Step 2: Planned vs Actual
 
-Find the **first** sync snapshot in today's daily note (the bottom-most "Sync — {time}" section, which was the morning snapshot). Extract the Immediate Attention items from it — these are what was planned.
+Find the **morning sync snapshot** — the earliest "Sync — {time}" section in today's daily note (myna-sync prepends snapshots, so the morning snapshot will be the bottom-most one). Extract its Immediate Attention items — these are what was planned.
 
 Compare against current state:
 - **Completed:** tasks now marked `- [x]`, meetings with all checkboxes checked, delegations resolved
@@ -230,7 +230,7 @@ Daily note exists but has no sync snapshot. Skip the planned vs actual compariso
 
 **No tasks completed today:** Planned vs Actual shows all items as "not started" or "partially done". No contributions detected. Carry everything forward.
 
-**contributions-{week}.md doesn't exist yet:** Create it using the template from foundations.md §2.8. Append new entries.
+**contributions-{week}.md doesn't exist yet:** Create it with frontmatter (`week_start: {YYYY-MM-DD}`) and `#contributions` tag, plus a `## Contributions — Week of {YYYY-MM-DD}` section header. Append new entries.
 
 **User runs wrap-up twice:** The End of Day section already exists. Read it for context. Prepend a new "End of Day — {HH:MM} (re-run)" snapshot above the existing one, noting what changed. Do not overwrite the original.
 
