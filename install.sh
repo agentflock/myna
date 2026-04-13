@@ -187,6 +187,7 @@ vault_dirs=(
   "Journal/Archive"
   "Team"
   "ReviewQueue"
+  "Dashboards"
   "_meta/learnings"
   "_system/config"
   "_system/templates"
@@ -267,6 +268,28 @@ done
 
 info "Installed $template_count templates"
 
+# ── Copy Dashboards ───────────────────────────────────────────
+
+step "Installing dashboards"
+
+DASHBOARDS_SRC="$SCRIPT_DIR/agents/dashboards"
+DASHBOARDS_DEST="$MYNA_ROOT/Dashboards"
+
+dashboard_count=0
+for dash in "$DASHBOARDS_SRC"/*.md; do
+  [ -f "$dash" ] || continue
+  dashboard_count=$((dashboard_count + 1))
+  dest="$DASHBOARDS_DEST/$(basename "$dash")"
+
+  if $DRY_RUN; then
+    echo "  [dry-run] cp $dash → $dest"
+  else
+    cp "$dash" "$dest"
+  fi
+done
+
+info "Installed $dashboard_count dashboards"
+
 # ── Install Manifest ──────────────────────────────────────────
 
 step "Writing install metadata"
@@ -319,6 +342,7 @@ echo "  Skills:        $SKILLS_DEST/myna-*/ ($feature_count feature + $steering_
 echo "  Vault:         $MYNA_ROOT/"
 echo "  Config:        $MYNA_ROOT/_system/config/"
 echo "  Templates:     $MYNA_ROOT/_system/templates/ ($template_count files)"
+echo "  Dashboards:    $MYNA_ROOT/Dashboards/ ($dashboard_count files)"
 echo "  Manifest:      $MYNA_HOME/install-manifest.json"
 echo ""
 
