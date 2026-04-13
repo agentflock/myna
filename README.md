@@ -100,6 +100,8 @@ The install script will:
 
 After install, the cloned repo is no longer needed at runtime — you can delete it or keep it around for updates (`git pull && ./install.sh`).
 
+Open `_system/setup-checklist.md` in Obsidian and follow the steps. See [Obsidian Setup](docs/obsidian-setup.md) for the full setup guide.
+
 ### Configure
 
 The install script creates starter config files in your vault. Edit them with your details:
