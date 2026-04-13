@@ -19,7 +19,6 @@ set -eo pipefail
 
 VAULT_PATH=""
 SUBFOLDER="myna"
-VAULT_NAME=""
 DRY_RUN=false
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 VERSION="1.0.0"
@@ -51,7 +50,6 @@ ${BOLD}Required:${NC}
 
 ${BOLD}Options:${NC}
   --subfolder <name>      Myna subfolder name (default: myna)
-  --vault-name <name>     Obsidian vault name for URI links (optional)
   --dry-run               Show what would be done without making changes
   --help                  Show this help message
 
@@ -72,7 +70,6 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --vault-path)  VAULT_PATH="$2"; shift 2 ;;
     --subfolder)   SUBFOLDER="$2"; shift 2 ;;
-    --vault-name)  VAULT_NAME="$2"; shift 2 ;;
     --dry-run)     DRY_RUN=true; shift ;;
     --help|-h)     usage ;;
     *)             err "Unknown option: $1"; usage ;;
