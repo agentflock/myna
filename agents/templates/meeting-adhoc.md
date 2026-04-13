@@ -1,1 +1,5 @@
 #meeting #adhoc
+
+## Context
+
+**Purpose:**

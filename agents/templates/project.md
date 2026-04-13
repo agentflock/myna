@@ -10,6 +10,8 @@
 
 > Append-only chronological log.
 
+## Active Blockers
+
 ## Open Tasks
 
 ```dataview
