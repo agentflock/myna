@@ -1,3 +1,10 @@
+---
+role: {{role}}
+team: {{team}}
+relationship: {{relationship-tier}}
+pending-feedback: false
+---
+
 #person #tier/{{relationship-tier}}
 
 ## Overview

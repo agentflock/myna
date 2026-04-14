@@ -313,6 +313,13 @@ Minimal project file structure (sections in order):
 2. Create `People/{slug}.md`:
 
 ```markdown
+---
+role: {role or unknown}
+team: {team or unknown}
+relationship: {tier}
+pending-feedback: false
+---
+
 #person #tier/{relationship-tier}
 
 ## Overview

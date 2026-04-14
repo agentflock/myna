@@ -1,3 +1,7 @@
+---
+status: active
+---
+
 #project #{{project-tag}} #status/active
 
 ## Overview
