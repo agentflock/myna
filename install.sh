@@ -533,8 +533,8 @@ else
     cat >> "$SHELL_RC" <<ALIASES
 
 # Myna aliases
-alias myna='claude --agent myna --allowedTools "Read,Write,Edit,Glob,Grep,Bash(cd *),Bash(ls *),Bash(cat *)" --pathAllowlist "$VAULT_PATH"'
-alias myna-ro='claude --agent myna --allowedTools "Read,Glob,Grep" --pathAllowlist "$VAULT_PATH"'
+alias myna='claude --agent myna --allowedTools "Read,Write,Edit,Glob,Grep,Bash(cd *),Bash(ls *),Bash(cat *)" --add-dir "$VAULT_PATH"'
+alias myna-ro='claude --agent myna --allowedTools "Read,Glob,Grep" --add-dir "$VAULT_PATH"'
 alias myna-x='claude --agent myna --allowedTools ""'
 ALIASES
     info "Added myna aliases to $SHELL_RC"
