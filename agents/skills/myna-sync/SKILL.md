@@ -35,10 +35,20 @@ If `workspace.yaml` is missing or unreadable, stop and tell the user: "workspace
 
 ---
 
-## Step 2: Determine Target Date
+## Step 2: Determine Target Date and Current Time
 
-**Normal sync:** today's date in configured timezone.
-**Plan tomorrow:** next weekday. If today is Friday, tomorrow = Monday.
+Get the current date, time, and day of week using the configured timezone — always via Bash, never derived internally:
+
+```bash
+TZ={timezone} date +"%Y-%m-%d"      # today's date
+TZ={timezone} date +"%H:%M"         # current time for Sync header
+TZ={timezone} date +"%A"            # day of week (e.g. "Tuesday")
+```
+
+Use these values everywhere in the skill — the Sync header timestamp, day-of-week greetings, and date calculations.
+
+**Normal sync:** today's date from the command above.
+**Plan tomorrow:** next weekday from today's date. If today is Friday, tomorrow = Monday.
 
 Daily note path: `Journal/DailyNote-{YYYY-MM-DD}.md`
 Weekly note path: `Journal/WeeklyNote-{YYYY-MM-DD}.md` (Monday of target week)
