@@ -168,10 +168,15 @@ Different from the observation capture above: this is a recognition entry specif
 
 **Task format:**
 ```
-- [ ] {title} 📅 {YYYY-MM-DD} ⏫ [project:: {name}] [type:: {task|delegation|dependency|reply-needed}] [person:: {name}] [effort:: {estimate}] [review-status:: pending] [Auto] (capture, {date})
+- [ ] {title} 📅 {YYYY-MM-DD} ⏫ [project:: {name}] [type:: {task|delegation|dependency|reply-needed}] [person:: [[{name}]]] [effort:: {estimate}] [review-status:: pending] [Auto] (capture, {date})
 ```
 
 Include only fields that have values.
+
+**Person field rules:**
+- Self-assigned tasks (`[type:: task]`): always include `[person:: [[{user.name}]]]` using `user.name` from workspace.yaml
+- Delegations / dependencies / reply-needed: `[person:: [[{their-name}]]]` using the name as it appears in people.yaml
+- Never use a plain string — always wiki-link with `[[ ]]`
 
 **Destination:** Project file at `Projects/{project-slug}.md` under Open Tasks section, or daily note if no project.
 
@@ -191,7 +196,7 @@ Ask: "Which project is this for? Or should I add it to your personal tasks?"
 
 If user says "auth migration":
 ```
-- [ ] Review Sarah's design doc 📅 2026-04-11 ⏫ [project:: Auth Migration] [type:: task] [Auto] (capture, 2026-04-05)
+- [ ] Review Sarah's design doc 📅 2026-04-11 ⏫ [project:: Auth Migration] [type:: task] [person:: [[Sam Bennett]]] [Auto] (capture, 2026-04-05)
 ```
 
 All fields explicit → write directly, no review queue.
@@ -214,7 +219,7 @@ All fields explicit → write directly, no review queue.
 
 **Recurring task format:**
 ```
-- [ ] {title} 🔁 every {interval} [project:: {name}] [type:: task] [User] (capture, {date})
+- [ ] {title} 🔁 every {interval} [project:: {name}] [type:: task] [person:: [[{user.name}]]] [User] (capture, {date})
 ```
 
 **Worked example:**
@@ -222,7 +227,7 @@ All fields explicit → write directly, no review queue.
 User: "Create recurring task: weekly team status update, every Monday"
 
 ```
-- [ ] Weekly team status update 🔁 every week [type:: task] [User] (capture, 2026-04-05)
+- [ ] Weekly team status update 🔁 every week [type:: task] [person:: [[Sam Bennett]]] [User] (capture, 2026-04-05)
 ```
 
 ---

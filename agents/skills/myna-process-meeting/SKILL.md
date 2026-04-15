@@ -93,13 +93,17 @@ Ambiguous items go to the review queue:
 
 **Task** (append to `## Open Tasks`):
 ```
-- [ ] Review updated API spec 📅 2026-04-17 🔼 [project:: Auth Migration] [type:: task] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
+- [ ] Review updated API spec 📅 2026-04-17 🔼 [project:: Auth Migration] [type:: task] [person:: [[{user.name}]]] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
+
+Use `user.name` from workspace.yaml for the person field on self-assigned tasks.
 
 **Delegation** (append to `## Open Tasks`):
 ```
-- [ ] Sarah to draft OAuth integration guide 📅 2026-04-17 [project:: Auth Migration] [type:: delegation] [person:: Sarah] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
+- [ ] Sarah to draft OAuth integration guide 📅 2026-04-17 [project:: Auth Migration] [type:: delegation] [person:: [[Sarah Carter]]] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
+
+Always wiki-link the person name using `[[ ]]`.
 
 **Decision callout** (append to `## Timeline`):
 ```

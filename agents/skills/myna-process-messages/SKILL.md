@@ -135,13 +135,17 @@ For each email/message/document, extract every relevant item across all destinat
 
 **Task** (append to `## Open Tasks` section):
 ```
-- [ ] Review Sarah's API spec draft 📅 2026-04-09 ⏫ [project:: Auth Migration] [type:: task] [Auto] (email, Sarah, 2026-04-05)
+- [ ] Review Sarah's API spec draft 📅 2026-04-09 ⏫ [project:: Auth Migration] [type:: task] [person:: [[{user.name}]]] [Auto] (email, Sarah, 2026-04-05)
 ```
+
+Use `user.name` from workspace.yaml for self-assigned tasks.
 
 **Delegation task** (append to project file tasks):
 ```
-- [ ] Sarah to send updated API spec to the team 📅 2026-04-09 ⏫ [project:: Auth Migration] [type:: delegation] [person:: Sarah] [Auto] (email, Sarah, 2026-04-05)
+- [ ] Sarah to send updated API spec to the team 📅 2026-04-09 ⏫ [project:: Auth Migration] [type:: delegation] [person:: [[Sarah Carter]]] [Auto] (email, Sarah, 2026-04-05)
 ```
+
+Always wiki-link the person name using `[[ ]]`.
 
 **Observation** (append to `## Observations` section in person file):
 ```
@@ -165,7 +169,7 @@ For each email/message/document, extract every relevant item across all destinat
   Interpretation: Sarah asked for your input on API deadline — no reply detected in thread
   Ambiguity: Unclear if already addressed offline
   Proposed destination: [[Projects/auth-migration]] — Open Tasks
-  Content: - [ ] Reply to Sarah about API spec timeline 📅 2026-04-05 ⏫ [project:: Auth Migration] [type:: reply-needed] [person:: Sarah] [Inferred] (email, Sarah, 2026-04-05)
+  Content: - [ ] Reply to Sarah about API spec timeline 📅 2026-04-05 ⏫ [project:: Auth Migration] [type:: reply-needed] [person:: [[Sarah Carter]]] [Inferred] (email, Sarah, 2026-04-05)
   ---
 ```
 
