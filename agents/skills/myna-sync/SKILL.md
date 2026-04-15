@@ -111,7 +111,11 @@ Collect in parallel:
 
 **Calendar:** Read today's (or tomorrow's) calendar events via the calendar MCP. For each event, note: title, start time, end time, attendees (count only — not names), and any existing meeting file path. If calendar MCP is unavailable, skip calendar sections and note it in the output.
 
-**Open tasks:** Grep `{vault}/{subfolder}/Projects/` and the current daily note for `- \[ \]` with `📅 {date}` on or before target date (overdue or due today). Also find tasks with no due date and high priority `⏫`. Cap at 15 items for the Immediate Attention section.
+**Overdue & due today:** Grep `{vault}/{subfolder}/Projects/` and the current daily note for `- \[ \]` with `📅 {date}` on or before target date.
+
+**No ETA:** Grep the same paths for `- \[ \]` lines with `⏫` and no `📅` date field. These are high-priority tasks with no deadline — keep them separate from overdue items.
+
+Cap the combined Immediate Attention list at 15 items — prioritize overdue tasks over No ETA items.
 
 **Overdue delegations:** Grep `{vault}/{subfolder}/` for `- \[ \]` lines containing `[type:: delegation]` with `📅 {date}` before today. These are red-flag items.
 
@@ -155,14 +159,24 @@ date: {YYYY-MM-DD}
 
 {1–5 highest-priority items: overdue tasks, overdue delegations, approaching deadlines, blockers. One line each.}
 
-### Open Tasks
+### Overdue & Due Today
 
 ```dataview
 TASK
 FROM "actual-subfolder-value"
-WHERE !completed AND (due <= date(today) OR !due)
+WHERE !completed AND due AND due <= date(today)
 SORT priority DESC
 LIMIT 20
+```
+
+### No ETA
+
+```dataview
+TASK
+FROM "actual-subfolder-value"
+WHERE !completed AND !due
+SORT priority DESC
+LIMIT 10
 ```
 
 ### Delegations
