@@ -46,9 +46,7 @@ Myna works without these — features that need them degrade gracefully.
 
 ## 6. Configure Myna
 
-Option A: Run `/myna-setup` and choose "Open config UI" for a visual editor.
-Option B: Run `/myna-setup` for a guided chat interview.
-Option C: Edit the files directly:
+Run `/myna-setup` for guided configuration — it walks you through each config file interactively. Or edit directly:
 
 - [ ] `myna/_system/config/workspace.yaml` — your name, email, timezone, enable/disable features
 - [ ] `myna/_system/config/projects.yaml` — active projects you want Myna to track
