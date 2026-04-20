@@ -44,9 +44,9 @@ Myna reads email, Slack, and calendar via MCP servers. Register them with Claude
 
 Myna works without these — features that need them degrade gracefully.
 
-## 6. Fill In Your Config Files
+## 6. Configure Myna
 
-Open each file in your vault and fill in your details:
+Run `/myna-setup` for guided configuration — it walks you through each config file interactively. Or edit directly:
 
 - [ ] `myna/_system/config/workspace.yaml` — your name, email, timezone, enable/disable features
 - [ ] `myna/_system/config/projects.yaml` — active projects you want Myna to track

@@ -89,7 +89,7 @@ cd myna
 ./install.sh --vault-path ~/path/to/your/vault
 ```
 
-Then open `myna/_system/setup-checklist.md` in your vault and follow the steps.
+Then run `/myna-setup` for guided configuration — it walks you through identity, projects, people, and communication style. Prefer editing YAML directly? The config files are at `myna/_system/config/`.
 
 ### Updating
 
