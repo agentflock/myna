@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Myna — Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            teal: {
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen">
+
+  <!-- Top bar -->
+  <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+    <div class="flex items-center gap-3">
+      <span class="text-teal-600 font-semibold text-lg tracking-tight">Myna</span>
+      <span class="text-slate-300">|</span>
+      <span class="text-slate-500 text-sm">Settings</span>
+    </div>
+    <div id="connection-status" class="flex items-center gap-2 text-sm">
+      <span id="status-dot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+      <span id="status-text" class="text-slate-400">Connecting...</span>
+      <button id="retry-btn" class="hidden text-teal-600 hover:text-teal-700 underline text-xs ml-1" onclick="loadConfig()">Retry</button>
+    </div>
+  </header>
+
+  <!-- Main layout -->
+  <div class="flex max-w-screen-xl mx-auto min-h-[calc(100vh-49px)]">
+
+    <!-- Sidebar -->
+    <nav class="w-56 bg-slate-900 flex-shrink-0 py-6 flex flex-col gap-1">
+      <div class="px-4 pb-3">
+        <p class="text-slate-500 text-xs font-medium uppercase tracking-wider">Configuration</p>
+      </div>
+      <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        Overview
+      </button>
+      <button class="nav-tab" data-tab="identity" onclick="switchTab('identity')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Identity
+      </button>
+      <button class="nav-tab" data-tab="integrations" onclick="switchTab('integrations')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        Integrations
+      </button>
+      <button class="nav-tab" data-tab="communication" onclick="switchTab('communication')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        Communication
+      </button>
+      <button class="nav-tab" data-tab="features" onclick="switchTab('features')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        Features
+      </button>
+
+      <div class="px-4 pt-5 pb-2">
+        <p class="text-slate-600 text-xs font-medium uppercase tracking-wider">Data</p>
+      </div>
+      <button class="nav-tab" data-tab="projects" onclick="switchTab('projects')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        Projects
+      </button>
+      <button class="nav-tab" data-tab="people" onclick="switchTab('people')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        People
+      </button>
+      <button class="nav-tab" data-tab="files" onclick="switchTab('files')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Files
+      </button>
+    </nav>
+
+    <!-- Content area -->
+    <main class="flex-1 overflow-auto">
+
+      <!-- ===================== OVERVIEW ===================== -->
+      <div id="tab-overview" class="tab-panel p-8">
+        <div class="max-w-3xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Overview</h1>
+          <p class="text-slate-500 text-sm mb-8">Your Myna configuration at a glance.</p>
+
+          <div class="grid grid-cols-2 gap-4" id="overview-grid">
+            <!-- Identity card -->
+            <div class="overview-card" id="card-identity">
+              <div class="flex items-center justify-between mb-3">
+                <span class="card-title">Identity</span>
+                <span class="status-badge" id="badge-identity"></span>
+              </div>
+              <div class="card-body" id="overview-identity-body">
+                <span class="text-slate-400 text-sm">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Integrations card -->
+            <div class="overview-card" id="card-integrations">
+              <div class="flex items-center justify-between mb-3">
+                <span class="card-title">Integrations</span>
+                <span class="status-badge" id="badge-integrations"></span>
+              </div>
+              <div class="card-body" id="overview-integrations-body">
+                <span class="text-slate-400 text-sm">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Communication card -->
+            <div class="overview-card" id="card-communication">
+              <div class="flex items-center justify-between mb-3">
+                <span class="card-title">Communication Style</span>
+                <span class="status-badge" id="badge-communication"></span>
+              </div>
+              <div class="card-body" id="overview-communication-body">
+                <span class="text-slate-400 text-sm">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Features card -->
+            <div class="overview-card" id="card-features">
+              <div class="flex items-center justify-between mb-3">
+                <span class="card-title">Features</span>
+                <span class="status-badge" id="badge-features"></span>
+              </div>
+              <div class="card-body" id="overview-features-body">
+                <span class="text-slate-400 text-sm">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Projects card -->
+            <div class="overview-card" id="card-projects">
+              <div class="flex items-center justify-between mb-3">
+                <span class="card-title">Projects</span>
+                <span class="status-badge" id="badge-projects"></span>
+              </div>
+              <div class="card-body" id="overview-projects-body">
+                <span class="text-slate-400 text-sm">Loading...</span>
+              </div>
+            </div>
+
+            <!-- People card -->
+            <div class="overview-card" id="card-people">
+              <div class="flex items-center justify-between mb-3">
+                <span class="card-title">People</span>
+                <span class="status-badge" id="badge-people"></span>
+              </div>
+              <div class="card-body" id="overview-people-body">
+                <span class="text-slate-400 text-sm">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== IDENTITY ===================== -->
+      <div id="tab-identity" class="tab-panel hidden p-8">
+        <div class="max-w-xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Identity</h1>
+          <p class="text-slate-500 text-sm mb-8">Your profile and working hours. Used to personalise Myna's output and daily note.</p>
+
+          <form id="identity-form" onsubmit="return false;">
+            <div class="form-section">
+              <h2 class="section-title">Profile</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="user-name">Name</label>
+                <input type="text" id="user-name" class="field-input" placeholder="Your full name" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="user-email">Email</label>
+                <input type="email" id="user-email" class="field-input" placeholder="you@company.com" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="user-role">Role</label>
+                <select id="user-role" class="field-input">
+                  <option value="">Select a role</option>
+                  <option value="engineering-manager">Engineering Manager</option>
+                  <option value="tech-lead">Tech Lead</option>
+                  <option value="senior-engineer">Senior Engineer</option>
+                  <option value="pm">PM</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Time &amp; Location</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="user-timezone">Timezone</label>
+                <select id="user-timezone" class="field-input" onchange="handleTimezoneChange()">
+                  <option value="">Select a timezone</option>
+                  <option value="America/Los_Angeles">America/Los_Angeles (Pacific)</option>
+                  <option value="America/Denver">America/Denver (Mountain)</option>
+                  <option value="America/Chicago">America/Chicago (Central)</option>
+                  <option value="America/New_York">America/New_York (Eastern)</option>
+                  <option value="America/Sao_Paulo">America/Sao_Paulo</option>
+                  <option value="Europe/London">Europe/London</option>
+                  <option value="Europe/Paris">Europe/Paris</option>
+                  <option value="Europe/Berlin">Europe/Berlin</option>
+                  <option value="Europe/Istanbul">Europe/Istanbul</option>
+                  <option value="Asia/Dubai">Asia/Dubai</option>
+                  <option value="Asia/Kolkata">Asia/Kolkata</option>
+                  <option value="Asia/Bangkok">Asia/Bangkok</option>
+                  <option value="Asia/Shanghai">Asia/Shanghai</option>
+                  <option value="Asia/Tokyo">Asia/Tokyo</option>
+                  <option value="Australia/Sydney">Australia/Sydney</option>
+                  <option value="_other">Other (type below)</option>
+                </select>
+                <input type="text" id="user-timezone-custom" class="field-input mt-2 hidden" placeholder="e.g. Pacific/Auckland" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="field-group">
+                  <label class="field-label" for="work-start">Work hours start</label>
+                  <input type="time" id="work-start" class="field-input" />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="work-end">Work hours end</label>
+                  <input type="time" id="work-end" class="field-input" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Cadence</h2>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="field-group">
+                  <label class="field-label" for="feedback-cycle">Feedback cycle</label>
+                  <div class="relative">
+                    <input type="number" id="feedback-cycle" class="field-input pr-12" min="1" max="365" placeholder="30" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">days</span>
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="journal-archive">Journal archive after</label>
+                  <div class="relative">
+                    <input type="number" id="journal-archive" class="field-input pr-12" min="1" max="365" placeholder="30" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">days</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Email filing</h2>
+              <p class="text-slate-500 text-sm mb-4">Where processed emails are filed.</p>
+
+              <div class="flex flex-col gap-3">
+                <label class="radio-option">
+                  <input type="radio" name="email-filing" value="per-project" class="radio-input" />
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">Per-project folders</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Emails are moved into their project's folder</p>
+                  </div>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="email-filing" value="common" class="radio-input" />
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">One shared folder</p>
+                    <p class="text-xs text-slate-400 mt-0.5">All processed emails go to a single folder</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 mt-8">
+              <button type="button" class="save-btn" onclick="saveTab('identity')">Save identity</button>
+              <span id="identity-feedback" class="feedback-msg hidden"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===================== INTEGRATIONS ===================== -->
+      <div id="tab-integrations" class="tab-panel hidden p-8">
+        <div class="max-w-xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Integrations</h1>
+          <p class="text-slate-500 text-sm mb-8">Connect Myna to your email, calendar, and messaging tools via MCP servers.</p>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 mb-8 text-sm text-slate-600 leading-relaxed">
+            Enter the MCP server names you registered with Claude Code. Run <code class="bg-white border border-slate-200 rounded px-1.5 py-0.5 text-xs font-mono text-slate-700">claude mcp list</code> to see your registered servers. Leave empty if not set up — Myna works without them.
+          </div>
+
+          <form id="integrations-form" onsubmit="return false;">
+            <div class="form-section">
+              <h2 class="section-title">MCP Servers</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="mcp-email">Email MCP server</label>
+                <input type="text" id="mcp-email" class="field-input font-mono" placeholder="e.g. gmail-mcp" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="mcp-calendar">Calendar MCP server</label>
+                <input type="text" id="mcp-calendar" class="field-input font-mono" placeholder="e.g. gcal-mcp" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="mcp-slack">Messaging MCP server</label>
+                <input type="text" id="mcp-slack" class="field-input font-mono" placeholder="e.g. slack-mcp" />
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 mt-8">
+              <button type="button" class="save-btn" onclick="saveTab('integrations')">Save integrations</button>
+              <span id="integrations-feedback" class="feedback-msg hidden"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===================== COMMUNICATION ===================== -->
+      <div id="tab-communication" class="tab-panel hidden p-8">
+        <div class="max-w-xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Communication</h1>
+          <p class="text-slate-500 text-sm mb-8">Writing style preferences used when Myna drafts emails and messages on your behalf.</p>
+
+          <form id="communication-form" onsubmit="return false;">
+            <div class="form-section">
+              <h2 class="section-title">Default style</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-default-preset">Default preset</label>
+                <select id="comm-default-preset" class="field-input">
+                  <option value="professional">Professional</option>
+                  <option value="conversational">Conversational</option>
+                  <option value="executive">Executive</option>
+                  <option value="casual">Casual</option>
+                  <option value="coaching">Coaching</option>
+                  <option value="diplomatic">Diplomatic</option>
+                  <option value="concise">Concise</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Per-tier overrides</h2>
+              <p class="text-slate-500 text-sm mb-4">Override the default style for specific relationship tiers.</p>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-upward">Upward (manager, leadership)</label>
+                <select id="comm-upward" class="field-input">
+                  <option value="">Use default</option>
+                  <option value="professional">Professional</option>
+                  <option value="conversational">Conversational</option>
+                  <option value="executive">Executive</option>
+                  <option value="casual">Casual</option>
+                  <option value="coaching">Coaching</option>
+                  <option value="diplomatic">Diplomatic</option>
+                  <option value="concise">Concise</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-peer">Peer</label>
+                <select id="comm-peer" class="field-input">
+                  <option value="">Use default</option>
+                  <option value="professional">Professional</option>
+                  <option value="conversational">Conversational</option>
+                  <option value="executive">Executive</option>
+                  <option value="casual">Casual</option>
+                  <option value="coaching">Coaching</option>
+                  <option value="diplomatic">Diplomatic</option>
+                  <option value="concise">Concise</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-direct">Direct reports</label>
+                <select id="comm-direct" class="field-input">
+                  <option value="">Use default</option>
+                  <option value="professional">Professional</option>
+                  <option value="conversational">Conversational</option>
+                  <option value="executive">Executive</option>
+                  <option value="casual">Casual</option>
+                  <option value="coaching">Coaching</option>
+                  <option value="diplomatic">Diplomatic</option>
+                  <option value="concise">Concise</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-cross-team">Cross-team</label>
+                <select id="comm-cross-team" class="field-input">
+                  <option value="">Use default</option>
+                  <option value="professional">Professional</option>
+                  <option value="conversational">Conversational</option>
+                  <option value="executive">Executive</option>
+                  <option value="casual">Casual</option>
+                  <option value="coaching">Coaching</option>
+                  <option value="diplomatic">Diplomatic</option>
+                  <option value="concise">Concise</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Difficult messages</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-sign-off">Email sign-off</label>
+                <input type="text" id="comm-sign-off" class="field-input" placeholder="e.g. Thanks, Best, Cheers" />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-difficult-approach">Difficult message approach</label>
+                <select id="comm-difficult-approach" class="field-input">
+                  <option value="">Select approach</option>
+                  <option value="direct-but-kind">Direct-but-kind</option>
+                  <option value="diplomatic">Diplomatic</option>
+                  <option value="straightforward">Straightforward</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Email preferences</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-email-length">Max length</label>
+                <select id="comm-email-length" class="field-input">
+                  <option value="">Select length</option>
+                  <option value="short">Short</option>
+                  <option value="medium">Medium</option>
+                  <option value="long">Long</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-email-greeting">Greeting style</label>
+                <select id="comm-email-greeting" class="field-input">
+                  <option value="">Select greeting</option>
+                  <option value="first-name">First name</option>
+                  <option value="formal">Formal</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Messaging preferences</h2>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-msg-formality">Formality</label>
+                <select id="comm-msg-formality" class="field-input">
+                  <option value="">Select formality</option>
+                  <option value="casual">Casual</option>
+                  <option value="professional">Professional</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="comm-msg-emoji">Emoji usage</label>
+                <select id="comm-msg-emoji" class="field-input">
+                  <option value="">Select emoji usage</option>
+                  <option value="none">None</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="moderate">Moderate</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 mt-8">
+              <button type="button" class="save-btn" onclick="saveTab('communication')">Save communication</button>
+              <span id="communication-feedback" class="feedback-msg hidden"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===================== FEATURES ===================== -->
+      <div id="tab-features" class="tab-panel hidden p-8">
+        <div class="max-w-2xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Features</h1>
+          <p class="text-slate-500 text-sm mb-8">Enable or disable individual Myna capabilities. Disabled features are silently skipped.</p>
+
+          <form id="features-form" onsubmit="return false;">
+
+            <div class="form-section">
+              <h2 class="section-title">Email &amp; Messaging</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Email processing</span>
+                    <span class="feature-desc">Process incoming emails into project files</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-email_processing" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Messaging processing</span>
+                    <span class="feature-desc">Extract action items from Slack and other messages</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-messaging_processing" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Email triage</span>
+                    <span class="feature-desc">Sort inbox into Reply / FYI / Follow-Up / Schedule folders</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-email_triage" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Meetings</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Meeting prep</span>
+                    <span class="feature-desc">Generate prep briefs before meetings</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-meeting_prep" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Process meeting</span>
+                    <span class="feature-desc">Extract decisions and action items after meetings</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-process_meeting" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Calendar</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Time blocks</span>
+                    <span class="feature-desc">Create focus time blocks on your calendar</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-time_blocks" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Calendar reminders</span>
+                    <span class="feature-desc">Set reminders for tasks and follow-ups</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-calendar_reminders" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">People &amp; Team</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">People management</span>
+                    <span class="feature-desc">Maintain person files for direct reports and peers</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-people_management" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Team health</span>
+                    <span class="feature-desc">Team health overview in daily note (managers)</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-team_health" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Attention gap detection</span>
+                    <span class="feature-desc">Flag people you haven't connected with recently</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-attention_gap_detection" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Feedback gap detection</span>
+                    <span class="feature-desc">Alert when feedback cycles are overdue</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-feedback_gap_detection" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Milestones</span>
+                    <span class="feature-desc">Birthdays and work anniversaries in daily note</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-milestones" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Tracking</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Self-tracking</span>
+                    <span class="feature-desc">Log contributions and generate self-review documents</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-self_tracking" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Contribution detection</span>
+                    <span class="feature-desc">Auto-log contributions to brag doc</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-contribution_detection" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Summaries</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Weekly summary</span>
+                    <span class="feature-desc">Generate weekly summary of work</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-weekly_summary" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Monthly updates</span>
+                    <span class="feature-desc">Prepare monthly status updates</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-monthly_updates" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h2 class="section-title">Context</h2>
+              <div class="feature-list">
+                <div class="feature-row">
+                  <div class="feature-info">
+                    <span class="feature-name">Park &amp; resume</span>
+                    <span class="feature-desc">Save and resume working context across sessions</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="feat-park_resume" class="toggle-input" />
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 mt-8">
+              <button type="button" class="save-btn" onclick="saveTab('features')">Save features</button>
+              <span id="features-feedback" class="feedback-msg hidden"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===================== PROJECTS ===================== -->
+      <div id="tab-projects" class="tab-panel hidden p-8">
+        <div class="max-w-2xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Projects</h1>
+          <p class="text-slate-500 text-sm mb-8">Manage active projects, aliases, and email/Slack mappings.</p>
+
+          <div id="projects-list" class="flex flex-col gap-2 mb-4"></div>
+
+          <button type="button" class="add-item-btn" onclick="addProject()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Project
+          </button>
+
+          <div class="flex items-center gap-3 mt-8 pt-6 border-t border-slate-100">
+            <button type="button" class="save-btn" onclick="saveTab('projects')">Save projects</button>
+            <span id="projects-feedback" class="feedback-msg hidden"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== PEOPLE ===================== -->
+      <div id="tab-people" class="tab-panel hidden p-8">
+        <div class="max-w-2xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">People</h1>
+          <p class="text-slate-500 text-sm mb-8">Manage your team members, relationship tiers, and aliases.</p>
+
+          <div id="people-list" class="flex flex-col gap-2 mb-4"></div>
+
+          <button type="button" class="add-item-btn" onclick="addPerson()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Person
+          </button>
+
+          <div class="flex items-center gap-3 mt-8 pt-6 border-t border-slate-100">
+            <button type="button" class="save-btn" onclick="saveTab('people')">Save people</button>
+            <span id="people-feedback" class="feedback-msg hidden"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== FILES (placeholder) ===================== -->
+      <div id="tab-files" class="tab-panel hidden p-8">
+        <div class="max-w-xl">
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Files</h1>
+          <p class="text-slate-500 text-sm mb-8">Import data files and manage vault sources.</p>
+          <div class="placeholder-panel">
+            <svg class="w-8 h-8 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <p class="text-slate-500 text-sm font-medium">Coming in task 3c</p>
+            <p class="text-slate-400 text-xs mt-1">File import and vault management will be available here.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 flex flex-col gap-2 z-50 pointer-events-none"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
