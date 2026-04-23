@@ -110,7 +110,6 @@ function populateIdentity() {
   const vault = ws.vault || {};
   const wh = ws.work_hours || {};
   const journal = ws.journal || {};
-  const email = ws.email || {};
 
   setValue('user-name',        user.name       || '');
   setValue('user-email',       user.email      || '');
@@ -168,10 +167,6 @@ function populateIdentity() {
     }
   }
 
-  // Email filing radio
-  const filing = email.processed_folder || 'per-project';
-  const radios = document.querySelectorAll('input[name="email-filing"]');
-  radios.forEach(r => { r.checked = r.value === filing; });
 }
 
 function populateIntegrations() {
@@ -182,10 +177,12 @@ function populateIntegrations() {
 }
 
 function populateCommunication() {
-  const cs = window.config['communication-style'] || {};
-  const tier = cs.presets_per_tier || {};
-  const ep   = cs.email_preferences || {};
-  const mp   = cs.messaging_preferences || {};
+  const cs    = window.config['communication-style'] || {};
+  const ws    = window.config.workspace || {};
+  const tier  = cs.presets_per_tier || {};
+  const ep    = cs.email_preferences || {};
+  const mp    = cs.messaging_preferences || {};
+  const email = ws.email || {};
 
   setCommStyleValue('comm-default-preset', cs.default_preset || '');
   setCommStyleValue('comm-upward',         tier.upward       || '');
@@ -198,6 +195,7 @@ function populateCommunication() {
   setValue('comm-email-greeting',     ep.greeting_style || '');
   setValue('comm-msg-formality',      mp.formality      || '');
   setValue('comm-msg-emoji',          mp.emoji_usage    || '');
+  setValue('comm-email-filing',       email.processed_folder || 'per-project');
 }
 
 /**
@@ -383,8 +381,6 @@ function getIdentityData() {
     tz = document.getElementById('user-timezone-custom').value.trim();
   }
 
-  const filingEl = document.querySelector('input[name="email-filing"]:checked');
-
   const roleSelect = document.getElementById('user-role');
   let roleValue = roleSelect.value;
   if (roleValue === '_custom') {
@@ -409,10 +405,7 @@ function getIdentityData() {
       ...(existing.journal || {}),
       archive_after_days: parseInt(document.getElementById('journal-archive').value, 10) || (existing.journal || {}).archive_after_days,
     },
-    email: {
-      ...(existing.email || {}),
-      processed_folder: filingEl ? filingEl.value : (existing.email || {}).processed_folder,
-    },
+    email: existing.email || {},
   };
 }
 
@@ -445,6 +438,23 @@ function getCommunicationData() {
     messaging_preferences: {
       formality:   document.getElementById('comm-msg-formality').value,
       emoji_usage: document.getElementById('comm-msg-emoji').value,
+    },
+  };
+}
+
+/**
+ * Return the workspace patch needed when saving the Communication tab.
+ * Email filing (processed_folder) lives in workspace.yaml under email:,
+ * not in communication-style.yaml.
+ */
+function getCommunicationWorkspacePatch() {
+  const existing = deepClone(window.config && window.config.workspace || {});
+  const filingEl = document.getElementById('comm-email-filing');
+  return {
+    ...existing,
+    email: {
+      ...(existing.email || {}),
+      processed_folder: filingEl ? filingEl.value : (existing.email || {}).processed_folder,
     },
   };
 }
@@ -533,6 +543,20 @@ async function saveTab(tabName) {
       peopleData = (data.people || []).map(p => ({ ...p }));
     } else {
       window.config[configName] = data;
+    }
+
+    // Communication tab also saves email filing (processed_folder) to workspace config
+    if (tabName === 'communication') {
+      const wsPatch = getCommunicationWorkspacePatch();
+      const wsRes = await fetch('/api/config/workspace', {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(wsPatch),
+      });
+      if (wsRes.ok) {
+        window.config.workspace = wsPatch;
+      }
+      // Workspace save failure is non-fatal — the style data already saved
     }
 
     renderOverview();
