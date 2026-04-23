@@ -163,6 +163,10 @@ If the user pastes a message and says "rewrite this for my VP" → myna-rewrite.
 - General planning: "what should I focus on?", "plan my day" → myna-plan
 - Day setup: "sync", "good morning" → myna-sync
 
+### Setup and Configuration
+
+- "Open config", "edit config", "reconfigure", "update my settings", "update my preferences", "change my settings", "change my preferences" → myna-setup
+
 ### Memory Routing
 
 When the user expresses save/recall/forget intent in any phrasing:
