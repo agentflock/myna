@@ -70,10 +70,14 @@ If the file doesn't exist, create it from the appropriate template (see File Tem
 
 Each session is a top-level `## {YYYY-MM-DD} Session` block prepended to the top of the meeting file, after the frontmatter and tags. Within it, two sections:
 
+**Video call URL:** Before writing the session, check the calendar event for a video call URL. Check in order: `conferenceData.entryPoints[].uri` (type: video), then the `location` field for a URL matching `zoom.us`, `meet.google.com`, `teams.microsoft.com`, or similar. If found, include it as a `📹 Join:` line at the top of the Prep section. If not found, omit the line entirely — do not write "N/A" or leave it empty.
+
 ```markdown
 ## 2026-04-10 Session
 
 ### Prep
+
+📹 Join: https://zoom.us/j/123456789
 
 #### Key Points
 > Strategic framing — read before you walk in.
@@ -321,6 +325,8 @@ Prepended to `Meetings/1-1s/sarah-chen.md` (after frontmatter and tags, above an
 ## 2026-04-10 Session
 
 ### Prep
+
+📹 Join: https://zoom.us/j/987654321
 
 #### Key Points
 > Strategic framing — read before you walk in.
