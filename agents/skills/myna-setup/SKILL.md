@@ -66,7 +66,7 @@ Read all six config files from `_system/config/`. Show a human-readable summary 
 If everything is populated, show the summary and offer: 1) add more projects/people, 2) edit existing config, 3) review applied defaults, 4) move on. If gaps exist, offer to fill them in priority order (identity first).
 
 Also check `~/.myna/pending-imports.json`. If it contains file paths, mention it:
-"You have N files ready to import. Run `/myna-setup` and choose option 3 (Import from docs) to process them, or I can process them now if you'd like."
+"You have N files ready to import. Tell me to import them and I'll process them now, or you can come back to this later."
 
 ---
 
