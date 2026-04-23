@@ -7,7 +7,7 @@
    - populateForms(): fills all forms from window.config
    - getTabData()   : reads a tab's form inputs → partial config object
    - saveTab()      : PUT /api/config/{name} with getTabData result
-   - showToast()    : bottom-right toast, auto-dismiss after 3s
+   - showToast()    : bottom-right toast, auto-dismiss after 2s
    ========================================================= */
 
 'use strict';
@@ -511,9 +511,6 @@ async function saveTab(tabName) {
   const data = getTabData(tabName);
   if (!data) return;
 
-  const btn = document.querySelector(`#tab-${tabName} .save-btn`);
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
-
   try {
     const res = await fetch('/api/config/' + configName, {
       method:  'PUT',
@@ -560,25 +557,11 @@ async function saveTab(tabName) {
     }
 
     renderOverview();
-    showToast('Saved successfully', 'success');
+    showToast('Saved', 'success');
   } catch (err) {
     console.error('Save failed:', err);
     showToast('Save failed: ' + err.message, 'error');
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = savedBtnLabel(tabName); }
   }
-}
-
-function savedBtnLabel(tabName) {
-  const labels = {
-    identity:      'Save identity',
-    integrations:  'Save integrations',
-    communication: 'Save communication',
-    features:      'Save features',
-    projects:      'Save projects',
-    people:        'Save people',
-  };
-  return labels[tabName] || 'Save';
 }
 
 // ── Communication style change handler ────────────────────────────────────
@@ -596,9 +579,11 @@ function handleCommStyleChange(fieldKey) {
   if (sel.value === '_custom') {
     custom.classList.remove('hidden');
     custom.focus();
+    // Don't save yet — wait for blur on the custom text input
   } else {
     custom.classList.add('hidden');
     custom.value = '';
+    saveTab('communication');
   }
 }
 
@@ -610,9 +595,11 @@ function handleTimezoneChange() {
   if (sel.value === '_other') {
     custom.classList.remove('hidden');
     custom.focus();
+    // Don't save yet — wait for blur on the custom text input
   } else {
     custom.classList.add('hidden');
     custom.value = '';
+    saveTab('identity');
   }
 }
 
@@ -624,9 +611,11 @@ function handleRoleChange() {
   if (sel.value === '_custom') {
     custom.classList.remove('hidden');
     custom.focus();
+    // Don't save yet — wait for blur on the custom text input
   } else {
     custom.classList.add('hidden');
     custom.value = '';
+    saveTab('identity');
   }
 }
 
@@ -648,7 +637,7 @@ function showToast(message, type) {
   setTimeout(() => {
     toast.classList.add('dismissing');
     setTimeout(() => toast.remove(), 220);
-  }, 3000);
+  }, 2000);
 }
 
 // ── Utility helpers ────────────────────────────────────────────────────────
@@ -1200,11 +1189,11 @@ function buildProjectCard(proj, idx) {
       <div class="entity-form-grid">
         <div class="field-group">
           <label class="field-label">Name</label>
-          <input type="text" class="field-input proj-name" value="${escHtmlAttr(proj.name || '')}" placeholder="Project name" oninput="syncProjectHeader(${idx})" />
+          <input type="text" class="field-input proj-name" value="${escHtmlAttr(proj.name || '')}" placeholder="Project name" oninput="syncProjectHeader(${idx})" onblur="saveTab('projects')" />
         </div>
         <div class="field-group">
           <label class="field-label">Status</label>
-          <select class="field-input proj-status" onchange="syncProjectHeader(${idx})">
+          <select class="field-input proj-status" onchange="syncProjectHeader(${idx}); saveTab('projects')">
             <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
             <option value="paused" ${status === 'paused' ? 'selected' : ''}>Paused</option>
             <option value="complete" ${status === 'complete' ? 'selected' : ''}>Complete</option>
@@ -1214,7 +1203,7 @@ function buildProjectCard(proj, idx) {
       <div class="entity-form-full">
         <div class="field-group">
           <label class="field-label">Description</label>
-          <textarea class="field-input proj-desc" rows="2" placeholder="Short description" oninput="syncProjectHeader(${idx})">${escHtml(proj.description || '')}</textarea>
+          <textarea class="field-input proj-desc" rows="2" placeholder="Short description" oninput="syncProjectHeader(${idx})" onblur="saveTab('projects')">${escHtml(proj.description || '')}</textarea>
         </div>
         <div class="field-group">
           <label class="field-label">Aliases</label>
@@ -1402,23 +1391,23 @@ function buildPersonCard(person, idx) {
       <div class="entity-form-grid">
         <div class="field-group">
           <label class="field-label">Display name</label>
-          <input type="text" class="field-input person-display-name" value="${escHtmlAttr(person.display_name || '')}" placeholder="e.g. Sarah" oninput="syncPersonHeader(${idx})" />
+          <input type="text" class="field-input person-display-name" value="${escHtmlAttr(person.display_name || '')}" placeholder="e.g. Sarah" oninput="syncPersonHeader(${idx})" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Full name</label>
-          <input type="text" class="field-input person-full-name" value="${escHtmlAttr(person.full_name || '')}" placeholder="e.g. Sarah Chen" />
+          <input type="text" class="field-input person-full-name" value="${escHtmlAttr(person.full_name || '')}" placeholder="e.g. Sarah Chen" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Email</label>
-          <input type="email" class="field-input person-email" value="${escHtmlAttr(person.email || '')}" placeholder="sarah@company.com" />
+          <input type="email" class="field-input person-email" value="${escHtmlAttr(person.email || '')}" placeholder="sarah@company.com" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Slack handle</label>
-          <input type="text" class="field-input person-slack" value="${escHtmlAttr(person.slack_handle || '')}" placeholder="@sarah" />
+          <input type="text" class="field-input person-slack" value="${escHtmlAttr(person.slack_handle || '')}" placeholder="@sarah" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Relationship tier</label>
-          <select class="field-input person-tier" onchange="syncPersonHeader(${idx})">
+          <select class="field-input person-tier" onchange="syncPersonHeader(${idx}); saveTab('people')">
             <option value="" ${!tier ? 'selected' : ''}>Select tier</option>
             <option value="direct"     ${tier === 'direct'     ? 'selected' : ''}>Direct report</option>
             <option value="peer"       ${tier === 'peer'       ? 'selected' : ''}>Peer</option>
@@ -1428,23 +1417,23 @@ function buildPersonCard(person, idx) {
         </div>
         <div class="field-group">
           <label class="field-label">Role</label>
-          <input type="text" class="field-input person-role" value="${escHtmlAttr(person.role || '')}" placeholder="e.g. Staff Engineer" oninput="syncPersonHeader(${idx})" />
+          <input type="text" class="field-input person-role" value="${escHtmlAttr(person.role || '')}" placeholder="e.g. Staff Engineer" oninput="syncPersonHeader(${idx})" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Team</label>
-          <input type="text" class="field-input person-team" value="${escHtmlAttr(person.team || '')}" placeholder="e.g. Platform" />
+          <input type="text" class="field-input person-team" value="${escHtmlAttr(person.team || '')}" placeholder="e.g. Platform" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Feedback cycle (days)</label>
-          <input type="number" class="field-input person-feedback-cycle" value="${escHtmlAttr(person.feedback_cycle_days != null ? String(person.feedback_cycle_days) : '')}" placeholder="30" min="1" />
+          <input type="number" class="field-input person-feedback-cycle" value="${escHtmlAttr(person.feedback_cycle_days != null ? String(person.feedback_cycle_days) : '')}" placeholder="30" min="1" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Birthday (MM-DD)</label>
-          <input type="text" class="field-input person-birthday" value="${escHtmlAttr(person.birthday || '')}" placeholder="03-15" />
+          <input type="text" class="field-input person-birthday" value="${escHtmlAttr(person.birthday || '')}" placeholder="03-15" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
           <label class="field-label">Work anniversary (YYYY-MM-DD)</label>
-          <input type="text" class="field-input person-anniversary" value="${escHtmlAttr(person.work_anniversary || '')}" placeholder="2022-06-01" />
+          <input type="text" class="field-input person-anniversary" value="${escHtmlAttr(person.work_anniversary || '')}" placeholder="2022-06-01" onblur="saveTab('people')" />
         </div>
       </div>
       <div class="entity-form-full">
@@ -1710,7 +1699,13 @@ document.addEventListener('DOMContentLoaded', () => {
   loadConfig();
   initFilesTab();
 
-  // Auto-save on blur for custom role input (Design Decision #7)
+  // ── Identity: text inputs → save on blur ──────────────────────────────────
+  ['user-name', 'user-email'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('blur', () => saveTab('identity'));
+  });
+
+  // Custom role text input → save on blur
   const roleCustomInput = document.getElementById('user-role-custom');
   if (roleCustomInput) {
     roleCustomInput.addEventListener('blur', () => {
@@ -1718,6 +1713,40 @@ document.addEventListener('DOMContentLoaded', () => {
         saveTab('identity');
       }
     });
+  }
+
+  // Custom timezone text input → save on blur
+  const tzCustomInput = document.getElementById('user-timezone-custom');
+  if (tzCustomInput) {
+    tzCustomInput.addEventListener('blur', () => {
+      if (document.getElementById('user-timezone').value === '_other') {
+        saveTab('identity');
+      }
+    });
+  }
+
+  // Journal archive (number input) → save on blur
+  const journalArchiveInput = document.getElementById('journal-archive');
+  if (journalArchiveInput) {
+    journalArchiveInput.addEventListener('blur', () => saveTab('identity'));
+  }
+
+  // ── Integrations: text inputs → save on blur ──────────────────────────────
+  ['mcp-email', 'mcp-calendar', 'mcp-slack'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('blur', () => saveTab('integrations'));
+  });
+
+  // ── Communication: unwired dropdowns → save on change ─────────────────────
+  ['comm-email-length', 'comm-email-greeting', 'comm-msg-formality', 'comm-msg-emoji'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', () => saveTab('communication'));
+  });
+
+  // Sign-off text input → save on blur
+  const signOffInput = document.getElementById('comm-sign-off');
+  if (signOffInput) {
+    signOffInput.addEventListener('blur', () => saveTab('communication'));
   }
 
   // Auto-save on blur for communication style custom inputs (Design Decision #7)
@@ -1730,5 +1759,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+  });
+
+  // ── Features: toggles → save on change ───────────────────────────────────
+  const featureKeys = [
+    'email_processing', 'messaging_processing', 'email_triage',
+    'meeting_prep', 'process_meeting',
+    'time_blocks', 'calendar_reminders',
+    'people_management', 'team_health', 'attention_gap_detection',
+    'feedback_gap_detection', 'milestones',
+    'self_tracking', 'contribution_detection',
+    'weekly_summary', 'monthly_updates',
+    'park_resume'
+  ];
+  featureKeys.forEach(key => {
+    const el = document.getElementById('feat-' + key);
+    if (el) el.addEventListener('change', () => saveTab('features'));
   });
 });
