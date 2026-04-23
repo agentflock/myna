@@ -34,15 +34,15 @@ Go to Settings in Obsidian and configure:
 - [ ] **Dataview** — enable Dataview JS and inline queries (Settings → Dataview)
 - [ ] **Templates** — template folder: `myna/_system/templates`
 
-## 5. Connect External MCP Servers
+## 5. Register External MCP Servers with Claude Code *(optional)*
 
-Myna reads email, Slack, and calendar via MCP servers. Register them with Claude Code:
+If you use Gmail, Slack, or Google Calendar MCP servers, register their binaries with Claude Code now. This is a one-time OS-level step that makes the server available to Claude Code — it is not Myna configuration.
 
 - [ ] Gmail: `claude mcp add gmail-mcp -- <your-gmail-mcp-command>`
 - [ ] Slack: `claude mcp add slack-mcp -- <your-slack-mcp-command>`
 - [ ] Google Calendar: `claude mcp add gcal-mcp -- <your-gcal-mcp-command>`
 
-Myna works without these — features that need them degrade gracefully.
+Skip this if you don't have MCP servers installed yet. Myna works without them — features that need them degrade gracefully. When you run `/myna-setup` in the next step, it will ask which server names to use.
 
 ## 6. Configure Myna
 
