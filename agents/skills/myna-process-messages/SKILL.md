@@ -192,7 +192,7 @@ For every email/message processed, append the full raw text to `_system/sources/
 
 {full email body}
 
-Referenced by: [[auth-migration]] — timeline entry, task
+Referenced by: [[Projects/auth-migration]] — timeline entry, task
 ```
 
 ---

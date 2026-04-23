@@ -133,7 +133,7 @@ Subject: Auth migration sync — decisions and next steps
 
 Quick recap from today.
 
-**Decision:** Going with Option B (caching layer). Rationale in [[auth-migration]].
+**Decision:** Going with Option B (caching layer). Rationale in [[Projects/auth-migration]].
 
 **Action items:**
 - Sarah: Submit API spec — by Friday, April 11

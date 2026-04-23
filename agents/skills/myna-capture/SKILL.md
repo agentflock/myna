@@ -285,7 +285,7 @@ User: "Create recurring task: weekly team status update, every Monday"
 
 **Central index entry** (`_system/links.md`):
 ```
-- [{YYYY-MM-DD}] [{title}]({url}) — {description} — {entity: [[project-slug]] or [[person-slug]] or general}
+- [{YYYY-MM-DD}] [{title}]({url}) — {description} — {entity: [[Projects/project-slug]] or [[People/person-slug]] or general}
 ```
 
 **Worked example:**
@@ -297,7 +297,7 @@ User: "save link: https://runbook.internal/auth-migration for auth migration"
 3. Write to `Projects/auth-migration.md` Links section:
    `- [2026-04-05] [Auth Migration Runbook](https://runbook.internal/auth-migration) — runbook`
 4. Write to `_system/links.md`:
-   `- [2026-04-05] [Auth Migration Runbook](https://runbook.internal/auth-migration) — runbook — [[auth-migration]]`
+   `- [2026-04-05] [Auth Migration Runbook](https://runbook.internal/auth-migration) — runbook — [[Projects/auth-migration]]`
 
 Output: "Saved link to auth-migration.md and central index."
 

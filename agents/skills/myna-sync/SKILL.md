@@ -113,9 +113,9 @@ Collect in parallel:
 
 **Due today:** Grep `{vault}/{subfolder}/Projects/` for `- \[ \]` with `📅 {target-date}`. Group by project file. Also grep outside `Projects/` for tasks with `📅 {target-date}` — these are "General" tasks with no project. Retain the full task text and source file for each result.
 
-**Overdue (for briefing signal only):** Grep `{vault}/{subfolder}/Projects/` for `- \[ \]` with `📅 {date}` before target date. Count total; surface the top 3 by priority for the briefing. Full list belongs in [[overdue]] dashboard.
+**Overdue (for briefing signal only):** Grep `{vault}/{subfolder}/Projects/` for `- \[ \]` with `📅 {date}` before target date. Count total; surface the top 3 by priority for the briefing. Full list belongs in [[Dashboards/overdue]] dashboard.
 
-**Overdue delegations (for briefing signal only):** Grep `{vault}/{subfolder}/` for `- \[ \]` lines containing `[type:: delegation]` with `📅 {date}` before today. Count total; surface any as red-flag bullets in the briefing. Full list belongs in [[delegations]] dashboard.
+**Overdue delegations (for briefing signal only):** Grep `{vault}/{subfolder}/` for `- \[ \]` lines containing `[type:: delegation]` with `📅 {date}` before today. Count total; surface any as red-flag bullets in the briefing. Full list belongs in [[Dashboards/delegations]] dashboard.
 
 **Blockers:** Grep `{vault}/{subfolder}/Projects/` for `> \[!blocker\]` callout blocks. For each match, read a window of ~5 surrounding lines. Skip if `resolved:: true` or `status:: resolved` appears within the same callout block. Surface unresolved ones as briefing bullets.
 
@@ -182,7 +182,7 @@ date: {YYYY-MM-DD}
 
 ### Dashboards
 
-[[home]] · [[tasks]] · [[this-week]] · [[overdue]] · [[delegations]] · [[blockers]] · [[projects]] · [[people]] · [[meetings]] · [[weekly]]
+[[Dashboards/home]] · [[Dashboards/tasks]] · [[Dashboards/this-week]] · [[Dashboards/overdue]] · [[Dashboards/delegations]] · [[Dashboards/blockers]] · [[Dashboards/projects]] · [[Dashboards/people]] · [[Dashboards/meetings]] · [[Dashboards/weekly]]
 ```
 
 ### Re-run Snapshot Format (prepended at top)
