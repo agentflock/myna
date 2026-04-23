@@ -149,7 +149,7 @@ Group recurring meetings: if the same meeting title appears on multiple days, co
 
 **Status:** active  **Last updated:** 2026-04-10
 
-**Key People:** [[sarah-chen]], [[alex-kumar]], [[james-lee]]
+**Key People:** [[People/sarah-chen]], [[People/alex-kumar]], [[People/james-lee]]
 
 ---
 

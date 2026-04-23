@@ -166,7 +166,7 @@ Inline `#tags` at the top of files (not YAML frontmatter arrays). Auto-applied b
 `[[file-name]]` for cross-references. Verify the target file exists before creating a wiki-link. If the file doesn't exist, use the plain name instead.
 
 ```
-Key People: [[sarah-chen]], [[alex-kumar]]
+Key People: [[People/sarah-chen]], [[People/alex-kumar]]
 ```
 
 ### Callout Blocks
@@ -195,7 +195,9 @@ SORT due ASC
 
 ### File Links in Output
 
-When referencing vault files, include both Obsidian URI and disk path:
+When referencing a vault file in chat output, use wikilink format: `[[path/to/file]]`. Never use plain file paths — they open in Chrome, not Obsidian.
+
+When creating or updating a vault file, also include the Obsidian URI and the full disk path so the user can navigate from the terminal or Obsidian:
 
 ```
 obsidian://open?vault={vault}&file={path}

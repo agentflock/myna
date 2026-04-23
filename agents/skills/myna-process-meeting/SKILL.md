@@ -185,7 +185,7 @@ Append to `_system/sources/{entity}.md` (one entry per project or person mention
 > Raw notes (verbatim)
 {paste verbatim notes content here}
 
-Referenced by: [[auth-migration]] — decision, task | [[sarah-chen]] — observation, delegation
+Referenced by: [[Projects/auth-migration]] — decision, task | [[People/sarah-chen]] — observation, delegation
 Items extracted: 1 decision, 2 tasks, 1 delegation, 1 observation
 ```
 
