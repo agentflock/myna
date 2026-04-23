@@ -139,6 +139,8 @@ Write YAML only when the user selects option 1 (or after corrections are applied
 
 Schema references: `_system/config/projects.yaml.example`, `_system/config/people.yaml.example`.
 
+**Post-import timeline offer:** After config is written and relationship tiers are resolved, if any of the imported documents were project update documents (status updates, progress reports, sprint summaries, or similar), ask: "Want me to create project timeline files from the update documents you imported? I'll add dated entries to each project's timeline." Wait for the user to say yes before doing anything — skip this step if they decline or don't respond to it.
+
 ---
 
 ## Section 5: Communication Style
