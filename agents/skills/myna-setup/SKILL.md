@@ -112,6 +112,10 @@ The most important section. Always present three explicit options upfront before
 2. **List them** — type a batch description of projects and/or people in any format. This skill structures it and confirms.
 3. **Skip for now** — come back later via `/myna-setup`.
 
+**Reading files by type (for option 1):**
+- **PDF**: Use Claude Code's Read tool directly — it handles PDFs natively. Do not write a script.
+- **docx**: Check `pandoc --version` first. If available, run `pandoc -t plain <file>` to extract text. If pandoc is not found, fall back to `python3 -c "import docx; ..."` (python-docx). Do not write custom parsing scripts.
+
 When extracting from docs or user input, populate both `projects.yaml` and `people.yaml`. Cross-reference: people mentioned in projects get added to people config; projects mentioned for people get linked.
 
 Show all extracted data as a **numbered human-readable list** — never as YAML. Then present these options:
