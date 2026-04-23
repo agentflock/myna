@@ -1,0 +1,1219 @@
+/* =========================================================
+   Myna Settings — app.js
+
+   Architecture:
+   - window.config  : raw config object from GET /api/config
+   - switchTab()    : tab navigation
+   - populateForms(): fills all forms from window.config
+   - getTabData()   : reads a tab's form inputs → partial config object
+   - saveTab()      : PUT /api/config/{name} with getTabData result
+   - showToast()    : bottom-right toast, auto-dismiss after 3s
+   ========================================================= */
+
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+window.config = null;
+let activeTab = 'overview';
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+
+function switchTab(tabName) {
+  // Update nav active state
+  document.querySelectorAll('.nav-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
+
+  // Show/hide panels
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.add('hidden');
+  });
+  const target = document.getElementById('tab-' + tabName);
+  if (target) {
+    target.classList.remove('hidden');
+  }
+
+  activeTab = tabName;
+
+  // Render dynamic tabs on first visit (config may have loaded while on another tab)
+  if (tabName === 'projects' && window.config) {
+    const list = document.getElementById('projects-list');
+    if (list && list.children.length === 0) populateProjects();
+  }
+  if (tabName === 'people' && window.config) {
+    const list = document.getElementById('people-list');
+    if (list && list.children.length === 0) populatePeople();
+  }
+  if (tabName === 'files' && !filesTabLoaded) {
+    filesTabLoaded = true;
+    loadImports();
+  }
+}
+
+// ── Config loading ─────────────────────────────────────────────────────────
+
+async function loadConfig() {
+  setStatus('connecting');
+
+  try {
+    const res = await fetch('/api/config');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    window.config = await res.json();
+    setStatus('connected');
+    populateForms();
+    renderOverview();
+  } catch (err) {
+    setStatus('disconnected');
+    console.error('Failed to load config:', err);
+  }
+}
+
+function setStatus(state) {
+  const dot  = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+  const btn  = document.getElementById('retry-btn');
+
+  if (state === 'connecting') {
+    dot.className  = 'w-2 h-2 rounded-full bg-slate-300';
+    text.className = 'text-slate-400';
+    text.textContent = 'Connecting...';
+    btn.classList.add('hidden');
+  } else if (state === 'connected') {
+    dot.className  = 'w-2 h-2 rounded-full bg-emerald-400';
+    text.className = 'text-slate-500';
+    text.textContent = 'Connected';
+    btn.classList.add('hidden');
+  } else {
+    dot.className  = 'w-2 h-2 rounded-full bg-red-400';
+    text.className = 'text-red-500';
+    text.textContent = 'Not connected';
+    btn.classList.remove('hidden');
+  }
+}
+
+// ── Form population ────────────────────────────────────────────────────────
+
+function populateForms() {
+  if (!window.config) return;
+  populateIdentity();
+  populateIntegrations();
+  populateCommunication();
+  populateFeatures();
+  populateProjects();
+  populatePeople();
+}
+
+function populateIdentity() {
+  const ws = window.config.workspace || {};
+  const user = ws.user || {};
+  const vault = ws.vault || {};
+  const wh = ws.work_hours || {};
+  const journal = ws.journal || {};
+  const email = ws.email || {};
+
+  setValue('user-name',        user.name       || '');
+  setValue('user-email',       user.email      || '');
+  setValue('user-role',        user.role       || '');
+  setValue('work-start',       wh.start        || '');
+  setValue('work-end',         wh.end          || '');
+  setValue('feedback-cycle',   ws.feedback_cycle_days != null ? ws.feedback_cycle_days : '');
+  setValue('journal-archive',  journal.archive_after_days != null ? journal.archive_after_days : '');
+
+  // Timezone — check if it's in the known list, else use "other"
+  const tz = ws.timezone || '';
+  const tzSelect = document.getElementById('user-timezone');
+  const knownOptions = Array.from(tzSelect.options).map(o => o.value);
+  if (tz && knownOptions.includes(tz)) {
+    tzSelect.value = tz;
+  } else if (tz) {
+    tzSelect.value = '_other';
+    const custom = document.getElementById('user-timezone-custom');
+    custom.value = tz;
+    custom.classList.remove('hidden');
+  }
+
+  // Email filing radio
+  const filing = email.processed_folder || 'per-project';
+  const radios = document.querySelectorAll('input[name="email-filing"]');
+  radios.forEach(r => { r.checked = r.value === filing; });
+}
+
+function populateIntegrations() {
+  const mcp = (window.config.workspace || {}).mcp_servers || {};
+  setValue('mcp-email',    mcp.email    || '');
+  setValue('mcp-calendar', mcp.calendar || '');
+  setValue('mcp-slack',    mcp.slack    || '');
+}
+
+function populateCommunication() {
+  const cs = window.config['communication-style'] || {};
+  const tier = cs.presets_per_tier || {};
+  const ep   = cs.email_preferences || {};
+  const mp   = cs.messaging_preferences || {};
+
+  setValue('comm-default-preset',     cs.default_preset || '');
+  setValue('comm-upward',             tier.upward       || '');
+  setValue('comm-peer',               tier.peer         || '');
+  setValue('comm-direct',             tier.direct       || '');
+  setValue('comm-cross-team',         tier['cross-team'] || '');
+  setValue('comm-sign-off',           cs.sign_off       || '');
+  setValue('comm-difficult-approach', cs.difficult_message_approach || '');
+  setValue('comm-email-length',       ep.max_length     || '');
+  setValue('comm-email-greeting',     ep.greeting_style || '');
+  setValue('comm-msg-formality',      mp.formality      || '');
+  setValue('comm-msg-emoji',          mp.emoji_usage    || '');
+}
+
+function populateFeatures() {
+  const features = (window.config.workspace || {}).features || {};
+  const featureKeys = [
+    'email_processing', 'messaging_processing', 'email_triage',
+    'meeting_prep', 'process_meeting',
+    'time_blocks', 'calendar_reminders',
+    'people_management', 'team_health', 'attention_gap_detection',
+    'feedback_gap_detection', 'milestones',
+    'self_tracking', 'contribution_detection',
+    'weekly_summary', 'monthly_updates',
+    'park_resume'
+  ];
+  featureKeys.forEach(key => {
+    const el = document.getElementById('feat-' + key);
+    if (el) el.checked = features[key] !== false; // default true if missing
+  });
+}
+
+// ── Overview rendering ─────────────────────────────────────────────────────
+
+function renderOverview() {
+  if (!window.config) return;
+
+  renderIdentityCard();
+  renderIntegrationsCard();
+  renderCommunicationCard();
+  renderFeaturesCard();
+  renderProjectsCard();
+  renderPeopleCard();
+}
+
+function renderIdentityCard() {
+  const user = (window.config.workspace || {}).user || {};
+  const body = document.getElementById('overview-identity-body');
+  const badge = document.getElementById('badge-identity');
+
+  const isConfigured = !!(user.name && user.email);
+  setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? 'Set up' : 'Not set');
+
+  if (user.name || user.email || user.role) {
+    body.innerHTML = [
+      user.name  ? kv('Name',  user.name) : '',
+      user.email ? kv('Email', user.email) : '',
+      user.role  ? kv('Role',  formatRole(user.role)) : '',
+    ].filter(Boolean).join('');
+  } else {
+    body.innerHTML = '<span class="text-slate-400 text-sm">Not configured</span>';
+  }
+}
+
+function renderIntegrationsCard() {
+  const mcp = (window.config.workspace || {}).mcp_servers || {};
+  const body = document.getElementById('overview-integrations-body');
+  const badge = document.getElementById('badge-integrations');
+
+  const configured = Object.entries(mcp).filter(([, v]) => v);
+  const isConfigured = configured.length > 0;
+  setBadge(badge, isConfigured ? (configured.length === 3 ? 'configured' : 'partial') : 'empty',
+    isConfigured ? `${configured.length}/3 connected` : 'None');
+
+  if (configured.length > 0) {
+    body.innerHTML = configured.map(([k, v]) => kv(formatMcpKey(k), v)).join('');
+  } else {
+    body.innerHTML = '<span class="text-slate-400 text-sm">No MCP servers configured</span>';
+  }
+}
+
+function renderCommunicationCard() {
+  const cs   = window.config['communication-style'] || {};
+  const body  = document.getElementById('overview-communication-body');
+  const badge = document.getElementById('badge-communication');
+
+  const isConfigured = !!cs.default_preset;
+  setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? 'Configured' : 'Not set');
+
+  if (cs.default_preset) {
+    const lines = [kv('Default', capitalize(cs.default_preset))];
+    if (cs.difficult_message_approach) {
+      lines.push(kv('Difficult msgs', formatSlug(cs.difficult_message_approach)));
+    }
+    body.innerHTML = lines.join('');
+  } else {
+    body.innerHTML = '<span class="text-slate-400 text-sm">Not configured</span>';
+  }
+}
+
+function renderFeaturesCard() {
+  const features = (window.config.workspace || {}).features || {};
+  const body  = document.getElementById('overview-features-body');
+  const badge = document.getElementById('badge-features');
+
+  const total   = Object.keys(features).length;
+  const enabled = Object.values(features).filter(Boolean).length;
+  const isConfigured = total > 0;
+
+  setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? `${enabled}/${total} on` : 'Not set');
+
+  body.innerHTML = isConfigured
+    ? kv('Enabled', `${enabled} of ${total} features`)
+    : '<span class="text-slate-400 text-sm">Not configured</span>';
+}
+
+function renderProjectsCard() {
+  const cfg = window.config.projects;
+  const projects = Array.isArray(cfg) ? cfg : (Array.isArray(cfg && cfg.projects) ? cfg.projects : []);
+  const body  = document.getElementById('overview-projects-body');
+  const badge = document.getElementById('badge-projects');
+
+  const count = projects.length;
+  const isConfigured = count > 0;
+
+  setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? `${count} projects` : 'None');
+  body.innerHTML = isConfigured
+    ? kv('Active', `${count} project${count !== 1 ? 's' : ''}`)
+    : '<span class="text-slate-400 text-sm">No projects configured</span>';
+}
+
+function renderPeopleCard() {
+  const cfg = window.config.people;
+  const people = Array.isArray(cfg) ? cfg : (Array.isArray(cfg && cfg.people) ? cfg.people : []);
+  const body  = document.getElementById('overview-people-body');
+  const badge = document.getElementById('badge-people');
+
+  const count = people.length;
+  const isConfigured = count > 0;
+
+  setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? `${count} people` : 'None');
+  body.innerHTML = isConfigured
+    ? kv('Tracked', `${count} person${count !== 1 ? 's' : ''}`)
+    : '<span class="text-slate-400 text-sm">No people configured</span>';
+}
+
+// ── Tab data readers ───────────────────────────────────────────────────────
+
+function getTabData(tabName) {
+  if (tabName === 'identity')      return getIdentityData();
+  if (tabName === 'integrations')  return getIntegrationsData();
+  if (tabName === 'communication') return getCommunicationData();
+  if (tabName === 'features')      return getFeaturesData();
+  if (tabName === 'projects')      return { projects: collectProjectsData() };
+  if (tabName === 'people')        return { people: collectPeopleData() };
+  return null;
+}
+
+function getIdentityData() {
+  // Start from existing config to preserve unrelated workspace fields
+  const existing = deepClone(window.config && window.config.workspace || {});
+
+  const tzSelect = document.getElementById('user-timezone');
+  let tz = tzSelect.value;
+  if (tz === '_other') {
+    tz = document.getElementById('user-timezone-custom').value.trim();
+  }
+
+  const filingEl = document.querySelector('input[name="email-filing"]:checked');
+
+  return {
+    ...existing,
+    user: {
+      ...(existing.user || {}),
+      name:  document.getElementById('user-name').value.trim(),
+      email: document.getElementById('user-email').value.trim(),
+      role:  document.getElementById('user-role').value,
+    },
+    timezone: tz,
+    work_hours: {
+      start: document.getElementById('work-start').value,
+      end:   document.getElementById('work-end').value,
+    },
+    feedback_cycle_days: parseInt(document.getElementById('feedback-cycle').value, 10) || existing.feedback_cycle_days,
+    journal: {
+      ...(existing.journal || {}),
+      archive_after_days: parseInt(document.getElementById('journal-archive').value, 10) || (existing.journal || {}).archive_after_days,
+    },
+    email: {
+      ...(existing.email || {}),
+      processed_folder: filingEl ? filingEl.value : (existing.email || {}).processed_folder,
+    },
+  };
+}
+
+function getIntegrationsData() {
+  const existing = deepClone(window.config && window.config.workspace || {});
+  return {
+    ...existing,
+    mcp_servers: {
+      email:    document.getElementById('mcp-email').value.trim(),
+      calendar: document.getElementById('mcp-calendar').value.trim(),
+      slack:    document.getElementById('mcp-slack').value.trim(),
+    },
+  };
+}
+
+function getCommunicationData() {
+  return {
+    default_preset: document.getElementById('comm-default-preset').value,
+    presets_per_tier: {
+      upward:       document.getElementById('comm-upward').value || null,
+      peer:         document.getElementById('comm-peer').value || null,
+      direct:       document.getElementById('comm-direct').value || null,
+      'cross-team': document.getElementById('comm-cross-team').value || null,
+    },
+    sign_off:                   document.getElementById('comm-sign-off').value.trim(),
+    difficult_message_approach: document.getElementById('comm-difficult-approach').value,
+    email_preferences: {
+      max_length:     document.getElementById('comm-email-length').value,
+      greeting_style: document.getElementById('comm-email-greeting').value,
+    },
+    messaging_preferences: {
+      formality:   document.getElementById('comm-msg-formality').value,
+      emoji_usage: document.getElementById('comm-msg-emoji').value,
+    },
+  };
+}
+
+function getFeaturesData() {
+  const existing = deepClone(window.config && window.config.workspace || {});
+  const featureKeys = [
+    'email_processing', 'messaging_processing', 'email_triage',
+    'meeting_prep', 'process_meeting',
+    'time_blocks', 'calendar_reminders',
+    'people_management', 'team_health', 'attention_gap_detection',
+    'feedback_gap_detection', 'milestones',
+    'self_tracking', 'contribution_detection',
+    'weekly_summary', 'monthly_updates',
+    'park_resume'
+  ];
+  const features = {};
+  featureKeys.forEach(key => {
+    const el = document.getElementById('feat-' + key);
+    if (el) features[key] = el.checked;
+  });
+  return { ...existing, features };
+}
+
+// ── Save handler ───────────────────────────────────────────────────────────
+
+const CONFIG_NAME_MAP = {
+  identity:      'workspace',
+  integrations:  'workspace',
+  features:      'workspace',
+  communication: 'communication-style',
+  projects:      'projects',
+  people:        'people',
+};
+
+async function saveTab(tabName) {
+  const configName = CONFIG_NAME_MAP[tabName];
+  if (!configName) return;
+
+  const data = getTabData(tabName);
+  if (!data) return;
+
+  const btn = document.querySelector(`#tab-${tabName} .save-btn`);
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  try {
+    const res = await fetch('/api/config/' + configName, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const msg = await res.text().catch(() => 'Server error');
+      throw new Error(msg || 'HTTP ' + res.status);
+    }
+
+    // Update local cache — preserve nested structure for projects/people
+    if (configName === 'workspace') {
+      window.config.workspace = data;
+    } else if (configName === 'projects') {
+      const existing = window.config.projects;
+      window.config.projects = (existing && typeof existing === 'object' && !Array.isArray(existing))
+        ? { ...existing, projects: data.projects }
+        : data.projects;
+      projectsData = (data.projects || []).map(p => ({ ...p }));
+    } else if (configName === 'people') {
+      const existing = window.config.people;
+      window.config.people = (existing && typeof existing === 'object' && !Array.isArray(existing))
+        ? { ...existing, people: data.people }
+        : data.people;
+      peopleData = (data.people || []).map(p => ({ ...p }));
+    } else {
+      window.config[configName] = data;
+    }
+
+    renderOverview();
+    showToast('Saved successfully', 'success');
+  } catch (err) {
+    console.error('Save failed:', err);
+    showToast('Save failed: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = savedBtnLabel(tabName); }
+  }
+}
+
+function savedBtnLabel(tabName) {
+  const labels = {
+    identity:      'Save identity',
+    integrations:  'Save integrations',
+    communication: 'Save communication',
+    features:      'Save features',
+    projects:      'Save projects',
+    people:        'Save people',
+  };
+  return labels[tabName] || 'Save';
+}
+
+// ── Timezone change handler ────────────────────────────────────────────────
+
+function handleTimezoneChange() {
+  const sel    = document.getElementById('user-timezone');
+  const custom = document.getElementById('user-timezone-custom');
+  if (sel.value === '_other') {
+    custom.classList.remove('hidden');
+    custom.focus();
+  } else {
+    custom.classList.add('hidden');
+    custom.value = '';
+  }
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+
+function showToast(message, type) {
+  const container = document.getElementById('toast-container');
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  const iconSvg = type === 'success'
+    ? `<svg class="toast-icon w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`
+    : `<svg class="toast-icon w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`;
+
+  toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('dismissing');
+    setTimeout(() => toast.remove(), 220);
+  }, 3000);
+}
+
+// ── Utility helpers ────────────────────────────────────────────────────────
+
+function setValue(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.tagName === 'SELECT') {
+    // Try setting directly — falls back to empty string if option doesn't exist
+    el.value = val;
+    if (el.value !== val && val !== '') {
+      // val not in options — leave as empty
+      el.value = '';
+    }
+  } else {
+    el.value = val;
+  }
+}
+
+function kv(label, value) {
+  return `<div class="flex items-baseline gap-1.5 leading-snug">
+    <span class="card-label flex-shrink-0">${escHtml(label)}</span>
+    <span class="card-value truncate">${escHtml(String(value))}</span>
+  </div>`;
+}
+
+function setBadge(el, state, label) {
+  el.className = 'status-badge ' + state;
+  el.textContent = label;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escHtmlAttr(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function capitalize(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function formatRole(role) {
+  const map = {
+    'engineering-manager': 'Engineering Manager',
+    'tech-lead':           'Tech Lead',
+    'senior-engineer':     'Senior Engineer',
+    'pm':                  'PM',
+  };
+  return map[role] || role;
+}
+
+function formatMcpKey(key) {
+  const map = { email: 'Email', calendar: 'Calendar', slack: 'Messaging' };
+  return map[key] || capitalize(key);
+}
+
+function formatSlug(slug) {
+  if (!slug) return '';
+  return slug.split('-').map(w => capitalize(w)).join('-');
+}
+
+function deepClone(obj) {
+  try { return JSON.parse(JSON.stringify(obj)); }
+  catch { return { ...obj }; }
+}
+
+// ── TagInput component ─────────────────────────────────────────────────────
+
+class TagInput {
+  constructor(container, initialValues = []) {
+    this.container = container;
+    this.tags = [];
+    this._buildDOM();
+    this.setValues(initialValues);
+  }
+
+  _buildDOM() {
+    this.tagsContainer = this.container.querySelector('.tags-container');
+    if (!this.tagsContainer) {
+      this.tagsContainer = document.createElement('div');
+      this.tagsContainer.className = 'tags-container';
+      this.container.appendChild(this.tagsContainer);
+    }
+
+    this.input = this.tagsContainer.querySelector('.tag-text-input');
+    if (!this.input) {
+      this.input = document.createElement('input');
+      this.input.type = 'text';
+      this.input.className = 'tag-text-input';
+      this.input.placeholder = 'Add...';
+      this.tagsContainer.appendChild(this.input);
+    }
+
+    this.input.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ',') && !e.isComposing) {
+        e.preventDefault();
+        this._addFromInput();
+      } else if (e.key === 'Backspace' && this.input.value === '' && this.tags.length > 0) {
+        this._removeTag(this.tags.length - 1);
+      }
+    });
+
+    // Comma typed triggers add too
+    this.input.addEventListener('input', () => {
+      if (this.input.value.endsWith(',')) {
+        this.input.value = this.input.value.slice(0, -1);
+        this._addFromInput();
+      }
+    });
+
+    // Click on the container focuses the input
+    this.container.addEventListener('click', (e) => {
+      if (e.target === this.container || e.target === this.tagsContainer) {
+        this.input.focus();
+      }
+    });
+  }
+
+  _addFromInput() {
+    const val = this.input.value.trim();
+    if (val && !this.tags.includes(val)) {
+      this.tags.push(val);
+      this._renderTags();
+    }
+    this.input.value = '';
+  }
+
+  _removeTag(idx) {
+    this.tags.splice(idx, 1);
+    this._renderTags();
+  }
+
+  _renderTags() {
+    // Remove existing pills (keep the input)
+    this.tagsContainer.querySelectorAll('.tag-pill').forEach(p => p.remove());
+
+    this.tags.forEach((tag, idx) => {
+      const pill = document.createElement('span');
+      pill.className = 'tag-pill';
+      pill.innerHTML = `${escHtml(tag)}<button type="button" class="tag-remove-btn" aria-label="Remove ${escHtml(tag)}">&#x2715;</button>`;
+      pill.querySelector('.tag-remove-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        this._removeTag(idx);
+      });
+      this.tagsContainer.insertBefore(pill, this.input);
+    });
+  }
+
+  getValues() {
+    return [...this.tags];
+  }
+
+  setValues(values) {
+    this.tags = (Array.isArray(values) ? values : []).filter(v => v && String(v).trim());
+    this._renderTags();
+  }
+
+  clear() {
+    this.tags = [];
+    this._renderTags();
+  }
+}
+
+// ── Projects tab ───────────────────────────────────────────────────────────
+
+// projectsData: array of project objects (source of truth for collapsed items)
+let projectsData = [];
+// tagInputInstances keyed by entity index, sub-key field name
+const tagInputs = { projects: {}, people: {} };
+
+function populateProjects() {
+  const raw = window.config && window.config.projects;
+  const arr = Array.isArray(raw) ? raw
+            : Array.isArray(raw && raw.projects) ? raw.projects
+            : [];
+  projectsData = arr.map(p => ({ ...p }));
+  renderProjectsList();
+}
+
+function renderProjectsList() {
+  const list = document.getElementById('projects-list');
+  list.innerHTML = '';
+  tagInputs.projects = {};
+  projectsData.forEach((proj, idx) => {
+    list.appendChild(buildProjectCard(proj, idx));
+  });
+}
+
+function buildProjectCard(proj, idx) {
+  const status = proj.status || 'active';
+  const desc = proj.description || '';
+  const truncDesc = desc.length > 80 ? desc.slice(0, 77) + '...' : desc;
+
+  const card = document.createElement('div');
+  card.className = 'entity-card';
+  card.dataset.idx = idx;
+
+  card.innerHTML = `
+    <div class="entity-card-header" onclick="toggleProjectCard(${idx})">
+      <div class="entity-card-header-left">
+        <span class="entity-card-name">${escHtml(proj.name || 'Unnamed project')}</span>
+        <span class="project-status-badge ${escHtml(status)}">${escHtml(status)}</span>
+        ${truncDesc ? `<span class="entity-card-desc">${escHtml(truncDesc)}</span>` : ''}
+      </div>
+      <svg class="entity-card-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </div>
+    <div class="entity-form">
+      <div class="entity-form-grid">
+        <div class="field-group">
+          <label class="field-label">Name</label>
+          <input type="text" class="field-input proj-name" value="${escHtmlAttr(proj.name || '')}" placeholder="Project name" oninput="syncProjectHeader(${idx})" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Status</label>
+          <select class="field-input proj-status" onchange="syncProjectHeader(${idx})">
+            <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
+            <option value="paused" ${status === 'paused' ? 'selected' : ''}>Paused</option>
+            <option value="complete" ${status === 'complete' ? 'selected' : ''}>Complete</option>
+          </select>
+        </div>
+      </div>
+      <div class="entity-form-full">
+        <div class="field-group">
+          <label class="field-label">Description</label>
+          <textarea class="field-input proj-desc" rows="2" placeholder="Short description" oninput="syncProjectHeader(${idx})">${escHtml(proj.description || '')}</textarea>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Aliases</label>
+          <div class="tag-input" data-tag-field="aliases-${idx}"><div class="tags-container"><input type="text" class="tag-text-input" placeholder="Add..."></div></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email folders</label>
+          <div class="tag-input" data-tag-field="email_folders-${idx}"><div class="tags-container"><input type="text" class="tag-text-input" placeholder="Add..."></div></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Slack channels</label>
+          <div class="tag-input" data-tag-field="slack_channels-${idx}"><div class="tags-container"><input type="text" class="tag-text-input" placeholder="Add..."></div></div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Key people</label>
+          <div class="tag-input" data-tag-field="key_people-${idx}"><div class="tags-container"><input type="text" class="tag-text-input" placeholder="Add..."></div></div>
+        </div>
+      </div>
+      <div class="entity-form-actions">
+        <button type="button" class="entity-form-done-btn" onclick="toggleProjectCard(${idx})">Done</button>
+        <div class="inline-delete-wrapper" style="display:flex;align-items:center;gap:0.5rem;">
+          <button type="button" class="entity-delete-btn" onclick="showProjectDeleteConfirm(${idx})">Delete</button>
+          <div class="inline-confirm" id="proj-confirm-${idx}">
+            <span>Delete this project?</span>
+            <button type="button" class="inline-confirm-yes" onclick="deleteProject(${idx})">Confirm</button>
+            <button type="button" class="inline-confirm-cancel" onclick="hideProjectDeleteConfirm(${idx})">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Wire up tag inputs synchronously on the detached card element
+  const fields = ['aliases', 'email_folders', 'slack_channels', 'key_people'];
+  if (!tagInputs.projects[idx]) tagInputs.projects[idx] = {};
+  fields.forEach(field => {
+    const el = card.querySelector(`[data-tag-field="${field}-${idx}"]`);
+    if (el) tagInputs.projects[idx][field] = new TagInput(el, proj[field] || []);
+  });
+
+  return card;
+}
+
+function toggleProjectCard(idx) {
+  const card = document.querySelector(`#projects-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  card.classList.toggle('expanded');
+}
+
+function syncProjectHeader(idx) {
+  const card = document.querySelector(`#projects-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  const name = card.querySelector('.proj-name').value.trim();
+  const status = card.querySelector('.proj-status').value;
+  const desc = card.querySelector('.proj-desc').value.trim();
+  const truncDesc = desc.length > 80 ? desc.slice(0, 77) + '...' : desc;
+
+  card.querySelector('.entity-card-name').textContent = name || 'Unnamed project';
+  const badge = card.querySelector('.project-status-badge');
+  badge.className = `project-status-badge ${status}`;
+  badge.textContent = status;
+  const descEl = card.querySelector('.entity-card-desc');
+  if (descEl) descEl.textContent = truncDesc;
+}
+
+function showProjectDeleteConfirm(idx) {
+  const card = document.querySelector(`#projects-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  card.querySelector('.entity-delete-btn').style.display = 'none';
+  card.querySelector(`#proj-confirm-${idx}`).classList.add('visible');
+}
+
+function hideProjectDeleteConfirm(idx) {
+  const card = document.querySelector(`#projects-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  card.querySelector(`#proj-confirm-${idx}`).classList.remove('visible');
+  card.querySelector('.entity-delete-btn').style.display = '';
+}
+
+function deleteProject(idx) {
+  projectsData.splice(idx, 1);
+  renderProjectsList();
+}
+
+function addProject() {
+  projectsData.push({ name: '', status: 'active', description: '', aliases: [], email_folders: [], slack_channels: [], key_people: [] });
+  renderProjectsList();
+  const list = document.getElementById('projects-list');
+  const newCard = list.lastElementChild;
+  if (newCard) {
+    newCard.classList.add('expanded');
+    newCard.querySelector('.proj-name').focus();
+    newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function collectProjectsData() {
+  const list = document.getElementById('projects-list');
+  return Array.from(list.querySelectorAll('.entity-card')).map(card => {
+    const idx = parseInt(card.dataset.idx, 10);
+    const base = projectsData[idx] || {};
+    const tiMap = (tagInputs.projects[idx] || {});
+
+    return {
+      ...base,
+      name:          card.querySelector('.proj-name').value.trim(),
+      status:        card.querySelector('.proj-status').value,
+      description:   card.querySelector('.proj-desc').value.trim(),
+      aliases:       tiMap.aliases        ? tiMap.aliases.getValues()        : (base.aliases        || []),
+      email_folders: tiMap.email_folders  ? tiMap.email_folders.getValues()  : (base.email_folders  || []),
+      slack_channels:tiMap.slack_channels ? tiMap.slack_channels.getValues() : (base.slack_channels || []),
+      key_people:    tiMap.key_people     ? tiMap.key_people.getValues()     : (base.key_people     || []),
+    };
+  });
+}
+
+// ── People tab ─────────────────────────────────────────────────────────────
+
+let peopleData = [];
+
+function populatePeople() {
+  const raw = window.config && window.config.people;
+  const arr = Array.isArray(raw) ? raw
+            : Array.isArray(raw && raw.people) ? raw.people
+            : [];
+  peopleData = arr.map(p => ({ ...p }));
+  renderPeopleList();
+}
+
+function renderPeopleList() {
+  const list = document.getElementById('people-list');
+  list.innerHTML = '';
+  tagInputs.people = {};
+  peopleData.forEach((person, idx) => {
+    list.appendChild(buildPersonCard(person, idx));
+  });
+}
+
+function buildPersonCard(person, idx) {
+  const tier = person.relationship_tier || '';
+  const tierLabel = tier ? tier.replace('-', '\u2011') : ''; // non-breaking hyphen
+
+  const card = document.createElement('div');
+  card.className = 'entity-card';
+  card.dataset.idx = idx;
+
+  const tierBadgeHtml = tier
+    ? `<span class="tier-badge ${escHtml(tier)}">${escHtml(tier)}</span>`
+    : '';
+  const roleHtml = person.role
+    ? `<span class="entity-card-desc">${escHtml(person.role)}</span>`
+    : '';
+
+  card.innerHTML = `
+    <div class="entity-card-header" onclick="togglePersonCard(${idx})">
+      <div class="entity-card-header-left">
+        <span class="entity-card-name">${escHtml(person.display_name || person.name || 'Unnamed person')}</span>
+        ${tierBadgeHtml}
+        ${roleHtml}
+      </div>
+      <svg class="entity-card-chevron w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </div>
+    <div class="entity-form">
+      <div class="entity-form-grid">
+        <div class="field-group">
+          <label class="field-label">Display name</label>
+          <input type="text" class="field-input person-display-name" value="${escHtmlAttr(person.display_name || '')}" placeholder="e.g. Sarah" oninput="syncPersonHeader(${idx})" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Full name</label>
+          <input type="text" class="field-input person-full-name" value="${escHtmlAttr(person.full_name || '')}" placeholder="e.g. Sarah Chen" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Email</label>
+          <input type="email" class="field-input person-email" value="${escHtmlAttr(person.email || '')}" placeholder="sarah@company.com" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Slack handle</label>
+          <input type="text" class="field-input person-slack" value="${escHtmlAttr(person.slack_handle || '')}" placeholder="@sarah" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Relationship tier</label>
+          <select class="field-input person-tier" onchange="syncPersonHeader(${idx})">
+            <option value="" ${!tier ? 'selected' : ''}>Select tier</option>
+            <option value="direct"     ${tier === 'direct'     ? 'selected' : ''}>Direct report</option>
+            <option value="peer"       ${tier === 'peer'       ? 'selected' : ''}>Peer</option>
+            <option value="upward"     ${tier === 'upward'     ? 'selected' : ''}>Upward</option>
+            <option value="cross-team" ${tier === 'cross-team' ? 'selected' : ''}>Cross-team</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Role</label>
+          <input type="text" class="field-input person-role" value="${escHtmlAttr(person.role || '')}" placeholder="e.g. Staff Engineer" oninput="syncPersonHeader(${idx})" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Team</label>
+          <input type="text" class="field-input person-team" value="${escHtmlAttr(person.team || '')}" placeholder="e.g. Platform" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Feedback cycle (days)</label>
+          <input type="number" class="field-input person-feedback-cycle" value="${escHtmlAttr(person.feedback_cycle_days != null ? String(person.feedback_cycle_days) : '')}" placeholder="30" min="1" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Birthday (MM-DD)</label>
+          <input type="text" class="field-input person-birthday" value="${escHtmlAttr(person.birthday || '')}" placeholder="03-15" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Work anniversary (YYYY-MM-DD)</label>
+          <input type="text" class="field-input person-anniversary" value="${escHtmlAttr(person.work_anniversary || '')}" placeholder="2022-06-01" />
+        </div>
+      </div>
+      <div class="entity-form-full">
+        <div class="field-group">
+          <label class="field-label">Aliases</label>
+          <div class="tag-input" data-tag-field="person-aliases-${idx}"><div class="tags-container"><input type="text" class="tag-text-input" placeholder="Add..."></div></div>
+        </div>
+      </div>
+      <div class="entity-form-actions">
+        <button type="button" class="entity-form-done-btn" onclick="togglePersonCard(${idx})">Done</button>
+        <div class="inline-delete-wrapper" style="display:flex;align-items:center;gap:0.5rem;">
+          <button type="button" class="entity-delete-btn" onclick="showPersonDeleteConfirm(${idx})">Delete</button>
+          <div class="inline-confirm" id="person-confirm-${idx}">
+            <span>Delete this person?</span>
+            <button type="button" class="inline-confirm-yes" onclick="deletePerson(${idx})">Confirm</button>
+            <button type="button" class="inline-confirm-cancel" onclick="hidePersonDeleteConfirm(${idx})">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Wire up aliases tag input synchronously on the detached card element
+  if (!tagInputs.people[idx]) tagInputs.people[idx] = {};
+  const aliasEl = card.querySelector(`[data-tag-field="person-aliases-${idx}"]`);
+  if (aliasEl) tagInputs.people[idx].aliases = new TagInput(aliasEl, person.aliases || []);
+
+  return card;
+}
+
+function togglePersonCard(idx) {
+  const card = document.querySelector(`#people-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  card.classList.toggle('expanded');
+}
+
+function syncPersonHeader(idx) {
+  const card = document.querySelector(`#people-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  const displayName = card.querySelector('.person-display-name').value.trim();
+  const tier = card.querySelector('.person-tier').value;
+  const role = card.querySelector('.person-role').value.trim();
+
+  card.querySelector('.entity-card-name').textContent = displayName || 'Unnamed person';
+
+  let badge = card.querySelector('.tier-badge');
+  if (tier) {
+    if (!badge) {
+      badge = document.createElement('span');
+      const nameEl = card.querySelector('.entity-card-name');
+      nameEl.after(badge);
+    }
+    badge.className = `tier-badge ${tier}`;
+    badge.textContent = tier;
+  } else if (badge) {
+    badge.remove();
+  }
+
+  let roleEl = card.querySelector('.entity-card-desc');
+  if (role) {
+    if (!roleEl) {
+      roleEl = document.createElement('span');
+      roleEl.className = 'entity-card-desc';
+      card.querySelector('.entity-card-header-left').appendChild(roleEl);
+    }
+    roleEl.textContent = role;
+  } else if (roleEl) {
+    roleEl.remove();
+  }
+}
+
+function showPersonDeleteConfirm(idx) {
+  const card = document.querySelector(`#people-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  card.querySelector('.entity-delete-btn').style.display = 'none';
+  card.querySelector(`#person-confirm-${idx}`).classList.add('visible');
+}
+
+function hidePersonDeleteConfirm(idx) {
+  const card = document.querySelector(`#people-list .entity-card[data-idx="${idx}"]`);
+  if (!card) return;
+  card.querySelector(`#person-confirm-${idx}`).classList.remove('visible');
+  card.querySelector('.entity-delete-btn').style.display = '';
+}
+
+function deletePerson(idx) {
+  peopleData.splice(idx, 1);
+  renderPeopleList();
+}
+
+function addPerson() {
+  peopleData.push({ display_name: '', full_name: '', aliases: [], email: '', slack_handle: '', relationship_tier: '', role: '', team: '', feedback_cycle_days: null, birthday: '', work_anniversary: '' });
+  renderPeopleList();
+  const list = document.getElementById('people-list');
+  const newCard = list.lastElementChild;
+  if (newCard) {
+    newCard.classList.add('expanded');
+    newCard.querySelector('.person-display-name').focus();
+    newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function collectPeopleData() {
+  const list = document.getElementById('people-list');
+  return Array.from(list.querySelectorAll('.entity-card')).map(card => {
+    const idx = parseInt(card.dataset.idx, 10);
+    const base = peopleData[idx] || {};
+    const tiMap = (tagInputs.people[idx] || {});
+
+    const feedbackVal = card.querySelector('.person-feedback-cycle').value.trim();
+
+    return {
+      ...base,
+      display_name:       card.querySelector('.person-display-name').value.trim(),
+      full_name:          card.querySelector('.person-full-name').value.trim(),
+      aliases:            tiMap.aliases ? tiMap.aliases.getValues() : (base.aliases || []),
+      email:              card.querySelector('.person-email').value.trim(),
+      slack_handle:       card.querySelector('.person-slack').value.trim(),
+      relationship_tier:  card.querySelector('.person-tier').value,
+      role:               card.querySelector('.person-role').value.trim(),
+      team:               card.querySelector('.person-team').value.trim(),
+      feedback_cycle_days:feedbackVal ? parseInt(feedbackVal, 10) : null,
+      birthday:           card.querySelector('.person-birthday').value.trim(),
+      work_anniversary:   card.querySelector('.person-anniversary').value.trim(),
+    };
+  });
+}
+
+// ── Files tab ──────────────────────────────────────────────────────────────
+
+let filesTabLoaded = false;
+
+function initFilesTab() {
+  const zone = document.getElementById('upload-zone');
+  if (!zone) return;
+
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', (e) => {
+    if (!zone.contains(e.relatedTarget)) {
+      zone.classList.remove('drag-over');
+    }
+  });
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+}
+
+function handleFileInputChange(e) {
+  if (e.target.files.length > 0) {
+    handleFiles(e.target.files);
+    e.target.value = ''; // reset so same file can be re-selected
+  }
+}
+
+async function handleFiles(fileList) {
+  const files = Array.from(fileList);
+  if (files.length === 0) return;
+
+  const formData = new FormData();
+  files.forEach(file => formData.append('file', file));
+
+  try {
+    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+
+    if (!res.ok) {
+      let msg = 'Upload failed';
+      try { const body = await res.json(); msg = body.error || body.message || msg; } catch {}
+      showToast(msg, 'error');
+      return;
+    }
+
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const section = document.getElementById('uploaded-files-section');
+    const list    = document.getElementById('uploaded-files-list');
+    section.classList.remove('hidden');
+
+    files.forEach(file => {
+      const row = document.createElement('div');
+      row.className = 'file-row';
+      row.innerHTML = `
+        <svg class="w-4 h-4 text-teal-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div>
+          <div class="file-row-name">${escHtml(file.name)}</div>
+          <div class="file-row-meta">Uploaded at ${escHtml(now)}</div>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    const label = files.length === 1 ? '1 file uploaded' : `${files.length} files uploaded`;
+    showToast(label, 'success');
+    loadImports(); // refresh pending imports list after upload
+  } catch (err) {
+    showToast('Upload failed: ' + err.message, 'error');
+  }
+}
+
+async function loadImports() {
+  const loadingEl = document.getElementById('pending-imports-loading');
+  const contentEl = document.getElementById('pending-imports-content');
+  if (!loadingEl || !contentEl) return;
+
+  try {
+    const res = await fetch('/api/imports');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const files = Array.isArray(data.files) ? data.files : [];
+
+    loadingEl.classList.add('hidden');
+    contentEl.classList.remove('hidden');
+
+    if (files.length === 0) {
+      contentEl.innerHTML = '<p class="text-slate-400 text-sm">No pending imports</p>';
+      return;
+    }
+
+    const rows = files.map(f => {
+      const name = f.split('/').pop();
+      return `
+        <div class="file-row">
+          <svg class="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <div>
+            <div class="file-row-name">${escHtml(name)}</div>
+            <div class="file-row-meta">${escHtml(f)}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    contentEl.innerHTML = `
+      <h2 class="section-title mb-3">Pending imports</h2>
+      <div class="flex flex-col gap-1">${rows}</div>
+    `;
+  } catch (err) {
+    if (loadingEl) {
+      loadingEl.textContent = 'Could not load imports.';
+      loadingEl.classList.remove('hidden');
+    }
+  }
+}
+
+// ── Defaults footer ────────────────────────────────────────────────────────
+
+function toggleDefaults() {
+  const content  = document.getElementById('defaults-content');
+  const chevron  = document.getElementById('defaults-chevron');
+  const expanded = !content.classList.contains('hidden');
+  content.classList.toggle('hidden', expanded);
+  chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+  switchTab('overview');
+  loadConfig();
+  initFilesTab();
+});

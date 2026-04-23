@@ -309,24 +309,26 @@ for name in "${config_files[@]}"; do
       case "$name" in
         projects)
           cat > "$config_dest" <<'YAML'
+# Run /myna-setup for guided configuration.
 projects: []
 YAML
           ;;
         people)
           cat > "$config_dest" <<'YAML'
+# Run /myna-setup for guided configuration.
 people: []
 YAML
           ;;
         meetings)
           cat > "$config_dest" <<'YAML'
+# Run /myna-setup for guided configuration.
 # Optional overrides. Most meetings need no entry — type inferred from calendar.
 meetings: []
 YAML
           ;;
         workspace)
           cat > "$config_dest" <<'YAML'
-# Myna — Workspace Configuration
-# See _system/config/workspace.yaml.example for all options and comments.
+# Run /myna-setup for guided configuration.
 
 user:
   name: ""
@@ -388,8 +390,7 @@ YAML
           ;;
         communication-style)
           cat > "$config_dest" <<'YAML'
-# Myna — Communication Style Configuration
-# See _system/config/communication-style.yaml.example for all options and comments.
+# Run /myna-setup for guided configuration.
 
 default_preset: professional
 
@@ -412,6 +413,7 @@ YAML
           ;;
         tags)
           cat > "$config_dest" <<'YAML'
+# Run /myna-setup for guided configuration.
 tags: []
 YAML
           ;;
@@ -522,6 +524,36 @@ EOF
   fi
 fi
 
+# ── Config UI ────────────────────────────────────────────────
+
+step "Installing config UI"
+
+UI_SRC="$SCRIPT_DIR/ui"
+UI_DEST="$MYNA_HOME/ui"
+
+if [ -d "$UI_SRC" ]; then
+  if $DRY_RUN; then
+    echo "  [dry-run] mkdir -p $UI_DEST"
+    echo "  [dry-run] cp ui files → $UI_DEST"
+  else
+    mkdir -p "$UI_DEST"
+    cp "$UI_SRC"/*.py "$UI_DEST/" 2>/dev/null || true
+    cp "$UI_SRC"/*.html "$UI_DEST/" 2>/dev/null || true
+    cp "$UI_SRC"/*.css "$UI_DEST/" 2>/dev/null || true
+    cp "$UI_SRC"/*.js "$UI_DEST/" 2>/dev/null || true
+    info "Config UI installed to $UI_DEST/"
+  fi
+else
+  warn "UI files not found — skipping config UI installation"
+fi
+
+# Create imports directory
+if $DRY_RUN; then
+  echo "  [dry-run] mkdir -p $MYNA_HOME/imports/archived"
+else
+  mkdir -p "$MYNA_HOME/imports/archived" 2>/dev/null || true
+fi
+
 # ── Setup Checklist ───────────────────────────────────────────
 
 step "Writing setup checklist"
@@ -587,6 +619,7 @@ echo "  Config:        $MYNA_ROOT/_system/config/"
 echo "  Templates:     $MYNA_ROOT/_system/templates/ ($template_count files)"
 echo "  Dashboards:    $MYNA_ROOT/Dashboards/ ($dashboard_count files)"
 echo "  Manifest:      $MYNA_HOME/install-manifest.json"
+echo "  Config UI:     $UI_DEST/"
 if ! $DRY_RUN; then
   echo "  Checklist:     $CHECKLIST_FILE"
 fi
@@ -595,22 +628,13 @@ echo ""
 if ! $DRY_RUN; then
   printf "${BOLD}Next steps:${NC}\n"
   echo ""
-  echo "  1. Complete the setup checklist:"
-  printf "     ${BOLD}$CHECKLIST_FILE${NC}\n"
-  echo ""
-  echo "  2. Edit your config files:"
-  echo "     \$EDITOR $CONFIG_DIR/workspace.yaml"
-  echo "     \$EDITOR $CONFIG_DIR/projects.yaml"
-  echo "     \$EDITOR $CONFIG_DIR/people.yaml"
-  echo ""
-  echo "  3. (Optional) Register external MCP servers:"
-  echo "     claude mcp add gmail-mcp -- <your-gmail-mcp-command>"
-  echo "     claude mcp add slack-mcp -- <your-slack-mcp-command>"
-  echo "     claude mcp add gcal-mcp -- <your-gcal-mcp-command>"
-  echo ""
-  echo "  4. Launch Myna:"
+  echo "  1. Launch Myna:"
   printf "     ${BOLD}myna${NC}  (after reloading your shell)\n"
   printf "     ${BOLD}claude --agent myna${NC}  (immediately)\n"
+  echo ""
+  echo "  2. Run /myna-setup for guided configuration"
+  echo "     Or edit config files directly:"
+  echo "     \$EDITOR $CONFIG_DIR/workspace.yaml"
   echo ""
   echo "  The cloned repo is no longer needed at runtime."
   echo "  To update: git pull && ./install.sh --vault-path $VAULT_PATH"

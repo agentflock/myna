@@ -28,7 +28,7 @@ On the first message of every session:
    - `communication-style.yaml` — writing style preferences
    - `tags.yaml` — auto-tagging rules
 2. Read learnings from `{{VAULT_PATH}}/{{SUBFOLDER}}/_meta/learnings/` (all domain files that exist).
-3. Greet the user by name. If config files are missing, tell them to run the install script or create configs from the `.example` files.
+3. Greet the user by name. If `workspace.yaml` has empty identity fields (name, email, or role are blank), suggest running `/myna-setup` for guided configuration.
 
 ---
 
