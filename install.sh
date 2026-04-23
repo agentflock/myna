@@ -361,9 +361,9 @@ calendar_event_types:
   reminder: Reminder
 
 mcp_servers:
-  email: gmail-mcp
-  slack: slack-mcp
-  calendar: gcal-mcp
+  email: ""
+  slack: ""
+  calendar: ""
 
 prompt_logging: true
 ai_model: claude-code
@@ -628,13 +628,14 @@ echo ""
 if ! $DRY_RUN; then
   printf "${BOLD}Next steps:${NC}\n"
   echo ""
-  echo "  1. Launch Myna:"
-  printf "     ${BOLD}myna${NC}  (after reloading your shell)\n"
-  printf "     ${BOLD}claude --agent myna${NC}  (immediately)\n"
-  echo ""
-  echo "  2. Run /myna-setup for guided configuration"
+  echo "  1. Run /myna-setup for guided configuration"
+  printf "     Type ${BOLD}/myna-setup${NC} inside a Claude Code session (not in the terminal)\n"
   echo "     Or edit config files directly:"
   echo "     \$EDITOR $CONFIG_DIR/workspace.yaml"
+  echo ""
+  echo "  2. Launch Myna:"
+  printf "     ${BOLD}myna${NC}  (after reloading your shell)\n"
+  printf "     ${BOLD}claude --agent myna${NC}  (immediately)\n"
   echo ""
   echo "  The cloned repo is no longer needed at runtime."
   echo "  To update: git pull && ./install.sh --vault-path $VAULT_PATH"

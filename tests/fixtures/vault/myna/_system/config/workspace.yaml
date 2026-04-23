@@ -38,9 +38,9 @@ calendar_event_types:
 
 # MCP server names — maps abstract names to user's actual MCP servers
 mcp_servers:
-  email: gmail-mcp
-  slack: slack-mcp
-  calendar: gcal-mcp
+  email: ""
+  slack: ""
+  calendar: ""
 
 # System settings
 prompt_logging: true
