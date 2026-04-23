@@ -312,28 +312,6 @@
               </div>
             </div>
 
-            <div class="form-section">
-              <h2 class="section-title">Email filing</h2>
-              <p class="text-slate-500 text-sm mb-4">Where processed emails are filed.</p>
-
-              <div class="flex flex-col gap-3">
-                <label class="radio-option">
-                  <input type="radio" name="email-filing" value="per-project" class="radio-input" />
-                  <div>
-                    <p class="text-sm font-medium text-slate-700">Per-project folders</p>
-                    <p class="text-xs text-slate-400 mt-0.5">Emails are moved into their project's folder</p>
-                  </div>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="email-filing" value="common" class="radio-input" />
-                  <div>
-                    <p class="text-sm font-medium text-slate-700">One shared folder</p>
-                    <p class="text-xs text-slate-400 mt-0.5">All processed emails go to a single folder</p>
-                  </div>
-                </label>
-              </div>
-            </div>
-
             <div class="flex items-center gap-3 mt-8">
               <button type="button" class="save-btn" onclick="saveTab('identity')">Save identity</button>
               <span id="identity-feedback" class="feedback-msg hidden"></span>
@@ -486,6 +464,15 @@
                   <option value="first-name">First name</option>
                   <option value="formal">Formal</option>
                   <option value="none">None</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Processed email filing</label>
+                <p class="text-slate-400 text-xs mb-3">Where processed emails are filed after Myna handles them.</p>
+                <select id="comm-email-filing" class="field-input" onchange="saveTab('communication')">
+                  <option value="per-project">Per-project folders — filed into each project's folder</option>
+                  <option value="common">One shared folder — all processed emails in one place</option>
                 </select>
               </div>
             </div>
