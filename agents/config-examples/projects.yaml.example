@@ -27,24 +27,3 @@ projects:
     description: "Core platform API modernization"
     key_people:
       - Marcus Lee
-
-# ---
-# Email Triage Configuration
-# Controls how "triage my inbox" classifies emails.
-# ---
-triage:
-  inbox_source: "INBOX"                # Email folder/label to read for triage
-  folders:                              # Triage folders — agent uses descriptions to classify
-    - name: Reply
-      description: "Needs a response from me"
-    - name: FYI
-      description: "Informational, no action needed"
-    - name: Follow-Up
-      description: "Waiting on someone else — check back later"
-    - name: Schedule
-      description: "Needs a meeting or calendar action"
-    # Add custom folders below:
-    - name: Trainings
-      description: "Training invitations, course materials, learning resources"
-  draft_replies_folder: DraftReplies    # Email folder for draft reply requests
-                                        # Process skill skips this — handled by draft-replies skill
