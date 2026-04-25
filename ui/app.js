@@ -790,10 +790,6 @@ function formatRole(role) {
     'software-developer':        'Software Developer',
     'technical-program-manager': 'Technical Program Manager',
     'vp-of-engineering':         'VP of Engineering',
-    // legacy values kept for backward compatibility
-    'tech-lead':                 'Tech Lead',
-    'senior-engineer':           'Senior Engineer',
-    'pm':                        'PM',
   };
   return map[role] || role;
 }
