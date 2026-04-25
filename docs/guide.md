@@ -2,7 +2,7 @@
 
 ## 1. What Is Myna
 
-Myna is a local-first AI assistant for tech professionals — engineering managers, tech leads, senior engineers, and PMs. It manages the information layer of your job: emails, Slack messages, meetings, projects, people, and tasks. You interact through natural language prompts inside Claude Code. Myna reads from your company's existing tools via MCP servers and writes exclusively to your local Obsidian vault as plain markdown. It drafts but never sends, organizes but never decides, surfaces but never hides.
+Myna is a privacy-first AI assistant for tech professionals — engineering managers, tech leads, senior engineers, and PMs. It manages the information layer of your job: emails, Slack messages, meetings, projects, people, and tasks. You interact through natural language prompts inside Claude Code. Myna reads from your company's existing tools via MCP servers and writes exclusively to your local Obsidian vault as plain markdown. It drafts but never sends, organizes but never decides, surfaces but never hides.
 
 To see what this looks like in practice, read [A Day with Myna](a-day-with-myna.md) — a realistic workday walkthrough from morning sync to end-of-day wrap-up.
 
@@ -272,7 +272,7 @@ After triage, Myna reads your project-mapped email folders and extracts structur
 
 | Principle | What it means |
 |-----------|---------------|
-| **Local-first** | All data lives in your Obsidian vault as plain markdown. Nothing leaves your machine except through MCP servers you've registered. |
+| **Privacy-first** | All data lives in your Obsidian vault as plain markdown. Nothing leaves your machine except through MCP servers you've registered. |
 | **Draft, never send** | Every outbound communication — email, Slack message, calendar invite with attendees — requires your explicit action. Myna writes to `Drafts/`; you send. |
 | **Human-in-the-loop** | Items requiring judgment go to a review queue. Myna flags uncertainty rather than guessing. |
 | **Claude-first, not Claude-only** | Built and tested for Claude Code, but all instructions are plain markdown readable by any capable LLM. |

@@ -72,7 +72,7 @@ Full walkthrough: [A Day With Myna](docs/a-day-with-myna.md) · Browse the [test
 
 ## Core Principles
 
-- Local-first — all data stays in your Obsidian vault as plain markdown, nothing leaves your machine
+- Privacy-first — all data stays in your Obsidian vault as plain markdown, nothing leaves your machine
 - Draft, never send — every outbound action requires your explicit approval
 - Human-in-the-loop — judgment calls go through a review queue, never auto-resolved
 - Enterprise-friendly — no new infrastructure, no cloud sync, connects to your existing MCP servers
@@ -94,7 +94,7 @@ Then run `/myna-setup` for guided configuration — it walks you through identit
 ### Updating
 
 ```bash
-myna-update
+myna update
 ```
 
 This pulls the latest from your cloned repo and re-runs the install script. Your vault data, configs, and `CUSTOM.md` overrides are never touched.
