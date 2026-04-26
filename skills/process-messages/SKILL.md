@@ -61,7 +61,7 @@ After successfully processing a channel, update its entry in `_system/logs/proce
 
 Format (YAML under `channels:` key):
 ```yaml
-# Auto-updated by myna-process-messages skill. Do not edit manually.
+# Auto-updated by /myna:process-messages skill. Do not edit manually.
 channels:
   auth-team: "2026-04-05T14:30:00Z"
 ```
@@ -225,7 +225,7 @@ These surface in the daily note's delegation/open-task view. When a subsequent p
 ## Edge Cases
 
 - **MCP unavailable (email or Slack):** If the MCP connection fails, skip that source type, note it in the output summary ("Email MCP unavailable — skipped"), and continue with other sources. Do not abort the whole run.
-- **No mapped projects:** If projects.yaml has no `email_folders` or `slack_channels`, skip that source type with a note: "No folders/channels mapped — nothing to process." Suggest running `myna-configure` to set up mappings.
+- **No mapped projects:** If projects.yaml has no `email_folders` or `slack_channels`, skip that source type with a note: "No folders/channels mapped — nothing to process." Suggest running `/myna:setup` to set up mappings.
 - **All items near-duplicates:** Normal outcome. Report the skip count in the output summary. Do not re-process.
 - **DraftReplies folder not in config:** Default to skipping a folder named `DraftReplies`. No config required.
 - **Empty folders/channels:** Normal outcome. Report zero items processed.
