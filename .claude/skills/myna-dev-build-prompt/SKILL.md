@@ -343,6 +343,8 @@ Write `tmp/[feature]/[prefix]-summary.md`:
 
 **Specific over general.** "Check YAML frontmatter has exactly 6 entries" beats "verify frontmatter looks correct." This applies to acceptance criteria, not to implementation steps.
 
+**No open fields — exact values or explicit source.** Any field a subagent could "fill in with something appropriate" is a hallucination invitation. Two categories to watch: (1) **Counts in acceptance criteria** — verify the exact number by reading the actual files before writing it (`ls agents/dashboards/ | wc -l`), never estimate. (2) **Metadata and embedded content** — if a task writes a manifest, config, or file that embeds exact strings (author, repo URL, keywords, JSON config, heredoc content), either specify the exact value in the prompt or write "copy verbatim from `[source file]`, do not reconstruct from memory." "Replicate from X" is not strong enough — say "verbatim."
+
 **Quality over speed.** Session length is not a concern. Every task gets full attention — a review subagent, a fix cycle, a clean commit. The goal is zero human rework after the session completes.
 
 **Three roles, clean separation.** Orchestrator sequences and merges — never implements. Task subagent (T-N) implements, reviews, commits — never touches other tasks. Review subagent reads and reports — never fixes. Keep each role doing only its job.
