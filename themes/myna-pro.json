@@ -1,0 +1,9 @@
+{
+  "name": "Myna Pro",
+  "base": "dark",
+  "overrides": {
+    "claude": "#4A5FA8",
+    "success": "#2EAA6E",
+    "error": "#C42B4A"
+  }
+}

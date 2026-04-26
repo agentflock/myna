@@ -1,0 +1,19 @@
+{
+  "name": "myna",
+  "description": "Local-first Chief of Staff for tech professionals",
+  "author": {
+    "name": "Siddharth Bathla",
+    "url": "https://github.com/bathlasiddharth"
+  },
+  "homepage": "https://github.com/bathlasiddharth/myna",
+  "repository": "https://github.com/bathlasiddharth/myna",
+  "license": "MIT",
+  "keywords": [
+    "chief-of-staff",
+    "productivity",
+    "meetings",
+    "email",
+    "engineering-manager",
+    "obsidian"
+  ]
+}

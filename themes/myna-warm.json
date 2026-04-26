@@ -1,0 +1,9 @@
+{
+  "name": "Myna Warm",
+  "base": "dark",
+  "overrides": {
+    "claude": "#D4860A",
+    "success": "#3A7D44",
+    "error": "#C1522A"
+  }
+}
