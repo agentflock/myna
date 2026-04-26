@@ -1,6 +1,6 @@
 ---
 name: steering-memory
-description: Memory model rules — three-layer precedence, session-start loading, domain mapping table, intent recognition for myna-learn, output boundary, factual entry refusal
+description: Memory model rules — three-layer precedence, session-start loading, domain mapping table, intent recognition for /myna:learn, output boundary, factual entry refusal
 user-invocable: false
 ---
 
@@ -39,9 +39,9 @@ When writing or querying learnings, use the correct domain file:
 | People management | `_meta/learnings/people.md` | Feedback style, observation patterns, recognition preferences |
 | Everything else | `_meta/learnings/general.md` | Output format, scheduling habits, workflow patterns |
 
-## Intent Recognition for myna-learn
+## Intent Recognition for /myna:learn
 
-Invoke the myna-learn skill when the user expresses intent to write to, query, or remove from learnings. Recognize intent broadly — no required keywords.
+Invoke `/myna:learn` when the user expresses intent to write to, query, or remove from learnings. Recognize intent broadly — no required keywords.
 
 **Save intent examples:** "remember that...", "save this", "keep that in mind", "from now on...", "always do X", "never do Y", "I prefer..."
 
