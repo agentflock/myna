@@ -1,11 +1,13 @@
 ---
-name: myna-wrap-up
+name: wrap-up
 description: Close out your day — compares planned vs actual, logs contributions, moves unfinished items to tomorrow's note, captures quick notes, and runs a learning reflection. Writes an End of Day section to today's daily note.
 user-invocable: true
 argument-hint: "[quick note: ...]"
 ---
 
 # myna-wrap-up
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Closes out the day. Reads today's daily note and vault state, writes an End of Day section, moves unfinished items forward, detects contributions, and runs a brief learning reflection. The daily note becomes the complete record of the day: sync snapshots at top, user edits in the middle, wrap-up at the bottom.
 
@@ -32,7 +34,7 @@ Also read:
 
 ## Step 2: Planned vs Actual
 
-Find the **morning sync snapshot** — the earliest "Sync — {time}" section in today's daily note (myna-sync prepends snapshots, so the morning snapshot will be the bottom-most one). Extract its Immediate Attention items — these are what was planned.
+Find the **morning sync snapshot** — the earliest "Sync — {time}" section in today's daily note (/myna:sync prepends snapshots, so the morning snapshot will be the bottom-most one). Extract its Immediate Attention items — these are what was planned.
 
 Compare against current state:
 - **Completed:** tasks now marked `- [x]`, meetings with all checkboxes checked, delegations resolved

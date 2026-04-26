@@ -1,11 +1,13 @@
 ---
-name: myna-prep-meeting
+name: prep-meeting
 description: Generate or update meeting prep for one meeting or all remaining meetings today. Infers meeting type from calendar data, writes the Prep section with checkboxes, carry-forward items, and coaching notes for sensitive topics.
 user-invocable: true
 argument-hint: '"prep for my 1:1 with Sarah", "prep for my remaining meetings", "update prep for my meetings"'
 ---
 
 # myna-prep-meeting
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Generate meeting prep — a set of checkboxes covering what to discuss, what to review, and what needs decisions — written to the meeting file before the meeting.
 
@@ -302,7 +304,7 @@ For batch (all remaining today):
 
 **No previous session (first time meeting):** Skip carry-forwards and follow-through check. Generate all other sections.
 
-**myna-sync already generated prep today:** Read existing prep as context (update mode — append delta only). Don't regenerate from scratch.
+**/myna:sync already generated prep today:** Read existing prep as context (update mode — append delta only). Don't regenerate from scratch.
 
 ---
 

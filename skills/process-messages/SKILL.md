@@ -1,11 +1,13 @@
 ---
-name: myna-process-messages
+name: process-messages
 description: Extract structured data from email, Slack, or pasted documents and route to the vault. Processes project-mapped folders/channels. Never touches inbox or DraftReplies. Populates tasks, timelines, person files, review queues.
 user-invocable: true
 argument-hint: '"process my email", "process my messages", "process this doc: [paste]"'
 ---
 
 # myna-process-messages
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Extract structured data from email, Slack, and pasted documents, then route each item to the right vault destination. A single input can produce entries for multiple destinations — this is correct behavior, not duplication.
 
@@ -21,7 +23,7 @@ If both are disabled, stop. If one is disabled, skip that source type but contin
 
 ### Email
 
-Read emails from folders mapped to projects in projects.yaml (`email_folders` per project). **Never read the inbox** — that's `myna-email-triage`. **Never read the `draft_replies_folder`** — that's `myna-draft-replies`.
+Read emails from folders mapped to projects in projects.yaml (`email_folders` per project). **Never read the inbox** — that's `/myna:email-triage`. **Never read the `draft_replies_folder`** — that's `/myna:draft-replies`.
 
 Skip the folder named in `triage.draft_replies_folder` (default: `DraftReplies`) entirely.
 

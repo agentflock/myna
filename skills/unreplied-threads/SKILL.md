@@ -1,15 +1,17 @@
 ---
-name: myna-unreplied-threads
-description: Show what's waiting on you (messages needing a reply from you) and what you're waiting on others for — queries reply-needed tasks in the vault. Invoke for "what am I waiting on?", "what's waiting for me?", "unreplied threads", "who owes me a reply?". Not the same as myna-blockers, which tracks project blockers — this is specifically communication threads.
+name: unreplied-threads
+description: Show what's waiting on you (messages needing a reply from you) and what you're waiting on others for — queries reply-needed tasks in the vault. Invoke for "what am I waiting on?", "what's waiting for me?", "unreplied threads", "who owes me a reply?". Not the same as /myna:blockers, which tracks project blockers — this is specifically communication threads.
 user-invocable: true
 argument-hint: "e.g. 'what am I waiting on?' / 'who owes me a reply?' / optionally filter by person name"
 ---
 
 # Unreplied & Follow-up Tracker
 
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+
 Queries reply-needed TODOs from the vault and shows what's waiting on you versus what you're waiting on. Read-only — inline output only.
 
-The unreplied tracker is not a separate log file. It's a view over open TODOs with `[type:: reply-needed]`, created by myna-process-messages during email and Slack processing.
+The unreplied tracker is not a separate log file. It's a view over open TODOs with `[type:: reply-needed]`, created by /myna:process-messages during email and Slack processing.
 
 ---
 
@@ -94,7 +96,7 @@ Waiting On Sarah (reply-needed)
 - Response to onboarding guide feedback — 4 days — email
 ```
 
-This query is scoped to `[type:: reply-needed]` tasks only. For a full picture of delegations and tasks assigned to Sarah, use myna-blockers or myna-weekly-summary.
+This query is scoped to `[type:: reply-needed]` tasks only. For a full picture of delegations and tasks assigned to Sarah, use /myna:blockers or /myna:weekly-summary.
 
 ---
 
@@ -106,15 +108,15 @@ This query is scoped to `[type:: reply-needed]` tasks only. For a full picture o
 ```
 Waiting On Them: nothing pending. Either you're caught up or no threads have been flagged yet.
 
-To track a thread, say "I'm waiting on [person] for [topic]" or let myna-process-messages flag it during next processing run.
+To track a thread, say "I'm waiting on [person] for [topic]" or let /myna:process-messages flag it during next processing run.
 ```
 
 ---
 
 ## Edge Cases
 
-- **No reply-needed tasks found:** Show the empty state message with guidance. Note that tasks are created during email/Slack processing by myna-process-messages.
-- **Task has no person field:** Include in the list, show "Unknown" for person. The `[person:: {name}]` field is set by myna-process-messages — if missing, parse the task description text.
+- **No reply-needed tasks found:** Show the empty state message with guidance. Note that tasks are created during email/Slack processing by /myna:process-messages.
+- **Task has no person field:** Include in the list, show "Unknown" for person. The `[person:: {name}]` field is set by /myna:process-messages — if missing, parse the task description text.
 - **Reply-needed task is overdue:** Call it out explicitly if the due date has passed: "(X days overdue)".
 - **Both directions for same person:** Sarah waiting on you AND you waiting on Sarah — show in both lists, labeled separately.
 - **Email/Slack MCP unavailable:** Query vault only. State in output: "(live MCP unavailable — showing vault tasks only)".
