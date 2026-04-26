@@ -1,11 +1,13 @@
 ---
-name: myna-setup
+name: setup
 description: Configure Myna interactively — guided setup for identity, integrations, projects, people, and communication style. Add a project or person later, review current config, or walk through initial setup. Resumable at any point.
 user-invocable: true
 argument-hint: "setup | add a project | add people | review config | update communication style"
 ---
 
 # myna-setup
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Guided, conversational configuration for Myna. Reads and writes the same YAML files as direct editing — just a friendlier interface. Works equally well for first-time setup, adding a project later, or reviewing what's configured.
 
@@ -23,15 +25,9 @@ Guided, conversational configuration for Myna. Reads and writes the same YAML fi
 
 ---
 
-## Section 0: Resolve Vault Path
+## Section 0: Vault Path
 
-Before anything else, resolve where config files live:
-
-1. If running inside the `myna` agent, vault path is already in context from the agent file.
-2. Otherwise, read `~/.myna/install-manifest.json` — the install script writes `vault_path` and `subfolder` there.
-3. If neither exists, tell the user to run `./install.sh --vault-path <path>` first.
-
-All config files are at `{vault_path}/{subfolder}/_system/config/`.
+The vault path comes from `~/.myna/config.yaml`, which is read by the fallback line near the top of this skill. All config files are at `{vault_path}/{subfolder}/_system/config/`.
 
 ---
 
@@ -120,7 +116,7 @@ The most important section. Always present three explicit options upfront before
 
 1. **Share docs** — paste text, give file paths, or share links. This skill extracts projects (name, status, timeline, key people, description) and people (name, role, relationship, team). If a link can't be accessed, ask the user to paste content instead.
 2. **List them** — type a batch description of projects and/or people in any format. This skill structures it and confirms.
-3. **Skip for now** — come back later via `/myna-setup`.
+3. **Skip for now** — come back later via `/myna:setup`.
 
 **Reading files by type (for option 1):**
 - **PDF**: Use Claude Code's Read tool directly — it handles PDFs natively. Do not write a script.
@@ -165,7 +161,7 @@ Say once upfront: "Just type the MCP server name for each, or 'skip' to move on.
 
 ## Section 6: Optional Config
 
-Briefly mention that `meetings.yaml` and `tags.yaml` exist for power users but most people don't need them. They can be edited directly or revisited via `/myna-setup`. Don't walk through them.
+Briefly mention that `meetings.yaml` and `tags.yaml` exist for power users but most people don't need them. They can be edited directly or revisited via `/myna:setup`. Don't walk through them.
 
 ---
 

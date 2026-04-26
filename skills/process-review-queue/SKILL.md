@@ -1,15 +1,17 @@
 ---
-name: myna-process-review-queue
-description: Process review queue items across review-work, review-people, and review-self queues — interactively in chat or by processing items the user has already checked in Obsidian. Does NOT process review-email-triage.md (email folder recommendations — that's handled by myna-email-triage).
+name: process-review-queue
+description: Process review queue items across review-work, review-people, and review-self queues — interactively in chat or by processing items the user has already checked in Obsidian. Does NOT process review-email-triage.md (email folder recommendations — that's handled by /myna:email-triage).
 user-invocable: true
 argument-hint: "review my queue | process review queue | what's in my queue? | process approved items | process [queue name]"
 ---
 
 # myna-process-review-queue
 
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+
 Processes pending review queue items. Writes approved items to their destinations with `[Verified]` tag. Logs all processed items to `ReviewQueue/processed/processed-{YYYY-MM-DD}.md` for audit trail.
 
-**Does NOT handle `review-email-triage.md`** — email triage is handled by myna-email-triage.
+**Does NOT handle `review-email-triage.md`** — email triage is handled by /myna:email-triage.
 
 ## Before You Start
 
@@ -149,7 +151,7 @@ For each approved item (chat or file mode):
 - Task entry: `- [ ] {task} [Verified]` (or `- [x] {task} [Verified]` if marking complete)
 - Contributions log: `- [{YYYY-MM-DD} | {source}] **{category}:** {description} [Verified] ({source-detail})`
 
-The `[Verified]` marker and provenance conventions are defined in myna-steering-conventions.
+The `[Verified]` marker and provenance conventions are defined in /myna:steering-conventions.
 
 ---
 

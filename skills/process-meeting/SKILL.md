@@ -1,11 +1,13 @@
 ---
-name: myna-process-meeting
-description: Process a completed meeting — reads Prep + Notes, closes checked items, notes unchecked items for carry-forward, extracts tasks/decisions/blockers/observations/recognition/contributions, and routes each to the vault. Distinct from myna-prep-meeting (which generates content before). Triggered by "done with 1:1 with Sarah", "process this meeting", or "process my meetings".
+name: process-meeting
+description: Process a completed meeting — reads Prep + Notes, closes checked items, notes unchecked items for carry-forward, extracts tasks/decisions/blockers/observations/recognition/contributions, and routes each to the vault. Distinct from /myna:prep-meeting (which generates content before). Triggered by "done with 1:1 with Sarah", "process this meeting", or "process my meetings".
 user-invocable: true
 argument-hint: '"done with 1:1 with Sarah", "process this meeting", "process my meetings"'
 ---
 
 # myna-process-meeting
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Process a completed meeting: read the meeting file, close what was discussed, note what wasn't, extract everything useful from Notes, and route each item to the right vault destination.
 
@@ -32,7 +34,7 @@ For the target session, read the full session block: both `### Prep` and `### No
 Determine meeting type — type controls extraction emphasis:
 1. From frontmatter `type` field in the meeting file
 2. From meetings.yaml override
-3. Infer using the same signals as myna-prep-meeting (attendee count, title, recurrence)
+3. Infer using the same signals as /myna:prep-meeting (attendee count, title, recurrence)
 
 ---
 
@@ -44,7 +46,7 @@ For checked items that correspond to open tasks or delegations in project files,
 
 ### Unchecked items (`- [ ]`) — not discussed
 
-Note which items were unchecked. Do not modify this session's file. The next time myna-prep-meeting runs for this person/meeting, it will add them as new checkboxes with `(carried from {YYYY-MM-DD})`. This skill does not create the next session — it only notes what was unchecked.
+Note which items were unchecked. Do not modify this session's file. The next time /myna:prep-meeting runs for this person/meeting, it will add them as new checkboxes with `(carried from {YYYY-MM-DD})`. This skill does not create the next session — it only notes what was unchecked.
 
 ---
 
@@ -255,7 +257,7 @@ Processed {N} meetings.
 3. Determine type: frontmatter `type: 1-1` → use 1:1 extraction emphasis
 4. Read Prep section:
    - 9 checked items: find 2 matching open delegations in auth-migration.md, mark complete
-   - 2 unchecked items: note for carry-forward (myna-prep-meeting will add them next time)
+   - 2 unchecked items: note for carry-forward (/myna:prep-meeting will add them next time)
 5. Read Notes section; wrap in framing delimiters:
    - Discussion: "Sarah delivered API spec v2, cert rotation still pending from infra, decision: go with PKCE flow"
    - Action Items: "I will review the spec by Friday. Sarah will follow up with ops about cert timeline."

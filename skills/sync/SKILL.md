@@ -1,11 +1,13 @@
 ---
-name: myna-sync
+name: sync
 description: 'Sync / "good morning" / "set up my day" — creates or refreshes the daily note, generates meeting prep, surfaces overdue tasks and review queue. Handles "plan tomorrow" and weekly note creation. Auto-archives old journal notes.'
 user-invocable: true
 argument-hint: "[plan tomorrow]"
 ---
 
 # myna-sync
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Sets up or refreshes your day. Rerunnable at any time — each run prepends a fresh snapshot at the top of the daily note; previous snapshots stay untouched.
 
@@ -248,13 +250,13 @@ For each calendar event today, if `features.meeting_prep` is enabled:
 
 3. If the file exists, check whether a prep section for today's date already exists. If yes, skip (don't duplicate). If no, append a new session section.
 
-4. For myna-sync, generate **minimal prep** — enough to orient the user before the meeting without the full depth that myna-prep-meeting provides:
+4. For /myna:sync, generate **minimal prep** — enough to orient the user before the meeting without the full depth that /myna:prep-meeting provides:
    - Carry-forward items: unchecked items from the previous session's Prep section (if the meeting file exists)
    - Open action items between you and attendees: Grep project files for `[person:: {attendee-name}]` open tasks
    - Recent project context: last 2–3 timeline entries from the relevant project file
    - For 1:1s only: a reminder of the last 1:1 date and count of carry-forward items
 
-   Full deep prep (pending feedback, coaching suggestions, career topics, personal notes) is available on demand via myna-prep-meeting. Add a note at the top of the Prep section: "Basic prep from sync. Say 'prep for [meeting]' for full prep."
+   Full deep prep (pending feedback, coaching suggestions, career topics, personal notes) is available on demand via /myna:prep-meeting. Add a note at the top of the Prep section: "Basic prep from sync. Say 'prep for [meeting]' for full prep."
 
 Meeting file is wiki-linked in the daily note's Today's Meetings section.
 

@@ -1,11 +1,13 @@
 ---
-name: myna-weekly-summary
+name: weekly-summary
 description: Summarize your week — synthesizes daily notes, contributions, decisions, and task completions into a structured weekly review with self-reflection prompts. Appends a new section each run. Includes team health snapshot for managers.
 user-invocable: true
 argument-hint: "[week of YYYY-MM-DD | last week]"
 ---
 
 # myna-weekly-summary
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Generates or updates the weekly summary. Each run appends a fresh `## Weekly Summary — {date}` section to the weekly note. Re-runs are additive — previous sections stay untouched.
 

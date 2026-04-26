@@ -1,11 +1,13 @@
 ---
-name: myna-rewrite
-description: Fix grammar, adjust tone for audience, or fully rewrite an existing message — three modes: fix (grammar only), tone (restyle for audience), rewrite (full restructure from rough notes). Input is user-provided text; output shown inline. Does NOT generate new content from scratch (use myna-draft for that).
+name: rewrite
+description: Fix grammar, adjust tone for audience, or fully rewrite an existing message — three modes: fix (grammar only), tone (restyle for audience), rewrite (full restructure from rough notes). Input is user-provided text; output shown inline. Does NOT generate new content from scratch (use /myna:draft for that).
 user-invocable: true
 argument-hint: "fix [message] | tone [message] --audience [person/tier] | rewrite [message] --audience [person/tier]"
 ---
 
 # myna-rewrite
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Transforms an existing message. The user provides the text; you return the transformed version inline. Always show output inline. User says "save" to write to `Drafts/`.
 

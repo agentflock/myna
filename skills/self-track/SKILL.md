@@ -1,11 +1,13 @@
 ---
-name: myna-self-track
+name: self-track
 description: Log contributions and generate self-review documents — brag docs, self-reviews, promo packets. Query by category, project, or date. Self-calibration: check draft claims against your log. YOUR contributions only.
 user-invocable: true
 argument-hint: "log contribution: [description] | what did I do this quarter | draft my self-review for [period] | build my promo case | am I underselling myself? | what feedback did I give this [period]"
 ---
 
 # myna-self-track
+
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
 
 Logs your contributions and generates self-review documents from them. Input path: log what you did. Output path: compile it into usable documents.
 
