@@ -53,12 +53,12 @@ Each audit: build sub-feature checklist from spec → grade each against skill b
 
 ## Report
 
-Save to `docs/reviews/coverage-{NNN}.md`.
+Save to `tmp/reviews/coverage-{NNN}.md`.
 
 Print summary:
 ```
 Myna Feature Coverage — Cycle {NNN} complete
-Report: docs/reviews/coverage-{NNN}.md
+Report: tmp/reviews/coverage-{NNN}.md
 
 {total} sub-features checked across {n} skills
 FULL: {count} ({pct}%) | PARTIAL: {count} ({pct}%) | NONE: {count} ({pct}%)

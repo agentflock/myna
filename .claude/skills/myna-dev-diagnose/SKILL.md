@@ -41,7 +41,6 @@ Always read:
 Selectively read based on what's described:
 - `docs/architecture.md` — if the problem touches skill routing, install, or agent structure
 - Relevant `docs/features/[domain].md` — if the problem is about a specific feature domain
-- `docs/roadmap.md` — if the problem might be a deferred feature
 
 ### 1b. Read the actual skill files
 

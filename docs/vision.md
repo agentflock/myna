@@ -198,4 +198,4 @@ After setup, Myna can immediately do useful things like "prep brief for my 1:1 w
 
 ## Status
 
-Phase 1 (Build) complete. Ready for Phase 2 (Install) targeting Claude Code. See `docs/decisions.md` for settled questions and `docs/roadmap.md` for current progress.
+Phase 1 (Build) complete. Ready for Phase 2 (Install) targeting Claude Code. See `docs/decisions.md` for settled questions and `ROADMAP.md` for current progress.

@@ -57,10 +57,6 @@ Read ALL of these before touching any file in scope:
 
 5. **`docs/decisions.md`** — settled decisions. Pay attention to: draft-never-send, vault-only writes, no skill chaining, deferred features (don't raise issues for out-of-scope things), Golden Rule, D046 (Claude-first).
 
-6. **`docs/reviews/`** — all previous review/fix/verify reports. Scan for:
-   - Issues that a previous fix report pushed back on with documented reasoning — do NOT re-raise those.
-   - Patterns that were previously fixed — check if they've regressed.
-
 Build a mental map of: each in-scope skill → its feature owner(s) → the vault destinations it writes to → the steering skills that govern its behavior. You need all three layers to review well.
 
 ---
@@ -120,7 +116,7 @@ Each non-Nitpick issue gets three options and a recommendation. Quote specific t
 
 ## Report
 
-**Standard mode:** save to `docs/reviews/review-{NNN}.md` (next number in sequence).
+**Standard mode:** save to `tmp/reviews/review-{NNN}.md` (next number in sequence). Create the directory if it doesn't exist.
 
 **Task mode (`--task`):** save to `tmp/[feature]/reviews/[short-name]-rN.md` (derived from label as described above). Create the directory if it doesn't exist.
 
@@ -129,7 +125,7 @@ After saving, print summary:
 Standard mode:
 ```
 Myna Review — Cycle {NNN} complete.
-Report: docs/reviews/review-{NNN}.md
+Report: tmp/reviews/review-{NNN}.md
 
 {N} Critical  {N} Important  {N} Minor  {N} Nitpick
 Convergence: {CONVERGED | CONTINUE}

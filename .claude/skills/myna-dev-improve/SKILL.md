@@ -32,9 +32,9 @@ Run `bash scripts/lint-agents.sh`. Fix all FAIL items. Re-run until clean. Lint 
 ### Phase 1-N — Review/Fix/Verify Cycles
 
 Each cycle:
-1. **Review** — spawn one subagent per skill (parallel for 4+ files). Evaluate against 10 dimensions (frontmatter, description, instruction clarity, feature coverage, vault formats, safety, edge cases, output, steering duplication, conciseness). Write report to `docs/reviews/review-{NNN}.md`.
-2. **Fix** — read review report, implement all fixes (Critical → Important → Minor → Nitpick). Cross-skill consistency check after fixes. Write report to `docs/reviews/fix-{NNN}.md`.
-3. **Verify** — confirm each fix resolved the original issue. Regression check on all modified files. Write report to `docs/reviews/verify-{NNN}.md`.
+1. **Review** — spawn one subagent per skill (parallel for 4+ files). Evaluate against 10 dimensions (frontmatter, description, instruction clarity, feature coverage, vault formats, safety, edge cases, output, steering duplication, conciseness). Write report to `tmp/reviews/review-{NNN}.md`.
+2. **Fix** — read review report, implement all fixes (Critical → Important → Minor → Nitpick). Cross-skill consistency check after fixes. Write report to `tmp/reviews/fix-{NNN}.md`.
+3. **Verify** — confirm each fix resolved the original issue. Regression check on all modified files. Write report to `tmp/reviews/verify-{NNN}.md`.
 
 ### Early Exit
 - After Review: 0 Critical + 0 Important → skip Fix/Verify

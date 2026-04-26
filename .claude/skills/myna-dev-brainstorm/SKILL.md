@@ -59,9 +59,7 @@ Check `$ARGUMENTS`:
 - `install.sh` — install/update script
 - `docs/architecture.md` — full architecture
 - `docs/decisions.md` — settled decisions (don't re-debate)
-- `docs/open-questions.md` — unresolved questions
 - `docs/design/foundations.md` — vault structure, data layer, config schemas
-- `docs/roadmap.md` — phase structure, task list
 - `CLAUDE.md` — project instructions, git conventions
 
 ### Git Conventions
@@ -81,8 +79,7 @@ Listen to the user's description. Then:
 1. **Read the relevant files** — not all docs, just the files related to the problem. If it's about routing, read `agents/main.md`. If it's about a skill, read that skill. If it's about install, read `install.sh`. Ground yourself in what actually exists.
 2. **Read `docs/vision.md`** — the authority on what Myna is and is not.
 3. **Read `docs/decisions.md`** — check if this touches any settled decisions. If it does, flag it immediately.
-4. **Read `docs/open-questions.md`** — check if this is already a known open question.
-5. **For skill duplication:** read the actual skill files — `agents/skills/myna-*/SKILL.md` and `agents/skills/myna-steering-*/SKILL.md`. Do not rely on architecture.md — it may be outdated.
+4. **For skill duplication:** read the actual skill files — `agents/skills/myna-*/SKILL.md` and `agents/skills/myna-steering-*/SKILL.md`. Do not rely on architecture.md — it may be outdated.
 6. **Evaluate validity** before presenting options:
 
    - **Vision fit:** Does this keep data in the vault and work offline? Does it fit "Chief of Staff for EMs, tech leads, PMs, tech executives"? Does it assist the user or decide for them?
@@ -135,7 +132,7 @@ If the user's choice opens new design questions, present them in the same batche
 - If the user pushes back, explore their direction — don't defend your recommendation.
 - If you realize the problem is different than initially stated (from reading the code), say so and reframe.
 - If this touches a settled decision in `docs/decisions.md`, flag it: "This would revisit D0XX. Are you sure?"
-- If this surfaces a new open question that isn't being resolved now, note it for `docs/open-questions.md`.
+- If this surfaces a new open question that isn't being resolved now, flag it in your summary so the user can decide what to do with it.
 
 ### Step 4: Converge
 
@@ -155,7 +152,7 @@ When all decisions are settled, present a summary:
 
 **Files affected:** [list]
 
-**New open questions (if any):** [list for docs/open-questions.md]
+**New open questions (if any):** [list]
 
 Ready for implementation? Say "generate prompt" and I'll package this into an autonomous execution prompt.
 ```
