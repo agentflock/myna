@@ -47,7 +47,7 @@ Extract the exact format string each skill writes to each destination. Quote ver
 For each destination, compare every writing skill's format against canonical. Flag divergences with severity.
 
 ### Step 5: Report
-Save to `docs/reviews/consistency-{NNN}.md`.
+Save to `tmp/reviews/consistency-{NNN}.md`.
 
 ## Severity
 - **Critical:** entries from two skills would be unreadable to the other or break queries

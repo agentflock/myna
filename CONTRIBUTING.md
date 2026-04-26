@@ -132,7 +132,6 @@ Run these any time — not part of a specific change:
 |------|---------|
 | `docs/vision.md` | North star — what Myna is and is not |
 | `docs/decisions.md` | Settled decisions — don't re-debate |
-| `docs/open-questions.md` | Unresolved questions |
 | `docs/architecture.md` | Runtime model, skill inventory, vault structure |
 | `docs/design/foundations.md` | Vault folder structure, canonical file formats |
 | `docs/features/` | Approved features per domain — authoritative source |

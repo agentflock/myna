@@ -60,7 +60,6 @@ The output is a markdown file at `tmp/[name]/[prefix]-prompt.md`.
 When making changes, check if these need updates (don't always include all — only the ones affected):
 - `docs/architecture.md` — when structural changes are made
 - `docs/decisions.md` — when new decisions are settled (use next D-number in sequence)
-- `docs/open-questions.md` — when new questions surface
 - `README.md` — when user-facing behavior changes
 - `docs/post-install-checklist.md` — when setup/install changes
 
@@ -124,7 +123,6 @@ Every task runs as a subagent (Agent tool). This eliminates context bleed betwee
 Check whether any of these need updating based on the changes. If yes, add a dedicated final sequential task — always last, always after all implementation tasks are merged (docs depend on knowing what actually changed):
 - `docs/architecture.md` — structural changes
 - `docs/decisions.md` — new decisions settled (next D-number in sequence)
-- `docs/open-questions.md` — new questions surfaced
 - `README.md` — user-facing behavior changes
 - `docs/post-install-checklist.md` — setup/install changes
 
@@ -293,7 +291,7 @@ Spawn this subagent with the Agent tool. Prompt:
 >
 > **Context:** Read the implementation diffs on `feat/[feature-name]` before editing — update only what the changes actually affect, not a general refresh.
 >
-> **Suggested files:** [list only affected docs from: `docs/architecture.md`, `docs/decisions.md`, `docs/open-questions.md`, `README.md`, `docs/post-install-checklist.md`]
+> **Suggested files:** [list only affected docs from: `docs/architecture.md`, `docs/decisions.md`, `README.md`, `docs/post-install-checklist.md`]
 >
 > **Done when:**
 > - [Specific assertion per doc, e.g. "decisions.md contains entry D0XX for [decision]"]
