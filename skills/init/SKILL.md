@@ -291,16 +291,20 @@ Overwrite if it exists.
 
 ---
 
-## Step 11: Create ~/.myna/custom-routing.md
+## Step 11: Create ~/.myna/overrides/ directory structure
 
-Create `~/.myna/custom-routing.md` **only if it does not already exist**. Write this content exactly:
+Create the following three items using `mkdir -p` semantics — skip each if it already exists:
+
+1. `~/.myna/overrides/` — the top-level user overrides directory.
+2. `~/.myna/overrides/skills/` — directory for user-added skill files.
+3. `~/.myna/overrides/routing.md` — routing rules file. Create **only if it does not already exist**. Write this content exactly:
 
 ```
-<!-- Custom routing rules for user-added skills.
-     This file is never overwritten by updates.
+<!-- User routing overrides for Myna.
+     This file is never overwritten by Myna updates.
      Rules here take precedence over Myna's built-in routing.
 
-     Format — add your routing rules as markdown below. Example:
+     Add routing rules as markdown below. Example:
 
      ### Oncall Routing
      - "oncall escalation", "page someone", "who's on call?" → my-oncall
@@ -412,5 +416,5 @@ Then tell the user: "Run `/myna:setup` next to configure your identity, projects
 - `mkdir -p` semantics: skip directories that already exist.
 - Never overwrite existing `.yaml` config files (workspace.yaml, projects.yaml, people.yaml, meetings.yaml, communication-style.yaml, tags.yaml).
 - Always overwrite `.yaml.example` files, templates, dashboards, guide, and setup-checklist — these are managed by Myna, not the user.
-- Never overwrite `~/.myna/custom-routing.md` if it already exists.
+- Never overwrite `~/.myna/overrides/routing.md` if it already exists.
 - Always overwrite `~/.myna/config.yaml` — it holds vault path and subfolder, safe to regenerate.
