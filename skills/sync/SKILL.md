@@ -8,7 +8,7 @@ argument-hint: "[plan tomorrow]"
 
 # myna-sync
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Sets up or refreshes your day. Rerunnable at any time — each run prepends a fresh snapshot at the top of the daily note; previous snapshots stay untouched.
 

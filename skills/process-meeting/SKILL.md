@@ -8,7 +8,7 @@ argument-hint: '"done with 1:1 with Sarah", "process this meeting", "process my 
 
 # myna-process-meeting
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Process a completed meeting: read the meeting file, close what was discussed, note what wasn't, extract everything useful from Notes, and route each item to the right vault destination.
 

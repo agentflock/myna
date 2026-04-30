@@ -88,10 +88,10 @@ Full walkthrough: [A Day With Myna](docs/a-day-with-myna.md) · Browse the [demo
 ```bash
 /plugin marketplace add agentflock/plugins
 /plugin install myna@agentflock
-/myna:init
+/myna:install
 ```
 
-`/myna:init` creates your Myna folder and remembers where it lives. Then run `/myna:setup` for guided configuration — identity, projects, people, and communication style. Or edit the config files directly at `myna/_system/config/`.
+`/myna:install` creates your Myna folder and remembers where it lives. Then run `/myna:setup` for guided configuration — identity, projects, people, and communication style. Or edit the config files directly at `myna/_system/config/`.
 
 Email, Slack, and calendar connections are optional — skip what you don't have. Myna works without them from day one.
 

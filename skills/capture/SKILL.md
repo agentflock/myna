@@ -6,7 +6,7 @@ user-invocable: true
 argument-hint: "capture: [anything] | observation about [person]: [text] | add task: [description] | create recurring task: [description] | save link: [url] for [entity] | update status of [project]"
 ---
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 # capture
 

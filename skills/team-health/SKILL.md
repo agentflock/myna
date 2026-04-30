@@ -8,7 +8,7 @@ argument-hint: "[optional: person name to focus on one person]"
 
 # Team Health Overview
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Point-in-time dashboard for all direct reports. Read-only — inline output. No vault writes unless the user asks to save.
 

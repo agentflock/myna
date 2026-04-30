@@ -8,7 +8,7 @@ argument-hint: "[quick note: ...]"
 
 # myna-wrap-up
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Closes out the day. Reads today's daily note and vault state, writes an End of Day section, moves unfinished items forward, detects contributions, and runs a brief learning reflection. The daily note becomes the complete record of the day: sync snapshots at top, user edits in the middle, wrap-up at the bottom.
 

@@ -8,7 +8,7 @@ argument-hint: "review my queue | process review queue | what's in my queue? | p
 
 # myna-process-review-queue
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Processes pending review queue items. Writes approved items to their destinations with `[Verified]` tag. Logs all processed items to `ReviewQueue/processed/processed-{YYYY-MM-DD}.md` for audit trail.
 

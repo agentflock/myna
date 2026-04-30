@@ -8,7 +8,7 @@ argument-hint: '"process my email", "process my messages", "process this doc: [p
 
 # myna-process-messages
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Extract structured data from email, Slack, and pasted documents, then route each item to the right vault destination. A single input can produce entries for multiple destinations — this is correct behavior, not duplication.
 

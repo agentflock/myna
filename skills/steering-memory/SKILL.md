@@ -7,7 +7,7 @@ user-invocable: false
 
 # Memory Model
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 ## Three-Layer Precedence
 

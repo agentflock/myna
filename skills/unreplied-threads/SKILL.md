@@ -8,7 +8,7 @@ argument-hint: "e.g. 'what am I waiting on?' / 'who owes me a reply?' / optional
 
 # Unreplied & Follow-up Tracker
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Queries reply-needed TODOs from the vault and shows what's waiting on you versus what you're waiting on. Read-only — inline output only.
 

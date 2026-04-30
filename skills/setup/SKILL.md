@@ -8,7 +8,7 @@ argument-hint: "setup | add a project | add people | review config | update comm
 
 # myna-setup
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 Guided, conversational configuration for Myna. Reads and writes the same YAML files as direct editing — just a friendlier interface. Works equally well for first-time setup, adding a project later, or reviewing what's configured.
 

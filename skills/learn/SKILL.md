@@ -6,7 +6,7 @@ user-invocable: true
 argument-hint: "remember that [preference] | forget that [rule] | what have you learned? | show my learnings | reflect | promote [rule]"
 ---
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 # learn
 

@@ -6,7 +6,7 @@ user-invocable: true
 argument-hint: "draft reply to [person] | follow-up email for [meeting] | follow-up meeting with [people] | status update for [project] | escalate [blocker] | recognition for [person] | help me say no to [request] | prep for [conversation] | monthly update | draft my MBR | draft my QBR"
 ---
 
-If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:init` and stop.
+If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:install` and stop.
 
 # draft
 

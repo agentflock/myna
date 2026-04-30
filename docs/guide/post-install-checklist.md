@@ -4,8 +4,8 @@ Complete these steps to finish setting up Myna after running `/plugin install my
 
 ## 1. Run First-Time Setup
 
-- [ ] In Claude Code, run `/myna:init` — creates the vault directory structure and writes `~/.myna/config.yaml`
-- [ ] When `/myna:init` finishes, run `/myna:setup` — guided configuration for identity, projects, people, and communication style
+- [ ] In Claude Code, run `/myna:install` — creates the vault directory structure and writes `~/.myna/config.yaml`
+- [ ] When `/myna:install` finishes, run `/myna:setup` — guided configuration for identity, projects, people, and communication style
 - [ ] (Optional) Add a shell alias: `alias myna="claude --agent myna:agent"` to your `~/.zshrc` or `~/.bashrc`, then `source` it
 
 ## 2. Install Obsidian Plugins
