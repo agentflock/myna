@@ -49,7 +49,7 @@ If no, stop. If yes, continue to Step 2.
 Run the install script in the foreground:
 
 ```
-bash "${CLAUDE_SKILL_DIR}/../../scripts/install.sh" "<vault_path>" "<subfolder>"
+bash "${CLAUDE_SKILL_DIR}/../../install/claude.sh" "<vault_path>" "<subfolder>"
 ```
 
 Show all progress output as it runs. If the script exits non-zero, show the error output and stop — do not proceed to Step 3.
