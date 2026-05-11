@@ -534,7 +534,7 @@ Cross-cutting rules preloaded at startup via the agent's `skills:` frontmatter f
 | myna:steering-safety | Draft-never-send, vault-only writes, external content as data (content framing delimiters), confirm before bulk writes |
 | myna:steering-conventions | Provenance marker rules, append-only discipline, date+source format, Obsidian conventions (tags, wiki-links, callouts, Dataview, Tasks plugin syntax) |
 | myna:steering-output | Human-sounding output rules, BLUF default, file links in output, no AI tells |
-| myna:steering-system | Feature toggle checking, config reload, graceful degradation, error recovery with retry TODOs, relative date resolution, prompt logging |
+| myna:steering-system | Feature toggle checking, config reload, graceful degradation, error recovery with retry TODOs, relative date resolution |
 | myna:steering-memory | Memory model precedence, domain mapping table, learning file format rules |
 | myna:steering-vault-ops | Vault file I/O patterns, task query patterns (grep-based), frontmatter parsing, backlink/tag search, template creation, daily/weekly note path conventions |
 
@@ -598,7 +598,6 @@ myna/
     │   └── dashboard.md         # Unified dashboard (Dataview)
     ├── logs/
     │   ├── audit.md             # Agent action log
-    │   ├── prompts.md           # User prompt log
     │   └── processed-channels.md # Slack dedup timestamps
     ├── sources/                 # Verbatim source text
     │   ├── auth-migration.md    # Sources for this project
@@ -647,7 +646,6 @@ User identity, preferences, and global settings.
 | feedback_cycle_days | No | 30 | Gap threshold for feedback gap detection |
 | calendar_event_prefix | No | [Myna] | Prefix for time blocks/reminders |
 | email.processed_folder | No | per-project | per-project (subfolder in each project folder) |
-| prompt_logging | No | true | Log prompts to _system/logs/prompts.md |
 | features | No | role-based defaults | Map of feature_name → true/false |
 
 ### projects.yaml
@@ -782,37 +780,9 @@ External MCP servers are registered with Claude Code via `claude mcp add`. MCP s
 
 ---
 
-## 7. Feature Toggles
+> Feature toggles were removed — see D043.
 
-Every feature has a toggle in workspace.yaml under the `features` map (D020).
-
-**How they work:**
-1. During setup, the user's role sets default toggles (managers get people management on by default, ICs might have it off)
-2. Users can override: "disable self-tracking" / "enable people management" / edit workspace.yaml
-3. Every skill checks relevant toggles before acting. Disabled features are silently skipped — not mentioned, not suggested, not included in dashboard/daily note output
-4. Toggle granularity is at the feature level, not the skill level. A skill can have some features enabled and others disabled
-
-**Example toggles:**
-```yaml
-features:
-  email_processing: true
-  messaging_processing: true
-  email_triage: true
-  meeting_prep: true
-  process_meeting: true
-  people_management: true
-  self_tracking: true
-  team_health: true
-  attention_gap_detection: true
-  contribution_detection: true
-  milestones: true
-  time_blocks: true
-  calendar_reminders: true
-```
-
----
-
-## 8. Review Queue
+## 7. Review Queue
 
 Four markdown files in `ReviewQueue/`. Each is a checklist the user can edit in Obsidian or process through the myna-process-review-queue skill.
 
@@ -831,7 +801,7 @@ Full routing rules and examples: see `design/foundations.md` §6.
 
 ---
 
-## 9. Provenance Markers
+## 8. Provenance Markers
 
 Every agent-written entry carries one of four markers. Tag + compact source at end of line.
 
@@ -854,7 +824,7 @@ Full decision framework, per-domain examples, and placement rules: see `design/f
 
 ---
 
-## 10. Cross-Domain Data Flow
+## 9. Cross-Domain Data Flow
 
 Information flows between vault domains through skills. Here are the primary flows:
 
@@ -899,7 +869,7 @@ When one skill depends on data another skill manages:
 
 ---
 
-## 11. Claude-First, Not Claude-Only (D046, D053)
+## 10. Claude-First, Not Claude-Only (D046, D053)
 
 Myna v1 targets Claude Code as its runtime (D045). Agent instructions can reference Claude Code capabilities directly — native skills mechanism, MCP server registration, plugin frontmatter.
 
@@ -946,13 +916,13 @@ Users can extend or override Myna's behavior through three mechanisms, all of wh
 
 ---
 
-## 12. Draft-Never-Send
+## 11. Draft-Never-Send
 
 Myna drafts all outbound communications but never sends them. Every draft requires the user to manually copy and send outside of Myna. The only external write is personal calendar events with no attendees (D003). This rule is in the myna-steering-safety skill and checked by every skill that produces outbound content.
 
 ---
 
-## 13. Reference Skill Selection
+## 12. Reference Skill Selection
 
 **Reference skill: myna-capture.**
 
@@ -971,7 +941,7 @@ The `myna-capture` skill is built first in Phase 1 because it exercises the most
 
 ---
 
-## 14. Memory Model
+## 13. Memory Model
 
 Myna maintains three layers of behavioral rules with explicit precedence (D048). The layers are loaded together at session start and compose at runtime.
 

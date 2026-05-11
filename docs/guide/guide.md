@@ -49,7 +49,7 @@ After install, Myna creates the following folder structure inside your vault's `
 | `Dashboards/` | 10 Dataview-powered dashboards |
 | `_system/config/` | Your 5 config files (YAML) |
 | `_system/templates/` | Templates for new notes |
-| `_system/logs/` | Audit log, prompt log, processed channel timestamps |
+| `_system/logs/` | Audit log, processed channel timestamps |
 | `_system/sources/` | Source message references for deduplication |
 | `_system/parked/` | Parked context saved by myna-park |
 | `_meta/learnings/` | Behavioral preferences captured by myna-learn |
@@ -126,7 +126,6 @@ The primary config file. Required — Myna reads it at every session start.
 | `mcp_servers.email` | Name of your registered email MCP server (e.g. `gmail-mcp`) |
 | `mcp_servers.slack` | Name of your registered Slack MCP server |
 | `mcp_servers.calendar` | Name of your registered calendar MCP server |
-| `features.*` | Toggle individual features on/off (all default to `true`) |
 
 ### projects.yaml
 
@@ -284,10 +283,6 @@ After triage, Myna reads your project-mapped email folders and extracts structur
 **`myna` command not found**
 
 The alias was added to your shell rc file but hasn't been loaded yet. Run `source ~/.zshrc` (or `source ~/.bashrc`), or open a new terminal window.
-
-**"Feature X is disabled"**
-
-Check `myna/_system/config/workspace.yaml` and confirm the relevant feature toggle is set to `true`. Changes take effect on the next session start.
 
 **Myna can't read my email / Slack / calendar**
 

@@ -56,7 +56,6 @@ myna/
     │   └── dashboard.md              # Unified dashboard (Dataview queries)
     ├── logs/
     │   ├── audit.md                  # Agent action log
-    │   ├── prompts.md                # User prompt log (if enabled)
     │   └── processed-channels.md     # Slack dedup: last timestamp per channel
     ├── state/                        # Mutable runtime state (not logs)
     │   └── email-sync.yaml           # last_processed_at timestamp for email dedup fallback
@@ -698,29 +697,7 @@ mcp_servers:
   calendar: gcal-mcp                  # optional — name of user's calendar MCP server
 
 # System settings
-prompt_logging: true                  # default: true — log prompts to _system/logs/
 ai_model: claude-code                  # reference only — not enforced by Myna
-
-# Feature toggles — true = enabled, false = disabled
-# Defaults set by role during setup
-features:
-  email_processing: true
-  messaging_processing: true
-  email_triage: true
-  meeting_prep: true
-  process_meeting: true
-  time_blocks: true
-  calendar_reminders: true
-  people_management: true
-  self_tracking: true
-  team_health: true
-  attention_gap_detection: true
-  feedback_gap_detection: true
-  contribution_detection: true
-  milestones: true                    # show birthdays/anniversaries in daily note
-  weekly_summary: true
-  monthly_updates: true
-  park_resume: true
 ```
 
 ### 3.2 projects.yaml
@@ -1202,12 +1179,6 @@ Nothing is silently dropped because the agent tried to pick "the best" destinati
 4. Attendee composition: all directs = team meeting, cross-team mix = coordination
 5. Recurrence: recurring = established meeting
 6. If not confident → ask user on first encounter, save answer in meetings.yaml
-
-### 9.6 Config-Driven Feature Behavior
-
-**Pattern:** Before any feature-specific behavior, check its toggle in the `features` map of workspace.yaml. Disabled features are **silently skipped** — not mentioned, not suggested, not included in output (daily notes, dashboards, briefings).
-
-Skills that cover multiple features check each feature's toggle independently. A skill can have some features active and others inactive.
 
 ### 9.7 Contribution Detection (Passive)
 

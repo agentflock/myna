@@ -49,7 +49,7 @@ After install, Myna creates the following folder structure inside your vault's `
 | `Dashboards/` | Dataview-powered dashboards |
 | `_system/config/` | Your 6 config files (YAML) |
 | `_system/templates/` | Templates for new notes |
-| `_system/logs/` | Audit log, prompt log, processed channel timestamps |
+| `_system/logs/` | Audit log, processed channel timestamps |
 | `_system/sources/` | Source message references for deduplication |
 | `_system/parked/` | Parked context saved by /myna:park |
 | `_meta/learnings/` | Behavioral preferences captured by /myna:learn |
@@ -125,7 +125,6 @@ The primary config file. Required — Myna reads it at every session start.
 | `mcp_servers.email` | Name of your registered email MCP server (e.g. `gmail-mcp`) |
 | `mcp_servers.slack` | Name of your registered Slack MCP server |
 | `mcp_servers.calendar` | Name of your registered calendar MCP server |
-| `features.*` | Toggle individual features on/off (all default to `true`) |
 
 ### projects.yaml
 
@@ -351,32 +350,6 @@ mcp_servers:
   email: ""                 # Name of your registered email MCP server (e.g. gmail-mcp)
   slack: ""                 # Name of your registered Slack MCP server (e.g. slack-mcp)
   calendar: ""              # Name of your registered calendar MCP server (e.g. gcal-mcp)
-
-prompt_logging: true        # Log user prompts to _system/logs/prompts.md
-
-# ---
-# Feature Toggles
-# true = enabled, false = disabled. All default to true.
-# Disabled features are silently skipped — never mentioned or suggested.
-# ---
-features:
-  email_processing: true
-  messaging_processing: true
-  email_triage: true
-  meeting_prep: true
-  process_meeting: true
-  time_blocks: true
-  calendar_reminders: true
-  people_management: true
-  self_tracking: true
-  team_health: true                   # Managers: team health overview in daily note
-  attention_gap_detection: true
-  feedback_gap_detection: true
-  contribution_detection: true
-  milestones: true                    # Birthdays/anniversaries in daily note
-  weekly_summary: true
-  monthly_updates: true
-  park_resume: true
 ```
 
 ### communication-style.yaml
