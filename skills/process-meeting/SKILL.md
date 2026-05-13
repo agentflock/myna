@@ -71,8 +71,8 @@ For each item extracted, determine:
 
 | What you extract | Where to write |
 |---|---|
-| Action item for you | `Projects/{project}.md` → `## Open Tasks` |
-| Action item for someone else | `Projects/{project}.md` → `## Open Tasks` with `[type:: task]` and `[person::]` set to the owner |
+| Action item for you | `Projects/{project}.md` → `## Tasks` |
+| Action item for someone else | `Projects/{project}.md` → `## Tasks` with `[type:: task]` and `[person::]` set to the owner |
 | Decision made | `Projects/{project}.md` → `## Timeline` (Decision callout) |
 | Blocker raised | `Projects/{project}.md` → `## Timeline` (Blocker callout) |
 | General status update | `Projects/{project}.md` → `## Timeline` |
@@ -103,53 +103,53 @@ Use this exact format for every review queue entry:
 
 ### Entry formats
 
-**Task** (append to `## Open Tasks`):
+**Task** (prepend to `## Tasks` — newest-first):
 ```
 - [ ] Review updated API spec 📅 2026-04-17 🔼 [project:: [[Auth Migration]]] [type:: task] [person:: [[{user.name}]]] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
 Use `user.name` from workspace.yaml for the person field on self-assigned tasks.
 
-**Task — assigned to another person** (append to `## Open Tasks`):
+**Task — assigned to another person** (prepend to `## Tasks` — newest-first):
 ```
-- [ ] Sarah to draft OAuth integration guide 📅 2026-04-17 [project:: [[Auth Migration]]] [type:: task] [person:: [[Sarah Carter]]] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
+- [ ] Sarah to draft OAuth integration guide 📅 2026-04-17 [project:: [[Auth Migration]]] [type:: task] [person:: [[Sarah Chen]]] [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
-**Decision callout** (append to `## Timeline`):
+**Decision callout** (prepend to `## Timeline` — newest-first):
 ```
 > [!info] Decision
-> [2026-04-10] Go with OAuth 2.0 PKCE flow for the auth migration [Auto] (meeting, 1:1 with Sarah)
+> Go with OAuth 2.0 PKCE flow for the auth migration [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
-**Blocker callout** (append to `## Timeline`):
+**Blocker callout** (prepend to `## Timeline` — newest-first):
 ```
 > [!warning] Blocker
-> [2026-04-10] Cert rotation from infra team required before launch — waiting on ops [Auto] (meeting, 1:1 with Sarah)
+> Cert rotation from infra team required before launch — waiting on ops [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
-**General timeline entry** (append to `## Timeline`):
+**General timeline entry** (prepend to `## Timeline` — newest-first):
 ```
-- [2026-04-10] Auth migration spec v2 reviewed and approved [Auto] (meeting, 1:1 with Sarah)
-```
-
-**Observation** (append to `## Observations`):
-```
-- [2026-04-10] **strength:** Proactively raised the cert rotation dependency before it became a blocker [Auto] (meeting, 1:1 with Sarah)
+- Auth migration spec v2 reviewed and approved [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
-**Recognition** (append to `## Recognition`):
+**Observation** (prepend to `## Observations` — newest-first):
 ```
-- [2026-04-10] Delivered the auth spec v2 ahead of schedule despite scope creep [Auto] (meeting, 1:1 with Sarah)
+- **strength:** Proactively raised the cert rotation dependency before it became a blocker [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
-**Personal note** (append to `## Personal Notes`):
+**Recognition** (prepend to `## Recognition` — newest-first):
+```
+- Delivered the auth spec v2 ahead of schedule despite scope creep [Auto] (meeting, 1:1 with Sarah, 2026-04-10)
+```
+
+**Personal note** (append to `## Personal Notes` — personal notes keep chronological append-order):
 ```
 - [2026-04-10] Running the SF marathon in June — mentioned training going well
 ```
 
-**Contribution** (append to `Journal/contributions-{YYYY-MM-DD}.md`, Monday date):
+**Contribution** (prepend to `## Contributions — Week of {YYYY-MM-DD}` in `Journal/contributions-{YYYY-MM-DD}.md`, Monday date — newest-first):
 ```
-- [2026-04-10] **people-development:** Delivered feedback on documentation gaps with specific examples [Inferred] (meeting, 1:1 with Sarah)
+- **people-development:** Delivered feedback on documentation gaps with specific examples [Inferred] (meeting, 1:1 with Sarah, 2026-04-10)
 ```
 
 ---
@@ -194,7 +194,7 @@ Before writing, check that destination files exist:
 
 ### Source file
 
-Append to `_system/sources/{entity}.md` (one entry per project or person mentioned). This links extracted items back to the meeting session without bloating vault files.
+Prepend to `_system/sources/{entity}.md` (one entry per project or person mentioned — newest at top). This links extracted items back to the meeting session without bloating vault files.
 
 ```markdown
 ## 2026-04-10 — meeting: 1:1 with Sarah
@@ -202,7 +202,7 @@ Append to `_system/sources/{entity}.md` (one entry per project or person mention
 > Raw notes (verbatim)
 {paste verbatim notes content here}
 
-Referenced by: [[Projects/auth-migration]] — decision, task | [[People/sarah-chen]] — observation, task
+Referenced by: [[Auth Migration]] — decision, task | [[Sarah Chen]] — observation, task
 Items extracted: 1 decision, 3 tasks, 1 observation
 ```
 
@@ -259,31 +259,3 @@ Processed {N} meetings.
 **Batch mode — which meetings to include:** Any meeting file with a session from today where the `### Notes` section has user-written content (non-empty Discussion, Action Items, or Decisions) and no `> *Processed` marker. Skip empty Notes sections.
 
 **Partial failure (some writes fail):** Complete all writes that succeed. List failures in the output. Don't roll back successful writes — partial processing is better than none.
-
----
-
-## Worked Example
-
-**User says:** "done with 1:1 with Sarah"
-
-1. Resolve "1:1 with Sarah" → `Meetings/1-1s/sarah-chen.md`
-2. Find today's session: `## 2026-04-10 Session`
-3. Determine type: frontmatter `type: 1-1` → use 1:1 extraction emphasis
-4. Read Prep section:
-   - 9 checked items: find 2 matching open tasks in auth-migration.md, mark complete
-   - 2 unchecked items: note for carry-forward (/myna:prep-meeting will add them next time)
-5. Read Notes section; wrap in framing delimiters:
-   - Discussion: "Sarah delivered API spec v2, cert rotation still pending from infra, decision: go with PKCE flow"
-   - Action Items: "I will review the spec by Friday. Sarah will follow up with ops about cert timeline."
-   - Decisions: "OAuth PKCE selected over client credentials — simpler, auditable"
-6. Extract:
-   - Task (yours): "Review Sarah's API spec v2" 📅 Friday → `Projects/auth-migration.md`, `[type:: task]` `[person:: [[{user.name}]]]` `[Auto]`
-   - Task (Sarah's): "Sarah to follow up with ops on cert rotation" → `Projects/auth-migration.md`, `[type:: task]` `[person:: [[Sarah Chen]]]` `[Auto]`
-   - Decision: "OAuth PKCE selected" → `Projects/auth-migration.md` timeline Decision callout `[Auto]`
-   - Blocker: "cert rotation pending from infra" → `Projects/auth-migration.md` timeline Blocker callout `[Auto]`
-   - Observation: "Sarah delivered spec v2 ahead of schedule" → `People/sarah-chen.md` `[Auto]`
-   - Contribution: "delivered feedback on documentation gaps" → `Journal/contributions-2026-04-07.md` `[Inferred]`
-7. Source summary → `_system/sources/auth-migration.md` and `_system/sources/sarah-chen.md`
-8. Append processed marker to `## 2026-04-10 Session` in the meeting file
-
-Output: "Processed 1:1 with Sarah. 9 checked items resolved, 2 unchecked noted for carry-forward. Written: 2 tasks (1 yours, 1 Sarah's), 1 decision, 1 blocker, 1 observation, 1 contribution."

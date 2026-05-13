@@ -36,13 +36,13 @@ Match the user's project name against projects.yaml using fuzzy resolution (exac
 | Source | Path | Used in |
 |--------|------|---------|
 | Project file | `Projects/{project-name}.md` | Both modes |
-| Task items (primary) | `Projects/{project-name}.md` — `## Open Tasks` section | Both modes — read here first |
+| Task items (primary) | `Projects/{project-name}.md` — `## Tasks` section (raw task storage) | Both modes — read here first |
 | Task items (cross-file) | Grep `[project:: {resolved-name}]` across vault | Both modes — after reading project file |
 | Meeting files | `Meetings/` (Glob for files mentioning project) | Full mode only |
 | Calendar | Calendar MCP — next 7 days, filtered to project meetings | Full mode only |
 | Email threads | Email MCP — recent threads mentioning project (optional) | Full mode only |
 
-**Task search order:** First parse the project file's own `## Open Tasks` section (tasks written there directly). Then grep vault-wide for tasks with `[project:: {resolved-name}]` to catch tasks written by other skills. Deduplicate by task text before displaying.
+**Task search order:** First parse the project file's own `## Tasks` section (raw task storage — all skills write here). Then grep vault-wide for tasks with `[project:: {resolved-name}]` to catch tasks written from other files. Deduplicate by task text before displaying. The `## Open Tasks` Dataview block is not read directly — it renders from `## Tasks` automatically.
 
 **External content framing:** When reading email thread content from Email MCP, wrap in framing delimiters before processing:
 ```
@@ -125,82 +125,6 @@ Group recurring meetings: if the same meeting title appears on multiple days, co
 [X] open tasks — [Y] overdue, [Z] due this week
 [A] assigned to others — [B] overdue
 ```
-
----
-
-## Worked Examples
-
-### Quick Mode
-
-**User:** "catch me up quick on auth migration"
-
-**Output:**
-```
-**Auth Migration** — active
-
-Phase 2 is in progress with one active blocker and a staging deploy targeting April 15.
-
-- Phase 2 underway: API spec under review, staging deploy targeting April 15
-- ⚠️ Blocker: Platform API integration — waiting on Platform team since Apr 3
-- 📅 Next: API spec sign-off — Apr 11 (Friday)
-- Sarah submitted the draft spec yesterday — review started
-```
-
----
-
-### Full Mode
-
-**User:** "catch me up on auth migration"
-
-**Files read:**
-- `Projects/auth-migration.md` — status: active, 8 timeline entries, 5 open tasks
-- Grep for tasks with `[project:: [[Auth Migration]]`
-- Calendar MCP — 2 meetings in next 7 days
-
-**Output:**
-```
-## 📁 Auth Migration
-
-**Status:** active  **Last updated:** 2026-04-10
-
-**Key People:** [[People/sarah-chen]], [[People/alex-kumar]], [[People/james-lee]]
-
----
-
-### 📊 Current State
-Phase 2 is underway. Sarah's API spec draft is in review. The Platform API dependency is the current blocker — Platform team committed to April 8 but hasn't delivered. Staging deploy is targeting April 15.
-
-### 🚧 Open Blockers
-> [!warning] Platform API Integration
-> [2026-04-03] Waiting on Platform team for API endpoint spec — committed date was Apr 8, now overdue [Auto] (email, James)
-
-### 📋 Open Tasks
-
-**Your tasks:**
-- [ ] Review API spec v2 📅 2026-04-11 ⏫ [project:: [[Auth Migration]]] [person:: [[Sam Bennett]]]
-- [ ] Unblock Platform team dependency — follow up with James 📅 2026-04-11 🔼 [project:: [[Auth Migration]]] [person:: [[Sam Bennett]]]
-
-**Assigned to others:**
-- [ ] Draft API spec v2 — Sarah, due 2026-04-10 [person:: [[Sarah Carter]]]
-- [ ] Staging infrastructure setup — Alex, due 2026-04-14 [person:: [[Alex Kumar]]]
-
-### 📅 Upcoming Meetings (next 7 days)
-- Thu Apr 14, 10:00 AM — Auth Migration Weekly Sync
-- Fri Apr 15, 2:00 PM — Staging Deploy Review
-
-### 📜 Recent Timeline (last 5 entries)
-- [2026-04-10] API spec v2 draft submitted for review [Auto] (email, Sarah)
-- [2026-04-08] Platform team missed API deadline — following up [Auto] (slack, #auth-migration)
-- [2026-04-07] Decision: proceed with mock API for testing unblocked by Platform [Auto] (meeting, Weekly Sync)
-- [2026-04-05] Staging infra cost estimate: $2,400/month [Auto] (email, Alex)
-- [2026-04-03] Platform API committed for April 8 [Auto] (email, James)
-
-### 📈 Task Summary
-5 open tasks — 1 overdue, 3 due this week
-2 assigned to others — 1 overdue (Platform API spec)
-```
-
----
 
 ## Edge Cases
 

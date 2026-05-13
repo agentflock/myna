@@ -55,9 +55,9 @@ Read in parallel:
 
 **Blockers this week:** Grep `{vault.path}/Projects/` for `[!warning] Blocker` blocks with dates in the target week, plus any blockers that opened before the week and are still unresolved.
 
-**Tasks completed vs carried:** Grep `{vault.path}/` for:
+**Tasks completed vs carried:** Grep `{vault.path}/Projects/` for:
 - `- \[x\]` with completion dates in the target week → completed count
-- Items present in Monday's daily note Immediate Attention and still `- \[ \]` at end of week → carried count
+- `- \[ \]` tasks with `📅 {date}` where the date falls in the target week and the task is still open at week's end → carried count (tasks due during the week that were not completed)
 
 **Team Health:** Read all `People/{slug}.md` files for direct reports (those with `relationship_tier: direct` in people.yaml). For each, gather: open task count, overdue task count, last 1:1 date, feedback gap (days since the last delivered feedback — count only observations with type `strength` or `growth-area` that have been explicitly noted; general observations that aren't feedback do not reset this clock), attention gap (days since any interaction was logged — 1:1, observation, or quick note). Check `Team/{team}.md` for any existing health snapshots this week. If people.yaml has no entries with `relationship_tier: direct`, skip this section silently.
 
@@ -182,56 +182,6 @@ Weekly note: {obsidian-uri}
 Then suggest:
 - "Say 'monthly update' to draft an MBR or status report from this week's data."
 - "Say 'wrap up' to close out today's daily note." (if it's end of week and today's wrap-up hasn't run)
-
----
-
-## Examples
-
-### Example 1: End-of-week summary, first run (manager role)
-
-User says: "weekly summary" on Friday April 11.
-
-Target week: April 7–11.
-
-Read 5 daily notes. Find:
-- 4 wrap-up End of Day sections (Monday–Thursday; Friday not done yet)
-- 3 contribution log entries (API spec review [Auto], 1:1 with Sarah [Inferred], cache decision [User])
-- 2 decisions in auth-migration.md this week
-- 1 blocker in platform-api.md (still open since April 5)
-- 9 tasks completed, 3 carried
-
-Generate self-reflection prompts:
-- No feedback logged for Alex this week (28 days since last observation)
-- "MBR draft" carried 4 consecutive days
-
-Output:
-```
-✅ Weekly summary written.
-
-Week of 2026-04-07: 3 accomplishments, 2 decisions, 1 open blocker, 9 tasks completed, 3 carried.
-
-Weekly note: obsidian://open?...
-```
-
-### Example 2: Re-run on same week
-
-User says: "weekly summary" again on Friday evening after running wrap-up.
-
-Existing summary covers through Thursday wrap-up. New data since then: Friday's completed tasks (2), one new decision logged during the afternoon meeting.
-
-Append a new `## Weekly Summary — 2026-04-11` section with the full week's data. The prior section from Thursday remains in place above it.
-
-### Example 3: Weekly summary with team health enabled
-
-User says: "how was my week?" (team_health enabled, has direct reports)
-
-Generate normal weekly summary. Additionally:
-- Check Sarah: 5 open, 0 overdue, 12-day feedback gap, last 1:1 Apr 2
-- Check Alex: 8 open, 3 overdue ⚠️, 45-day feedback gap ⚠️, last 1:1 Mar 28 ⚠️
-
-Write team health table to both weekly note and `Team/platform-team.md`. Mention in reflection: "Alex has 3 overdue tasks and a 45-day feedback gap — worth a check-in."
-
----
 
 ## Edge Cases
 

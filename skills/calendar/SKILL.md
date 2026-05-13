@@ -141,7 +141,7 @@ Write these as tasks in the project file? (yes / edit first / cancel)
 
 **Step 3: Write subtasks (on confirmation)**
 
-Append subtasks directly after the `## Open Tasks` section header in the relevant project file (before the Dataview block, not inside it). Use Obsidian Tasks plugin TODO format:
+Write subtasks to the `## Tasks` section in the relevant project file (raw task storage — do not write to or around the `## Open Tasks` Dataview block). Use Obsidian Tasks plugin TODO format:
 
 ```
 - [ ] {subtask description} 📅 {YYYY-MM-DD if suggested} [project:: [[{project}]]] [type:: task] [Auto] (capture, {YYYY-MM-DD})
@@ -149,105 +149,13 @@ Append subtasks directly after the `## Open Tasks` section header in the relevan
 
 If no project file is found, append them to the current daily note at `Journal/{YYYY-MM-DD}.md`. If the daily note does not exist, ask whether to create it or show the subtasks inline only.
 
-Tasks go in the project file, not the Dataview query block — the Dataview query will automatically pick them up.
+Tasks go in `## Tasks`, not the `## Open Tasks` Dataview query block — the Dataview query automatically picks them up from `## Tasks`.
 
 **Step 4: Optionally schedule**
 
 After writing subtasks: "Want me to find calendar slots for any of these? Say 'block time for subtask 1' and I'll find a slot."
 
 Do not auto-schedule. Let the user choose which subtasks to block time for.
-
----
-
-## Examples
-
-### Example 1: Reserve time for a specific task
-
-User says: "reserve 2 hours on Thursday for the design doc"
-
-Read workspace.yaml: work hours 9 AM–5 PM, prefix `[Myna]`.
-Query calendar for Thursday: 10 AM–11 AM (meeting), 2 PM–3 PM (1:1). Free slots: 9–10 AM (1 hr, too short), 11 AM–2 PM (3 hrs ✓), 3–5 PM (2 hrs ✓).
-
-Output:
-```
-📅 Available slots on Thursday (Apr 10):
-
-Option 1: 11:00 AM–1:00 PM (2 hrs) — morning, clear of meetings
-Option 2: 3:00 PM–5:00 PM (2 hrs) — afternoon block after 1:1
-
-Proposed time block:
-Title: [Myna:Focus] Design doc
-When: Thursday Apr 10, 11:00 AM–1:00 PM
-No attendees.
-
-Pick a slot (1 or 2), or say "cancel".
-```
-
-User says "1".
-
-```
-✅ Time block created: [Myna:Focus] Design doc, Thursday Apr 10 11:00 AM–1:00 PM.
-```
-
-### Example 2: Find best slot this week for deep work
-
-User says: "block 3 hours this week for deep work on the MBR"
-
-Scan the week. Tuesday has the lightest calendar (1 meeting at 3 PM, otherwise free). Best options:
-
-```
-📅 Best slots this week for a 3-hr focus block:
-
-Option 1: Tuesday Apr 8, 9:00 AM–12:00 PM — lightest day, uninterrupted morning
-Option 2: Thursday Apr 10, 11:00 AM–2:00 PM — before the afternoon 1:1
-Option 3: Friday Apr 11, 9:00 AM–12:00 PM — but Friday afternoons tend to have interruptions
-
-Proposed time block:
-Title: [Myna:Focus] MBR draft
-When: Tuesday Apr 8, 9:00 AM–12:00 PM
-No attendees.
-
-Create this, pick another option, or cancel?
-```
-
-### Example 3: Standalone reminder
-
-User says: "remind me to check the deployment logs at 2pm today"
-
-```
-⏰ Proposed reminder:
-Title: [Myna:Reminder] Check deployment logs
-When: Today, 2:00 PM–2:15 PM
-No attendees.
-
-Create this reminder? (yes / cancel)
-```
-
-User confirms. Event created.
-
-### Example 4: Task breakdown
-
-User says: "help me break down the auth migration design doc"
-
-Reads `Projects/auth-migration.md`. Finds the task "Write auth migration design doc" with 3 related timeline entries.
-
-```
-📋 Subtasks for "auth migration design doc":
-
-1. Outline sections and acceptance criteria (~1 hr)
-2. Draft current state and problem framing (~1.5 hrs)
-3. Draft proposed solution and alternatives (~2 hrs)
-4. Add migration timeline and risk matrix (~1 hr)
-5. Review and incorporate Sarah's feedback (~1 hr)
-
-Total estimated effort: ~6.5 hrs
-
-Write these as tasks in Projects/auth-migration.md? (yes / edit first / cancel)
-```
-
-User says "yes". Tasks appended to auth-migration.md. "Want me to find calendar slots for any of these?"
-
----
 
 ## Edge Cases
 

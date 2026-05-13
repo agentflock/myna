@@ -34,14 +34,16 @@ Also read:
 
 ## Step 2: Planned vs Actual
 
-Find the **morning sync snapshot** — the earliest "Sync — {time}" section in today's daily note (/myna:sync prepends snapshots, so the morning snapshot will be the bottom-most one). Extract its Immediate Attention items — these are what was planned.
+Query open tasks across project files where `📅 {today}` — grep `Projects/` for `- \[ \].*📅 {today}`. These source-file due dates are what was "planned" for today. Do NOT attempt to read `### Immediate Attention` from the daily note — that section no longer exists in the canonical structure.
 
 Compare against current state:
-- **Completed:** tasks now marked `- [x]`, meetings with all checkboxes checked, delegations resolved
-- **Not started:** items from Immediate Attention with no matching completion anywhere in today's note or project files
+- **Completed:** tasks now marked `- [x]` with today's date, meetings with all checkboxes checked, delegations resolved
+- **Not started:** tasks from the above query with no matching `- [x]` completion anywhere in today's note or project files
 - **Partially done:** tasks with `[review-status:: pending]` or meetings with some checkboxes checked and some not
 
-If there was no morning sync snapshot, note it and skip the comparison. Still proceed with contribution detection and carry-forward.
+Also check today's daily note `## Morning Focus` section for any user-typed intent that should inform the comparison — this is the one section the user writes themselves.
+
+If no tasks were due today and no Morning Focus was written, note it and skip the comparison. Still proceed with contribution detection and carry-forward.
 
 ---
 
@@ -88,16 +90,16 @@ Scan for items from today that look like contributions worth tracking:
 
 **Before writing any contribution**, check the current week's `Journal/contributions-{YYYY-MM-DD}.md` for near-duplicates (same action + same entity). Skip if already logged.
 
-**Contribution entry format:**
+**Contribution entry format** (content-first):
 ```
-- [{YYYY-MM-DD} | wrap-up] **{category}:** {description} [{provenance}] ({source-type}, {source}, {date})
+- **{category}:** {description} [{provenance}] (wrap-up, {user.name}, {YYYY-MM-DD})
 ```
 
 Categories by role (from `user.role` in workspace.yaml):
 - **IC / tech-lead:** decisions-and-influence, unblocking-others, issue-prevention, code-reviews, feedback-given, documentation, escalations-handled, delegation-management, best-practices, risk-mitigation, coaching-and-mentoring
 - **engineering-manager / pm:** people-development, operational-improvements, strategic-alignment, hiring-and-team-building, cross-team-leadership, stakeholder-management
 
-Append all `[Auto]` and `[Inferred]` contributions to `Journal/contributions-{YYYY-MM-DD}.md` (create file if it doesn't exist). Add review-self items to `ReviewQueue/review-self.md`.
+Prepend all `[Auto]` and `[Inferred]` contributions to the top of the `## Contributions — Week of {YYYY-MM-DD}` section in `Journal/contributions-{YYYY-MM-DD}.md` (create file if it doesn't exist — include frontmatter `week_start:` and `#contributions` tag). Add review-self items to `ReviewQueue/review-self.md`.
 
 ---
 
@@ -172,62 +174,11 @@ Then suggest:
 - "Say 'weekly summary' to summarize the week." (if it's Friday or end of sprint)
 - "Say 'review my queue' to process contributions in review-self."
 
----
-
-## Examples
-
-### Example 1: Standard end-of-day wrap-up
-
-User says: "wrap up"
-
-Morning sync showed 3 Immediate Attention items: API spec review, follow-up with Alex, auth migration status update.
-
-Current state:
-- API spec review: task is `- [x]` → completed
-- Follow-up with Alex: delegation task still `- [ ]` → not started
-- Auth migration status update: meeting checked off, but corresponding task not done → partially done
-
-Contributions found:
-- API spec review task completed → `[Auto]` unblocking-others (Sarah's work unblocked)
-- 1:1 with Sarah checked off → `[Inferred]` people-development (meeting attended)
-- Blocker in auth-migration.md resolved today with user's name in context → `[Inferred]` unblocking-others
-- "Who drove the Q2 planning outcome?" — ambiguous → review-self
-
-Output to daily note End of Day section, then:
-```
-✅ Wrap-up complete (6:02 PM).
-
-Completed: 1 item | Not started: 1 (carried to tomorrow) | Partially done: 1
-Contributions: 2 logged [1 Auto, 1 Inferred], 1 in review-self
-
-Today's note: obsidian://open?...
-Tomorrow's note: obsidian://open?...
-```
-
-### Example 2: Wrap-up with quick note
-
-User says: "wrap up — quick note: the cache decision in the auth migration review was mine, I drove it"
-
-Quick note is explicit → routes as `[User]` contribution to `Journal/contributions-{week}.md` under decisions-and-influence category. Also appends a timeline entry to `Projects/auth-migration.md` under `## Timeline` noting the decision.
-
-Carry-forward and planned vs actual run as normal.
-
-### Example 3: No morning sync ran
-
-User says: "end of day"
-
-Daily note exists but has no sync snapshot. Skip the planned vs actual comparison (nothing to compare against). Still:
-- Run contribution detection from tasks completed today
-- Carry all unfinished `- [ ]` tasks to tomorrow
-- Write End of Day section noting "No morning sync — planned vs actual skipped."
-
----
-
 ## Edge Cases
 
 **No tasks completed today:** Planned vs Actual shows all items as "not started" or "partially done". No contributions detected. Carry everything forward. Omit Contributions Detected section from End of Day if no contributions are detected.
 
-**contributions-{week}.md doesn't exist yet:** Create it with frontmatter (`week_start: {YYYY-MM-DD}`) and `#contributions` tag, plus a `## Contributions — Week of {YYYY-MM-DD}` section header. Append new entries.
+**contributions-{week}.md doesn't exist yet:** Create it with frontmatter (`week_start: {YYYY-MM-DD}`) and `#contributions` tag, plus a `## Contributions — Week of {YYYY-MM-DD}` section header. Write new entries into the section (newest-first from the start).
 
 **User runs wrap-up twice:** The End of Day section already exists. Read it for context. Append a new "End of Day — {HH:MM} (re-run)" section below the existing one, noting what changed. Do not overwrite the original.
 

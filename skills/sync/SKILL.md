@@ -89,7 +89,7 @@ week_start: {YYYY-MM-DD}
 
 ## Carry-Forwards
 
-## Weekly Summary
+## Weekly Summary — {YYYY-MM-DD}
 
 ### Accomplishments
 ### Decisions Made
@@ -206,7 +206,7 @@ date: {YYYY-MM-DD}
 - [ ] {HH:MM} [[{meeting-file}]] — {meeting title} {prep-status}
 ```
 
-Note: re-run snapshots are compact — they omit Dataview sections (those live in the permanent part of the note and update automatically) and focus on what changed. Dashboards link row is permanent and not repeated in re-run snapshots.
+Note: re-run snapshots are compact — they include `### Briefing` and `### Today's Meetings` only (no `### Tasks Due Today` or `### Dashboards` — those live in the first snapshot of the day and remain static). Dashboards link row is permanent and not repeated in re-run snapshots.
 
 ---
 
@@ -226,7 +226,8 @@ For each calendar event today:
    ```markdown
    ---
    type: 1-1
-   person: [[{person-slug}]]
+   person: [[{Full Name}]]
+   aliases: ["{Full Name} 1:1"]
    ---
 
    #meeting #1-1
@@ -292,48 +293,6 @@ If there are meetings today, print a numbered list of them:
 Then ask: "Want me to prep any of these? Say a number or 'all'."
 
 If there are no meetings today, skip the list and the question.
-
----
-
-## Examples
-
-### Example 1: First sync of the day (Monday)
-
-User says: "good morning"
-
-1. No weekly note exists for this ISO week → archive previous weekly note if present, then create `Journal/2026-W15.md` with week capacity populated.
-2. Archive check: glob `Journal/*.md` for `\d{4}-\d{2}-\d{2}.md` files that are not today's date → move any found to `Journal/Archive/Daily/`.
-3. No daily note for today → create `Journal/2026-04-07.md`.
-4. Calendar: 3 meetings today (weekly sync 10:00 AM, 1:1 with Sarah 2:00 PM, design review 4:00 PM). Total: 2.5 hrs.
-5. Tasks: 2 overdue, 4 due today (estimated 5 hrs effort).
-6. Delegations: 1 overdue — Alex was supposed to send infra proposal by last Friday.
-7. Review queue: 3 in review-work, 1 in review-self.
-8. Milestones: Sarah's birthday in 3 days.
-9. Meetings.yaml check: "1:1 with Sarah" → matches alias → `Meetings/1-1s/sarah-chen.md`. Append new session. "Design Review" → adhoc → `Meetings/Adhoc/2026-04-07-design-review.md`.
-10. Briefing bullets: over-capacity warning, 2 overdue tasks (top by priority), 1 overdue task assigned to Alex (infra proposal), Sarah's birthday in 3 days, 4 review queue items.
-11. Output: "Sync complete (8:47 AM). 3 meetings today (2.5 hrs), 4 tasks due today, 2 overdue. Weekly note created for 2026-W15."
-
-### Example 2: Re-sync mid-afternoon
-
-User says: "sync"
-
-1. Daily note already exists with an 8:47 AM snapshot.
-2. Compare: 2 tasks completed since morning, 1 new meeting added (ad-hoc at 3 PM).
-3. Prepend a new "Sync — 2:15 PM" snapshot (Briefing + Today's Meetings only). Previous snapshot left intact. Dataview and Dashboards sections are permanent — not repeated.
-4. Output: "Sync complete (2:15 PM). 1 meeting remaining (1 hr), 2 tasks due today, 2 overdue."
-
-### Example 3: Plan tomorrow
-
-User says: "plan tomorrow"
-
-1. Target date = 2026-04-08 (Tuesday).
-2. Archive previous daily note if present. Tomorrow's daily note doesn't exist → create `Journal/2026-04-08.md`.
-3. Read tomorrow's calendar: 2 meetings.
-4. Tasks due tomorrow: 3.
-5. Generate prep for tomorrow's meetings.
-6. Output: "Tomorrow's note ready (2026-04-08). 2 meetings, 3 tasks due. Prep files created."
-
----
 
 ## Edge Cases
 
