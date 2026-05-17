@@ -134,11 +134,6 @@ feedback_cycle_days: 30
 
 calendar_event_prefix: "[Myna]"
 
-mcp_servers:
-  email: ""
-  slack: ""
-  calendar: ""
-
 features:
   email_processing: true
   messaging_processing: true

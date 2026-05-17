@@ -31,11 +31,5 @@ calendar_event_types:
   task: Task
   reminder: Reminder
 
-# MCP server names — maps abstract names to user's actual MCP servers
-mcp_servers:
-  email: ""
-  slack: ""
-  calendar: ""
-
 # System settings
 prompt_logging: true

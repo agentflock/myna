@@ -165,7 +165,7 @@ If the user pastes a message and says "rewrite this for my VP" → `/myna:rewrit
 
 ### Setup and Configuration
 
-- "Open config", "edit config", "reconfigure", "update my settings", "update my preferences", "change my settings", "change my preferences" → `/myna:setup`
+- "Open config", "open config UI", "config UI", "launch config", "edit config", "reconfigure", "update my settings", "update my preferences", "change my settings", "change my preferences" → `/myna:setup`
 
 ### Memory Routing
 

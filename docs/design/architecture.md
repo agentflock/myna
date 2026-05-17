@@ -757,7 +757,7 @@ Myna does NOT build MCPs for email, Slack, or calendar (D005). It connects to wh
 | Slack | myna-process-messages, myna-unreplied-threads | No |
 | Calendar | myna-sync, myna-prep-meeting, myna-calendar (reading schedule, creating events) | No |
 
-External MCP servers are registered with Claude Code via `claude mcp add`. MCP server names are configured in workspace.yaml so skills know which tool names to call. Skills call MCP tools directly by name (e.g., the tool names from the user's email MCP server). The `mcp_servers` map in workspace.yaml records the server names for reference.
+External MCP servers are registered with Claude Code via `claude mcp add`. Skills describe intent (e.g., "read inbox emails") and Claude Code resolves the call to whichever MCP tool is available in the session — no hardcoded tool names in skill instructions.
 
 ---
 

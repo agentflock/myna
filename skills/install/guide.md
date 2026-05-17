@@ -120,10 +120,6 @@ The primary config file. Required — Myna reads it at every session start.
 | `email.processed_folder` | `per-project` (email moves to each project's Processed/ subfolder) |
 | `feedback_cycle_days` | Days between feedback gap alerts (default: 30) |
 | `calendar_event_prefix` | Prefix on all Myna-created calendar events (default: `[Myna]`) |
-| `mcp_servers.email` | Name of your registered email MCP server (e.g. `gmail-mcp`) |
-| `mcp_servers.slack` | Name of your registered Slack MCP server |
-| `mcp_servers.calendar` | Name of your registered calendar MCP server |
-
 ### projects.yaml
 
 One entry per active project. Myna uses this to route emails, Slack messages, and prompts to the right project file.
@@ -209,8 +205,6 @@ claude mcp add gmail-mcp -- <your-gmail-mcp-command>
 claude mcp add slack-mcp -- <your-slack-mcp-command>
 claude mcp add gcal-mcp -- <your-gcal-mcp-command>
 ```
-
-After registering, update the `mcp_servers` section in `workspace.yaml` to match the names you used. The default names (`gmail-mcp`, `slack-mcp`, `gcal-mcp`) are pre-filled in the starter config.
 
 MCP servers provide Myna with read access to your inbox, channels, and calendar. Myna never sends email, never posts to Slack, and never creates calendar events with attendees.
 
@@ -299,7 +293,7 @@ Check `myna/_system/config/workspace.yaml` and confirm the relevant feature togg
 
 **Myna can't read my email / Slack / calendar**
 
-Confirm the MCP server is registered: `claude mcp list`. The server name must match what's in `workspace.yaml` under `mcp_servers`. Re-register if needed with `claude mcp add`.
+Confirm the relevant MCP server (email, Slack, or calendar) is registered: `claude mcp list`. If missing, add it with `claude mcp add <name> -- <command>`.
 
 **Dashboards show no data**
 
@@ -344,10 +338,6 @@ feedback_cycle_days: 30     # Days between feedback gap alerts (default: 30)
 
 calendar_event_prefix: "[Myna]"  # Prefix on all Myna-created calendar events
 
-mcp_servers:
-  email: ""                 # Name of your registered email MCP server (e.g. gmail-mcp)
-  slack: ""                 # Name of your registered Slack MCP server (e.g. slack-mcp)
-  calendar: ""              # Name of your registered calendar MCP server (e.g. gcal-mcp)
 ```
 
 ### communication-style.yaml

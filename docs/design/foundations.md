@@ -644,12 +644,6 @@ calendar_event_types:                 # labels appended to prefix
   task: Task                          # → [Myna:Task]
   reminder: Reminder                  # → [Myna:Reminder]
 
-# MCP server names — maps abstract names to user's actual MCP servers
-mcp_servers:
-  email: gmail-mcp                    # optional — name of user's email MCP server
-  slack: slack-mcp                    # optional — name of user's Slack MCP server
-  calendar: gcal-mcp                  # optional — name of user's calendar MCP server
-
 # System settings
 ai_model: claude-code                  # reference only — not enforced by Myna
 ```
@@ -974,7 +968,7 @@ The full pattern library with examples lives in `myna-steering-vault-ops`.
 
 ### 7.1 External MCP Operations
 
-Skills that read from external sources (email, Slack, calendar) need these capabilities from the user's MCP servers. Exact tool names and parameters depend on which MCP servers the user has installed and registered with Claude Code via `claude mcp add`. The `mcp_servers` map in workspace.yaml records the server names for reference.
+Skills that read from external sources (email, Slack, calendar) need these capabilities from the user's MCP servers.
 
 | Operation | Used by | Parameters |
 |-----------|---------|-----------|
