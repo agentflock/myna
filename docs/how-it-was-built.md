@@ -1,8 +1,10 @@
 # How Myna Was Built
 
-Myna is a privacy-first AI Chief of Staff for Engineering Managers, Tech Leads, and other leaders who manage multiple projects and communication channels. It works within your company's approved tools and never acts without your approval. It was also built by one person, with no team, no sprints, no standups. I defined the vision, described the features, and settled key decisions. Everything else: the main agent, 24 feature skills, 6 steering skills, the install script, vault templates, dashboards, and this documentation were written by Claude.
+When I started shaping this project in March 2026, this was the bet: **describe what you want, go to sleep, and wake up to something that works.**
 
-Two models shared the work. Claude Opus 4.6 handled architecture, design decisions, and complex multi-file tasks where deeper reasoning mattered. Claude Sonnet 4.6 handled implementation, iteration, and the bulk of the build. Claude ran autonomously for most of it, with roughly a week of my part-time effort across the whole project. Two things came out of this, not one: the assistant itself, and the methodology Claude and I used to build it — the pipeline, the build recipe, the design patterns, the lessons — so that someone else could follow the same process to build a different agentic assistant entirely.
+Myna is a privacy-first AI Chief of Staff for Engineering Managers, Tech Leads, and other leaders who manage multiple projects and communication channels. It works within your company's approved tools and never acts without your approval. It was also built by one person, with no team, no sprints, no standups. I defined the vision, described the features, and settled key decisions. Everything else was written by Claude: the main agent, 24 feature skills, 6 steering skills, the install script, vault templates, dashboards, and the article you are reading.
+
+Two models shared the work. Claude Opus 4.6 handled architecture, design decisions, and complex multi-file tasks where deeper reasoning mattered. Claude Sonnet 4.6 handled implementation, iteration, and the bulk of the build. Claude ran autonomously for most of it, with roughly a week of my part-time effort across v1. After launch, that workflow became a development system: feature specs, design reviews, execution prompts, task queues, implementation subagents, reviewer subagents, and automated review/fix loops. Two things came out of this, not one: the assistant itself, and the methodology Claude and I used to build and keep building it. Enough that someone else could follow the same process to build a different agentic assistant entirely.
 
 *The system prompt is the system. Claude built a system that Claude then runs. That fact is either obvious or strange depending on how long you think about it.*
 
@@ -18,7 +20,7 @@ Myna handles the information layer. Privacy-first, works within your company's a
 
 ## What We Were Actually Building
 
-The first real clarity came when I stopped thinking about Myna as an application. There is no server, no API, no frontend. What Claude and I were building was agent instructions and a vault structure. The AI model the user already has is the runtime.
+The first real clarity came when I stopped thinking about Myna as an application. There is no server, no API, no frontend. The AI model the user already has is the runtime. What Claude and I were building was agent instructions and a vault structure. Myna is not software wrapped around an AI model. It is software made out of instructions for one.
 
 That framing changed how every decision got made. You are not building features in the traditional sense. You are writing instructions for a capable model, defining where information lives, and specifying the rules it follows. The deliverable is structured knowledge, not code.
 
@@ -30,11 +32,11 @@ With the vision clear, the next step was figuring out what to actually build. In
 
 The approach that worked best was asking Claude to think from specific personas. What does a Software Development Manager actually need on a Tuesday? What does a Product Manager feel the most friction with day to day? That exercise surfaced things a generalist review would have missed. Delegation tracking was already in the list, but the SDM perspective added the proactive nudge: warn me when something is overdue. Without that, the tracker is just a list nobody checks.
 
-The most important session was an accuracy audit. Any feature that required Myna to infer things about people got examined carefully. One feature, engagement signal detection, was supposed to flag signs that a team member might be disengaged. I killed it. Myna only has the user's notes, not objective data. **A wrong inference about a person is worse than no inference.** It became attention gap detection instead: surfacing where your own attention has dropped. "You haven't logged feedback for this person in 52 days" is a factual date comparison. You will trust it and act on it. The original feature you wouldn't.
+The most important session was an accuracy audit. Any feature that required Myna to infer things about people got examined carefully. One feature, engagement signal detection, was supposed to flag signs that a team member might be disengaged. I killed it. Myna only has the user's notes, not objective data. **A wrong inference about a person is worse than no inference.** It became attention gap detection instead: surfacing where your own attention has dropped. "You haven't logged feedback for this person in 52 days" is a factual date comparison. One produces a useful reminder. The other produces fake authority.
 
 ## Designing for Autonomy
 
-The goal from the start was to keep my involvement concentrated at the design phase and let Claude handle the build with minimal oversight. In practice this meant spending an hour with Claude in the evening settling decisions and reviewing the plan, then Claude working through the night. I would wake up to hundreds of lines of reviewed, documented output ready for my morning review.
+The goal from the start was to keep my involvement concentrated at the design phase and let Claude handle the build with minimal oversight. In practice this meant spending an hour with Claude in the evening settling decisions and reviewing the plan, then stepping away. I went to sleep after making decisions. I woke up to reviewed, documented work.
 
 After finalizing features, the typical next step would have been a requirements phase. I skipped it. For a traditional system you need requirements because the computer only does what you code. For an AI system, the model already knows how to summarize, extract, and draft. What it needs is structure: where information lives, what rules to follow, what guardrails to enforce. So instead of requirements, Claude and I wrote foundations. File templates, vault structure, conventions, cross-domain rules, all defined upfront in one place. Foundations bridged features directly to build.
 
@@ -48,20 +50,91 @@ For every major autonomous session, Claude also wrote the prompt I would paste t
 
 The first full design pass came back with around 3,400 lines, including a detailed security model with multiple defense layers. It was thorough and premature. Claude and I were solving problems we hadn't encountered yet on a system we hadn't validated yet. I pulled it back significantly and kept only what v1 actually needed.
 
-**Learning:** This was one of the biggest lessons from the entire project. AI will go deep on complexity before you have validated the basics. It is not a flaw, it is what happens when you give a capable system a hard problem without a scope constraint. The fix is to set that constraint explicitly, not assume the AI will calibrate it on its own.
+**Learning:** This was one of the biggest lessons from the entire project. AI will go deep on complexity before you have validated the basics. This is not a flaw. It is what happens when you give a capable system a hard problem without a scope constraint. The fix is to set that constraint explicitly, not assume the AI will calibrate it on its own.
 
 ## Build, Review, Refine
 
 Before the build started, Claude created a build plan that mapped out dependencies, identified what could run in parallel, and broke everything into granular tasks. I reviewed it and we finalized it together.
 
-An orchestrator agent then used that plan to give each subagent precise instructions on exactly what to create. Once each subagent completed its task, the orchestrator spawned a reviewer subagent to review the output and fix any issues before moving on. 8 subagents ran in parallel, each focused on their assigned skills with no coordination needed between them. **The orchestrator ran for 3 hours.** 14 skills, around 3,400 lines, one session.
+An orchestrator agent then used that plan to give each subagent precise instructions on exactly what to create. Once each subagent completed its task, the orchestrator spawned a reviewer subagent to review the output and fix any issues before moving on. Eight subagents worked at once. They did not coordinate. They did not need to. Foundations was the coordination layer. **The orchestrator ran for 3 hours.** 14 skills, around 3,400 lines, one session.
 
 The cross-skill audit afterward found 7 issues across 20 files. That is a low number for parallel autonomous work. The reason it worked: when the authority chain is clear and every agent reads the same source of truth, they make consistent decisions without needing to talk to each other. Foundations did that job.
 
-To keep quality high without manual review, Claude and I built a set of slash commands: review, fix, verify, coverage, and consistency. The review command ran a fresh Claude instance as a senior critic across all skills. Fix implemented the changes. Verify confirmed nothing regressed. Claude could run the full loop autonomously, catch its own issues, and converge to a clean state without me being in the loop.
+To keep quality high without manual review, Claude and I built the first version of a review loop: review, fix, verify, coverage, and consistency. The review command ran a fresh Claude instance as a senior critic across all skills. Fix implemented the changes. Verify confirmed nothing regressed. Claude could run the full loop autonomously, catch its own issues, and converge to a clean state without me being in the loop.
 
 As I used the system, some skills were doing too much. Brief had nine sub-modes. Sync mixed planning with execution. Claude and I split them into focused single-intent skills, one clear purpose each. That refinement took the count from 14 to 24.
 
 **Learning:** I initially used Opus to write the skills. The output was extensive and over-specified. Switching to Sonnet produced cleaner, more concise instructions that were actually easier for the model to follow. For agent instructions, more capable does not always mean better. Clarity and conciseness matter more than depth.
 
-*The future of building software might look like this: describe what you want, go to sleep, and wake up to something that works.*
+## After the First Version
+
+Shipping v1 was one problem. Continuing to develop it without losing the discipline that made it coherent was another. The workflow that got v1 built was not enough for the work after v1. The first build needed a plan. Ongoing development needed a system.
+
+The rhythm stayed the same: I work the hours I have, Claude works the ones I do not. When I come back, the work is ready for judgment, not supervision.
+
+There are two paths now, depending on the size of the work. The human touchpoints are the moments where direction changes. Claude does the work in between.
+
+### New Features
+1. **Human** + Claude: brainstorm the feature
+2. Claude: checks it against the vision, architecture, and settled decisions
+3. Claude: writes, reviews, and revises the feature spec
+4. **Human:** approves the spec
+5. Claude: writes, reviews, and revises the design
+6. **Human:** approves the design
+7. Claude: writes the execution prompt
+8. **Human:** runs the prompt
+9. Claude: creates the feature branch and orchestrates the run
+10. Claude: task subagents implement and commit, in parallel where safe
+11. Claude: reviewer subagents review
+12. Claude: task subagents fix blocking issues and amend the commit
+13. Claude: repeats review/fix up to 3 rounds
+14. Claude: pushes the feature branch and writes the summary
+15. **Human:** reviews the summary and code, then ships
+
+The important part is that the prompt is not written from a vague idea. By the time Claude generates it, the feature has already gone through a spec and design pass, each reviewed and revised by Claude before I approve it. The prompt is the handoff from design into autonomous execution. It contains the tasks, the context, and the constraints a fresh session needs to run without me in the room.
+
+That fresh session is an orchestrator. Its job is sequencing, branch management, and coordination. It does not implement the feature itself. It reads the prompt, creates the branch, opens the run log, and spawns one task subagent for each task already defined in the prompt. If tasks have no file overlap, the orchestrator runs them in parallel. If they depend on each other, it runs them in order.
+
+### Bugs and Small Changes
+1. **Human:** describes the problem
+2. Claude: checks it against the vision, architecture, and settled decisions
+3. Claude: proposes options
+4. **Human:** chooses
+5. Claude: adds a structured task to the queue
+6. **Human** + Claude: add more structured tasks as time allows
+7. **Human:** asks Claude to run the queue
+8. Claude: creates the fix branch and runs the queue one task at a time
+9. Claude: task subagents implement and commit
+10. Claude: reviewer subagents review
+11. Claude: task subagents fix blocking issues and amend the commit
+12. Claude: repeats review/fix up to 3 rounds
+13. Claude: pushes the fix branch and writes the summary
+14. **Human:** reviews the summary and code, then ships
+
+The lighter loop still has a gate. Claude does not treat every complaint as a task. It checks whether the change belongs in Myna at all, then turns the chosen option into a structured queue entry: problem, correct behavior, context, suggested files, done criteria, and whether the changelog should change.
+
+The queue is the handoff from decision into execution. It can sit there while I keep adding small fixes, then run when I am ready to hand the work to Claude. Claude creates a dated fix branch, processes tasks FIFO, and rereads the queue before each task so anything added mid-run gets picked up. At the end, it writes a summary, archives completed tasks, leaves failed ones in the queue, and pushes the branch.
+
+**Learning:** Autonomy needs friction in the right places. The speed comes from automating the work between gates, not from removing the gates. Spec approval, design approval, task criteria, automated review, and final human judgment are the reason the work can move quickly without becoming loose.
+
+### Shared Task Discipline
+
+Both paths converge on the same discipline. Every task is implemented, committed, then reviewed by a separate reviewer subagent. The review is scoped to that task's diff and checked against the task's done criteria. If the reviewer finds blocking issues, the task subagent fixes them, amends the commit, and runs review again. The loop runs up to three rounds. Clean work moves forward. Unresolved critical work is reported, not hidden.
+
+**Defects get caught where they start. Each task has to pass automated reviews before it is merged.**
+
+The old slash-command loop became a task protocol: implement, commit, review, fix, repeat.
+
+**Learning:** The prompt and the review both work because they deny shared context. The prompt gives a fresh session everything it needs to build without me in the room. The reviewer gets only the diff, the criteria, and the project rules. Less hidden context made the system more autonomous, not less.
+
+The important detail is not that Claude reviews Claude. It is that the reviewer subagent never watched the code being written. It is a fresh invocation. It did not participate in the design choices, make the trade-offs, or build up sympathy for the implementation. It gets the diff, the criteria, and the project rules. It reads what is on the page, not what was intended.
+
+That separation is the point. A human reviewing their own work cannot manufacture it. You can wait an hour, switch chairs, change your mood. You still remember why the code exists. The reviewer does not. That ignorance is useful.
+
+**My role got smaller, not weaker. I approve direction, choose when to run, and decide what ships. Claude does the work between those moments.**
+
+### What Comes Next
+
+The next step is cross-model review: Claude implements, Codex reviews. The structure already supports it. The task protocol already separates implementation from review. The only change is the reviewer on the other side.
+
+*The bet paid off, and the bar got higher: describe what you want, step away, and come back to work that was built, reviewed, fixed, and ready to ship.*
