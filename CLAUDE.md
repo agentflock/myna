@@ -47,6 +47,8 @@ When the user corrects your direction or you discover a non-obvious pattern duri
 - Keep commits atomic — one logical change per commit.
 - Commit messages describe what was accomplished, not which files changed. Subject: lead with the most important change in plain language. Body: explain what was done and why — the decisions made, problems solved — not a list of edits.
 - **Never add Co-Authored-By lines.**
+- **Never create merge commits.** All merges must be fast-forward (`git merge --ff-only`). If a fast-forward isn't possible, rebase the source branch onto the target first. Never use `--no-ff`.
+- **Pulls always rebase.** Use `git pull --rebase`. Never `git pull` without rebase.
 - Update `[Unreleased]` in `CHANGELOG.md` for user-facing changes — new behavior, bug fixes a user would notice, new skills. Skip for internal refactors, dev tooling changes, and doc cleanup. One entry per meaningful change, not per commit.
 
 ## Ground Rules
