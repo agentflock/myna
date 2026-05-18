@@ -131,10 +131,16 @@ The important detail is not that Claude reviews Claude. It is that the reviewer 
 
 That separation is the point. A human reviewing their own work cannot manufacture it. You can wait an hour, switch chairs, change your mood. You still remember why the code exists. The reviewer does not. That ignorance is useful.
 
-**My role got smaller, not weaker. I approve direction, choose when to run, and decide what ships. Claude does the work between those moments.**
+*The bet paid off, and the bar got higher: describe what you want, step away, and come back to work that was built, reviewed, fixed, and ready to ship.*
 
 ### What Comes Next
 
-The next step is cross-model review: Claude implements, Codex reviews. The structure already supports it. The task protocol already separates implementation from review. The only change is the reviewer on the other side.
+**Vision:** Products should ship with their own product and engineering team. As people use the product, that embedded team learns where it falls short, designs and builds changes to the product itself, and lets the user decide what becomes part of their version. Patterns that repeat across users become candidates for the core product. Eventually, the company building the product shrinks to a handful of people. The engineering doesn't happen at HQ anymore, it happens inside each user's instance. Six humans, a million engineering teams.
 
-*The bet paid off, and the bar got higher: describe what you want, step away, and come back to work that was built, reviewed, fixed, and ready to ship.*
+The current system is not there yet. It still depends on me to notice the problem, describe the change, start the run, and decide whether the result belongs.
+
+The first step is trust. The separate-agent review loop is the base. Next it needs different models, user-facing tests, and a clear record of why each change exists. The system has to catch the problems I would normally look for before it asks me to judge the result.
+
+Then the system can start bringing me product changes before I ask for them. It can learn from real use, find where the product is falling short, design the change, build it, review it, and give me something real to try, along with the reason it built it. Not ideas. Not dashboards. A change I can try.
+
+If this works, the product does not just get built once. It keeps being built wherever it is used.
