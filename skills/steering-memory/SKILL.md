@@ -16,7 +16,7 @@ Myna's behavioral rules live in two layers. Applied together at runtime with exp
 | Layer | Lives in | Authoritative for |
 |-------|----------|-------------------|
 | Hard rules | 6 steering skills (myna-steering-*) | Safety, scope, draft-never-send, vault-only writes, append-only discipline |
-| User preferences | `workspace.yaml` identity fields + Claude Code memory (feedback type) | Preferences, behavioral corrections, workflow adjustments observed across sessions |
+| User preferences | `workspace.yaml` identity fields + Claude Code memory (feedback type) | Behavioral corrections, workflow adjustments observed across sessions |
 
 **Runtime resolution:**
 1. **Hard rules in steering ALWAYS win.** Immutable. Cannot be overridden by any user preference or memory entry.

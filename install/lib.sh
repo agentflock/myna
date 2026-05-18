@@ -68,14 +68,13 @@ EOF
     "_system/logs"
     "_system/sources"
     "_system/parked"
-    "_meta/learnings"
   )
 
   for dir in "${DIRS[@]}"; do
     mkdir -p "$MYNA_ROOT/$dir"
   done
 
-  echo "[2/10] Created 18 vault directories"
+  echo "[2/10] Created 17 vault directories"
 
   # ---------------------------------------------------------------------------
   # Step 3: Create starter YAML config files (only if they do not exist)
@@ -133,25 +132,7 @@ email:
 feedback_cycle_days: 30
 
 calendar_event_prefix: "[Myna]"
-
-features:
-  email_processing: true
-  messaging_processing: true
-  email_triage: true
-  meeting_prep: true
-  process_meeting: true
-  time_blocks: true
-  calendar_reminders: true
-  people_management: true
-  self_tracking: true
-  team_health: true
-  attention_gap_detection: true
-  feedback_gap_detection: true
-  contribution_detection: true
-  milestones: true
-  weekly_summary: true
-  monthly_updates: true
-  park_resume: true'
+'
 
   _myna_create_if_missing "$MYNA_ROOT/_system/config/communication-style.yaml" \
 '# Run /myna:setup for guided configuration.

@@ -69,7 +69,7 @@ brew --version
 
 **Config file paths (shown only when user skips Python 3 install):**
 
-- `{vault_path}/myna/_system/config/workspace.yaml` — your identity (name, job title, timezone) and feature toggles. Start here.
+- `{vault_path}/myna/_system/config/workspace.yaml` — your identity (name, job title, timezone). Start here.
 - `{vault_path}/myna/_system/config/projects.yaml` — the projects you're working on, with names, aliases, and which email folders or Slack channels map to each.
 - `{vault_path}/myna/_system/config/people.yaml` — the people you work with: direct reports, manager, key collaborators, and their roles.
 - `{vault_path}/myna/_system/config/communication-style.yaml` — how you like to write: tone and style presets for different audiences.

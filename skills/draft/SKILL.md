@@ -15,12 +15,10 @@ Generates polished professional writing from vault context. Outputs shown inline
 ## Before You Start
 
 Read at session start:
-- `_system/config/workspace.yaml` — user identity, feature toggles
+- `_system/config/workspace.yaml` — user identity, role, and timezone
 - `_system/config/communication-style.yaml` — tone presets, sign-off, BLUF settings
 - `_system/config/people.yaml` — relationship tiers, aliases
 - `_system/config/projects.yaml` — project aliases
-
-Feature toggles: if `email_processing` is disabled, skip email MCP reads. If `self_tracking` is disabled, skip contribution cross-references.
 
 ## Draft Mode Detection
 
@@ -391,7 +389,7 @@ Note: Consider writing a brief note after this conversation capturing the agreem
 1. Determine type: MBR (Monthly Business Review), MTR (Monthly Tech Review), or QBR (Quarterly Business Review). Ask if unclear.
 2. Ask user for audience (self, leadership, team) and apply appropriate depth.
 3. Read all project files in `Projects/` — extract timeline entries from the past month (past quarter for QBR).
-4. Read `Journal/contributions-{YYYY-MM-DD}.md` files for the relevant period (Monday-dated weekly files). Skip if `self_tracking` is disabled.
+4. Read `Journal/contributions-{YYYY-MM-DD}.md` files for the relevant period (Monday-dated weekly files).
 5. Compile: progress per project, key decisions, blockers resolved vs outstanding, contribution highlights.
 6. For QBR: add month-over-month trend analysis — what improved, what persisted, what's new.
 7. Apply BLUF: lead with overall summary/health, then per-project detail.

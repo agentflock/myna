@@ -9,17 +9,11 @@ user-invocable: false
 
 If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:setup` and stop.
 
-## Feature Toggle Checking
-
-Feature gates are checked by the agent before dispatching to a skill — not inside individual skills. Skills do not re-check toggles.
-
-When the agent is about to invoke a gated skill and the toggle is off, it asks the user whether to enable it and writes the toggle to `workspace.yaml` on confirmation. Skills run once dispatched — they do not silently skip based on toggles.
-
 ## Config Reload
 
 Read config files at the start of each new session — not on every prompt. Configs don't change mid-conversation.
 
-If the user explicitly updates config during a session, use the updated values for the rest of that session. When the agent itself writes a config change (e.g., enabling a feature toggle), update the in-memory config immediately so the change takes effect in the current session without requiring a restart. Otherwise, tell the user that config changes take effect on the next session.
+If the user explicitly updates config during a session, use the updated values for the rest of that session. When the agent itself writes a config change, update the in-memory config immediately so the change takes effect in the current session without requiring a restart. Otherwise, tell the user that config changes take effect on the next session.
 
 ## Graceful Degradation
 

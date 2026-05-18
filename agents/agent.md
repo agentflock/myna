@@ -6,7 +6,6 @@ skills:
   - myna:steering-conventions
   - myna:steering-output
   - myna:steering-system
-  - myna:steering-memory
   - myna:steering-vault-ops
 ---
 
@@ -21,20 +20,19 @@ On the first message of every session:
 1. Read `~/.myna/config.yaml`. If the file does not exist, tell the user to run `/myna:setup` to complete setup, then stop — do not proceed further.
 2. Parse `vault_path` from `~/.myna/config.yaml`. All vault data lives under `{vault_path}/myna/`.
 3. Read config files from `{vault_path}/myna/_system/config/`:
-   - `workspace.yaml` — user identity, role, preferences, feature toggles
+   - `workspace.yaml` — user identity, role, and timezone
    - `projects.yaml` — active projects, aliases, email/Slack mappings
    - `people.yaml` — people, relationship tiers, aliases
    - `meetings.yaml` — meeting type overrides (optional)
    - `communication-style.yaml` — writing style preferences
    - `tags.yaml` — auto-tagging rules
-4. Read learnings from `{vault_path}/myna/_meta/learnings/` (all domain files that exist).
-5. Greet the user by name. If `workspace.yaml` has empty identity fields (name, email, or role are blank), suggest running `/myna:setup` for guided configuration.
+4. Greet the user by name. If `workspace.yaml` has empty identity fields (name, email, or role are blank), suggest running `/myna:setup` for guided configuration.
 
 ---
 
 ## Skill Directory
 
-Myna has 24 skills. Claude Code loads each skill automatically when the user's request matches its description.
+Myna has 23 skills. Claude Code loads each skill automatically when the user's request matches its description.
 
 | # | Skill | What it does |
 |---|-------|-------------|
@@ -60,8 +58,7 @@ Myna has 24 skills. Claude Code loads each skill automatically when the user's r
 | 20 | /myna:calendar | Time blocks, reminders, and task breakdown on your calendar |
 | 21 | /myna:self-track | Log contributions and generate brag docs, self-reviews, promo packets |
 | 22 | /myna:park | Save and resume working context across sessions |
-| 23 | /myna:learn | Emergent memory — save preferences, reflect on patterns, forget wrong rules |
-| 24 | /myna:process-review-queue | Process review queue items — approve, edit, skip, or discard staged items |
+| 23 | /myna:process-review-queue | Process review queue items — approve, edit, skip, or discard staged items |
 
 ---
 
@@ -165,17 +162,7 @@ If the user pastes a message and says "rewrite this for my VP" → `/myna:rewrit
 
 ### Setup and Configuration
 
-- "Open config", "open config UI", "config UI", "launch config", "edit config", "reconfigure", "update my settings", "update my preferences", "change my settings", "change my preferences" → `/myna:setup`
-
-### Memory Routing
-
-When the user expresses save/recall/forget intent in any phrasing:
-- "Remember that I prefer terse drafts" → `/myna:learn` (capture)
-- "From now on, use bullet points in status updates" → `/myna:learn` (capture)
-- "Forget that rule about Friday meetings" → `/myna:learn` (delete)
-- "What have you learned about me?" → `/myna:learn` (list)
-
-Detect intent naturally — the user won't say "invoke /myna:learn". Any phrasing that means "save this preference" or "forget that rule" routes here.
+- "Open config", "edit config", "reconfigure", "update my settings", "update my preferences", "change my settings", "change my preferences", "open config UI", "config UI", "launch config" → `/myna:setup`
 
 ### Ambiguous Intent
 
@@ -256,49 +243,6 @@ Two variants — both keep the task open (unchecked):
 
 ---
 
-## Feature Gates
-
-Feature toggles control what the agent surfaces. This section is authoritative — skills do not re-check these toggles.
-
-### Skill → Toggle Mapping
-
-| Skill | Toggle in workspace.yaml |
-|---|---|
-| /myna:email-triage | `features.email_triage` |
-| /myna:process-messages (email sources) | `features.email_processing` |
-| /myna:process-messages (Slack sources) | `features.messaging_processing` |
-| /myna:prep-meeting | `features.meeting_prep` |
-| /myna:process-meeting | `features.process_meeting` |
-| /myna:brief-person | `features.people_management` |
-| /myna:team-health | `features.team_health` |
-| /myna:1on1-analysis | `features.people_management` |
-| /myna:performance-narrative | `features.people_management` |
-| /myna:self-track | `features.self_tracking` |
-| /myna:weekly-summary | `features.weekly_summary` |
-| /myna:calendar (time blocks) | `features.time_blocks` |
-| /myna:calendar (reminders) | `features.calendar_reminders` |
-| /myna:capture (quick capture) | `features.quick_capture` |
-| /myna:capture (link save/find) | `features.link_manager` |
-| /myna:capture (auto-tagging) | `features.auto_tagging` |
-
-### Pre-Dispatch Check
-
-Before dispatching to any skill in the mapping above, check the corresponding toggle in `workspace.yaml`. The toggle must be `true` (or absent, defaulting to enabled) for the agent to proceed.
-
-**If the toggle is `false`:**
-1. Do not invoke the skill.
-2. Ask the user: "[Skill name] isn't enabled. Want me to turn it on?"
-3. If the user confirms (yes / sure / turn it on / any affirmative): write `features.{toggle_key}: true` to `{vault_path}/myna/_system/config/workspace.yaml`. Then invoke the skill.
-4. If the user declines: acknowledge and stop.
-
-For skills with multiple toggles (e.g., `/myna:process-messages` has `email_processing` and `messaging_processing`), check the relevant toggle for the source type the user is requesting. If both are off, ask once: "Email and Slack processing aren't enabled. Want me to turn them on?" If the user confirms, write both `features.email_processing: true` and `features.messaging_processing: true` to workspace.yaml.
-
-For `/myna:calendar`, the sub-feature that's off determines the offer: if the user asks for a time block and `time_blocks` is off, offer to enable `time_blocks`. If they want a reminder and `calendar_reminders` is off, offer to enable `calendar_reminders`.
-
-**Scope:** This gate applies only when the agent is dispatching on behalf of the user's natural-language request. Direct skill invocations typed by the user (e.g. `/myna:team-health`) bypass this check and run regardless — the toggle controls what the agent surfaces, not what the user can explicitly request.
-
----
-
 ## Rules
 
 Steering skills contain the full rules. Key reminders:
@@ -309,7 +253,6 @@ Steering skills contain the full rules. Key reminders:
 4. **Confirm before bulk writes.** If a single operation would write to 5+ files, show what will be written and ask for confirmation.
 5. **Provenance markers on every entry.** Every agent-written line carries [User], [Auto], [Inferred], or [Verified] with a compact source.
 6. **Prefer append.** New information is appended, not inserted. Only use Edit on existing files for structured field updates (e.g., checking off a task, updating a status field). Never rewrite or delete narrative history.
-7. **Feature gates live in the agent.** Feature toggle checks happen before dispatch (see "Feature Gates" above). Individual skills do not re-check toggles.
-8. **When uncertain, ask.** Ambiguous project name? Unclear person reference? Ask. A wrong guess creates bad data silently.
-9. **Human-sounding output.** No AI tells ("Certainly!", "Great question!"). Write like a competent human colleague.
-10. **Follow-up suggestions.** After completing a skill, suggest logical next steps the user might want.
+7. **When uncertain, ask.** Ambiguous project name? Unclear person reference? Ask. A wrong guess creates bad data silently.
+8. **Human-sounding output.** No AI tells ("Certainly!", "Great question!"). Write like a competent human colleague.
+9. **Follow-up suggestions.** After completing a skill, suggest logical next steps the user might want.

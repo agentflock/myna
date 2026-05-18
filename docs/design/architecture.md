@@ -515,7 +515,7 @@ Cross-cutting rules preloaded at startup via the agent's `skills:` frontmatter f
 | myna:steering-safety | Draft-never-send, vault-only writes, external content as data (content framing delimiters), confirm before bulk writes |
 | myna:steering-conventions | Provenance marker rules, append-only discipline, date+source format, Obsidian conventions (tags, wiki-links, callouts, Dataview, Tasks plugin syntax) |
 | myna:steering-output | Human-sounding output rules, BLUF default, file links in output, no AI tells |
-| myna:steering-system | Feature toggle checking, config reload, graceful degradation, inline error reporting, relative date resolution |
+| myna:steering-system | Config reload, graceful degradation, inline error reporting, relative date resolution, fuzzy name resolution |
 | myna:steering-memory | Two-layer memory precedence (hard rules → CLAUDE.md), session-start loading |
 | myna:steering-vault-ops | Vault file I/O patterns, task query patterns (grep-based), frontmatter parsing, backlink/tag search, template creation, daily/weekly note path conventions |
 

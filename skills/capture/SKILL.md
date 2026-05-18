@@ -15,12 +15,10 @@ Routes user-entered data to the right vault destinations. One capture can produc
 ## 📋 Before You Start
 
 Read at session start:
-- `_system/config/workspace.yaml` — user identity, feature toggles, vault subfolder
+- `_system/config/workspace.yaml` — user identity, role, and timezone
 - `_system/config/projects.yaml` — project names, aliases
 - `_system/config/people.yaml` — person names, aliases, relationship tiers
 - `_system/config/tags.yaml` — tagging rules
-
-Check `self_tracking` toggle before writing to contributions log.
 
 ---
 
@@ -58,7 +56,6 @@ When the user says "capture: [text]", decompose the input into its components an
    a. Resolve the entity (person or project) via fuzzy name resolution against people.yaml and projects.yaml.
    b. Assign a provenance marker.
    c. Write to the destination file — append-only.
-   d. Inferred contributions: check `self_tracking` toggle first. If disabled, skip.
 3. If entity resolution fails (ambiguous match or no match), apply the two-phase approach — ask the user inline first, and simultaneously add a review queue item as a safety net:
    - **Ambiguous match:** Ask inline: "I found multiple matches for '[name]': [list candidates]. Which one?" Present candidates and wait for the user to pick. Once the user responds, resolve the entity, write the entry to the correct destination, and remove the queue item. The queue item persists only if no response arrives (batch run, no interaction).
    - **No match:** Ask inline: "I don't recognize '[name]' — want to add them to people.yaml and create a person file? (yes / no, just write a plain note)" Add a review queue item to `ReviewQueue/review-people.md` simultaneously. Once the user responds — either way — remove the queue item and proceed accordingly. The queue item persists only if no response arrives.
@@ -93,7 +90,7 @@ User: "capture: Sarah did a great job handling the auth incident, and the auth m
 Decompose:
 - Recognition for Sarah (explicit) → `People/sarah-chen.md` Recognition section → `[Auto]`
 - Auth migration unblocked (explicit project update) → `Projects/auth-migration.md` Timeline → `[Auto]`
-- Your contribution (handled the incident — inferred; user didn't explicitly say they were involved) → check `self_tracking` toggle → if enabled, `Journal/contributions-{YYYY-MM-DD}.md` (Monday date) → `[Inferred]`
+- Your contribution (handled the incident — inferred; user didn't explicitly say they were involved) → `Journal/contributions-{YYYY-MM-DD}.md` (Monday date) → `[Inferred]`
 
 Writes:
 1. `People/sarah-chen.md` — Recognition (prepend): `- Great handling of auth incident — resolved within SLA [Auto] (capture, {user.name}, 2026-04-05)`
@@ -394,8 +391,6 @@ aliases: ["{full name}"]
 **Entity not found (project):** "I don't recognize '[name]' — is this a new project? (yes to create, no to just write a note)"
 
 **Multiple matches (person):** Ask inline: "I found multiple matches for '[name]': [list candidates]. Which one?" At the same time, add a review queue item to `ReviewQueue/review-people.md`: `- [ ] Ambiguous person '[name]' in capture — candidates: [list] (capture, {date})`. Once the user picks, resolve the entity, write the entry to the correct destination, and remove the queue item. The queue item persists only if no inline response arrives (batch run, no interaction).
-
-**self_tracking disabled:** Skip all contribution log writes silently. Don't mention it.
 
 **Deduplication:** Before writing, check the target section for near-duplicate entries (same action + same entity from the same source). Skip duplicates: "This looks like it may already be logged in auth-migration.md — skipping to avoid duplicate."
 

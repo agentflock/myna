@@ -136,11 +136,10 @@ function populateForms() {
   populateCalendar();
   populateIntegrations();
   populateCommunication();
-  populateFeatures();
   populateProjects();
   populatePeople();
   // Attach help listeners for all static tabs now that DOM is ready
-  ['identity', 'calendar', 'communication', 'integrations', 'features'].forEach(tab => attachHelpListeners(tab));
+  ['identity', 'calendar', 'communication', 'integrations'].forEach(tab => attachHelpListeners(tab));
   // Re-render help panel in case the active tab has no listeners yet
   renderHelpPanel(activeTab);
   attachHelpListeners(activeTab);
@@ -218,11 +217,7 @@ function populateCalendar() {
 
 function populateIntegrations() {
   const ws      = window.config.workspace || {};
-  const mcp     = ws.mcp_servers || {};
   const triage  = (window.config.projects || {}).triage || {};
-  setValue('mcp-email',                  mcp.email    || '');
-  setValue('mcp-calendar',               mcp.calendar || '');
-  setValue('mcp-slack',                  mcp.slack    || '');
   setValue('triage-inbox-source',        triage.inbox_source         || 'INBOX');
   setValue('triage-draft-replies-folder',triage.draft_replies_folder || 'DraftReplies');
   setValue('email-processed-folder',     (ws.email || {}).processed_folder || '');
@@ -285,14 +280,6 @@ function setCommStyleValue(selectId, value) {
   }
 }
 
-function populateFeatures() {
-  const features = (window.config.workspace || {}).features || {};
-  document.querySelectorAll('#tab-features input[type="checkbox"][id^="feat-"]').forEach(el => {
-    const key = el.id.replace(/^feat-/, '');
-    el.checked = features[key] !== false; // default true if missing
-  });
-}
-
 // ── Overview rendering ─────────────────────────────────────────────────────
 
 function renderOverview() {
@@ -302,7 +289,6 @@ function renderOverview() {
   renderCalendarCard();
   renderIntegrationsCard();
   renderCommunicationCard();
-  renderFeaturesCard();
   renderProjectsCard();
   renderPeopleCard();
 }
@@ -341,19 +327,24 @@ function renderCalendarCard() {
 }
 
 function renderIntegrationsCard() {
-  const mcp = (window.config.workspace || {}).mcp_servers || {};
   const body = document.getElementById('overview-integrations-body');
   const badge = document.getElementById('badge-integrations');
 
-  const configured = Object.entries(mcp).filter(([, v]) => v);
-  const isConfigured = configured.length > 0;
-  setBadge(badge, isConfigured ? (configured.length === 3 ? 'configured' : 'partial') : 'empty',
-    isConfigured ? `${configured.length}/3 connected` : 'None');
+  const triage = (window.config.projects || {}).triage || {};
+  const ws = window.config.workspace || {};
+  const hasInboxSource = !!(triage.inbox_source);
+  const hasProcessedFolder = !!(ws.email && ws.email.processed_folder);
+  const isConfigured = hasInboxSource || hasProcessedFolder;
 
-  if (configured.length > 0) {
-    body.innerHTML = configured.map(([k, v]) => kv(formatMcpKey(k), v)).join('');
+  setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? 'Configured' : 'None');
+
+  if (isConfigured) {
+    const lines = [];
+    if (hasInboxSource) lines.push(kv('Inbox source', triage.inbox_source));
+    if (hasProcessedFolder) lines.push(kv('Processed folder', ws.email.processed_folder));
+    body.innerHTML = lines.join('');
   } else {
-    body.innerHTML = '<span class="text-slate-400 text-sm">No MCP servers configured</span>';
+    body.innerHTML = '<span class="text-slate-400 text-sm">Not configured</span>';
   }
 }
 
@@ -370,25 +361,6 @@ function renderCommunicationCard() {
   } else {
     body.innerHTML = '<span class="text-slate-400 text-sm">Not configured</span>';
   }
-}
-
-function renderFeaturesCard() {
-  const features = (window.config.workspace || {}).features || {};
-  const body  = document.getElementById('overview-features-body');
-  const badge = document.getElementById('badge-features');
-
-  // Count from DOM — authoritative list, defaults missing keys to enabled
-  const allToggles = Array.from(document.querySelectorAll('#tab-features input[type="checkbox"][id^="feat-"]'));
-  const total   = allToggles.length;
-  const enabled = allToggles.filter(el => {
-    const key = el.id.replace(/^feat-/, '');
-    return features[key] !== false;
-  }).length;
-
-  setBadge(badge, total > 0 ? 'configured' : 'empty', total > 0 ? `${enabled}/${total} on` : 'Not set');
-  body.innerHTML = total > 0
-    ? kv('Enabled', `${enabled} of ${total} features`)
-    : '<span class="text-slate-400 text-sm">Not configured</span>';
 }
 
 function renderProjectsCard() {
@@ -428,7 +400,6 @@ function getTabData(tabName) {
   if (tabName === 'calendar')      return getCalendarData();
   if (tabName === 'integrations')  return getIntegrationsData();
   if (tabName === 'communication') return getCommunicationData();
-  if (tabName === 'features')      return getFeaturesData();
   if (tabName === 'projects')      return { projects: collectProjectsData() };
   if (tabName === 'people')        return { people: collectPeopleData() };
   return null;
@@ -481,17 +452,12 @@ function getCalendarData() {
 }
 
 function getIntegrationsData() {
-  // Returns workspace data (MCP servers + email.processed_folder).
+  // Returns workspace data (email.processed_folder).
   // projects.triage fields are saved separately via saveIntegrationsTriageData().
   const existing = deepClone(window.config && window.config.workspace || {});
   const processedFolder = document.getElementById('email-processed-folder').value.trim();
   return {
     ...existing,
-    mcp_servers: {
-      email:    document.getElementById('mcp-email').value.trim(),
-      calendar: document.getElementById('mcp-calendar').value.trim(),
-      slack:    document.getElementById('mcp-slack').value.trim(),
-    },
     email: {
       ...(existing.email || {}),
       processed_folder: processedFolder,
@@ -552,23 +518,12 @@ function getCommStyleValue(selectId) {
   return sel.value;
 }
 
-function getFeaturesData() {
-  const existing = deepClone(window.config && window.config.workspace || {});
-  const features = {};
-  document.querySelectorAll('#tab-features input[type="checkbox"][id^="feat-"]').forEach(el => {
-    const key = el.id.replace(/^feat-/, '');
-    features[key] = el.checked;
-  });
-  return { ...existing, features };
-}
-
 // ── Save handler ───────────────────────────────────────────────────────────
 
 const CONFIG_NAME_MAP = {
   identity:      'workspace',
   calendar:      'workspace',
   integrations:  'workspace',
-  features:      'workspace',
   communication: 'communication-style',
   projects:      'projects',
   people:        'people',
@@ -1878,51 +1833,6 @@ const HELP_CONTENT = {
       { id: 'email-processed-folder',      label: 'Processed email folder',    desc: 'Folder where Myna moves emails after triage to prevent reprocessing.' },
     ],
   },
-  features: {
-    intro: 'Toggle individual Myna capabilities on or off. Disabled features are silently skipped — no errors, no partial output. Start with the features you need most and enable others as you get comfortable.',
-    fields: [
-      // Email & Messaging
-      { id: 'feat-email_processing',        label: 'Email processing',              desc: 'Reads incoming emails and files them into project notes with action items extracted. Requires an Email MCP server.' },
-      { id: 'feat-messaging_processing',    label: 'Messaging processing',          desc: 'Processes Slack messages and DMs to extract action items and decisions, then routes them to project files.' },
-      { id: 'feat-email_triage',            label: 'Email triage',                  desc: 'Sorts your inbox into four folders: Reply, FYI, Follow-Up, and Schedule — so you always know what needs action.' },
-      // Meetings
-      { id: 'feat-meeting_prep',            label: 'Meeting prep',                  desc: 'Generates a prep brief before each meeting, pulling in relevant project context, open items, and attendee notes.' },
-      { id: 'feat-process_meeting',         label: 'Process meeting',               desc: 'After a meeting, extracts decisions and action items from your notes and closes them out in project files.' },
-      { id: 'feat-meeting_summaries',       label: 'Meeting summaries from email',  desc: 'Automatically imports Zoom or Teams AI-generated summaries into your meeting files so notes and decisions are captured without manual copying.' },
-      // Calendar
-      { id: 'feat-time_blocks',             label: 'Time blocks',                   desc: 'Creates labelled focus-time events on your calendar so your day is protected. Uses the Calendar MCP server.' },
-      { id: 'feat-calendar_reminders',      label: 'Calendar reminders',            desc: 'Sets calendar reminders for tasks and follow-ups that have deadlines. Requires a Calendar MCP server.' },
-      // People & Team
-      { id: 'feat-people_management',       label: 'People management',             desc: 'Maintains a person file for each team member — logs interactions, open items, and context over time.' },
-      { id: 'feat-team_health',             label: 'Team health',                   desc: 'Adds a team health snapshot to your weekly summary: who has open blockers, who you haven\'t connected with recently. Enable if you have direct reports.' },
-      { id: 'feat-attention_gap_detection', label: 'Attention gap detection',       desc: 'Flags direct reports or key people you haven\'t interacted with in longer than your configured attention interval.' },
-      { id: 'feat-feedback_gap_detection',  label: 'Feedback gap detection',        desc: 'Alerts you when a feedback cycle is overdue for a direct report based on your configured feedback cadence.' },
-      { id: 'feat-milestones',              label: 'Milestones',                    desc: 'Surfaces birthdays and work anniversaries in the daily note so you can acknowledge them in the moment.' },
-      { id: 'feat-observations_logging',    label: 'Observations & feedback logging', desc: 'Logs observations, feedback given, and coaching moments to each person file — builds longitudinal context over time.' },
-      { id: 'feat-recognition_tracking',    label: 'Recognition tracking',          desc: 'Tracks recognition you give and receive, and surfaces it at self-review time. Useful for building a full picture of team contributions.' },
-      { id: 'feat-person_briefing',         label: 'Person briefing',               desc: 'Generates a briefing on any person before a meeting or conversation — recent interactions, open items, shared projects, and context.' },
-      { id: 'feat-one_on_one_analysis',     label: '1:1 pattern analysis',          desc: 'Analyzes patterns across your 1:1 meetings with a person — recurring topics, action item follow-through, and relationship health.' },
-      { id: 'feat-performance_narrative',   label: 'Performance narrative',         desc: 'Generates a performance review narrative for a team member from logged observations, feedback, and contributions.' },
-      // Tracking
-      { id: 'feat-self_tracking',           label: 'Self-tracking',                 desc: 'Maintains a brag doc of your contributions and can generate self-review documents at performance-cycle time.' },
-      { id: 'feat-contribution_detection',  label: 'Contribution detection',        desc: 'Automatically scans your activity and logs notable contributions to your brag doc without you needing to capture them manually.' },
-      // Summaries
-      { id: 'feat-weekly_summary',          label: 'Weekly summary',                desc: 'Generates a structured summary of the week\'s work — decisions made, items shipped, and things still in flight.' },
-      { id: 'feat-monthly_updates',         label: 'Monthly updates',               desc: 'Drafts a monthly status update suitable for sharing with your manager or leadership team.' },
-      // Writing & Drafts
-      { id: 'feat-email_draft_reply',       label: 'Email draft reply',             desc: 'Drafts a reply to an email thread with full context — project files, open items, and your communication style applied.' },
-      { id: 'feat-message_rewriting',       label: 'Message rewriting',             desc: 'Rewrites a draft message for tone, clarity, or audience — from direct-and-concise to diplomatic, or from casual to formal.' },
-      { id: 'feat-document_processing',     label: 'Document processing',           desc: 'Extracts action items, decisions, and key context from documents, PRDs, or specs and routes them to the right project files.' },
-      { id: 'feat-pre_read_prep',           label: 'Pre-read preparation',          desc: 'Generates a briefing before you read a long document — what it is, why it matters, and what to watch for.' },
-      { id: 'feat-difficult_conversation',  label: 'Difficult conversation prep',   desc: 'Helps you prepare for high-stakes or challenging conversations — structures the key points and anticipates likely responses.' },
-      { id: 'feat-help_me_say_no',          label: 'Help me say no',                desc: 'Drafts a diplomatic decline for a request, meeting invite, or commitment — maintains the relationship while holding the boundary.' },
-      // Context
-      { id: 'feat-park_resume',             label: 'Park & resume',                 desc: 'Saves your working context (open items, current focus, recent decisions) so you can resume exactly where you left off in a new session.' },
-      { id: 'feat-quick_capture',           label: 'Quick capture',                 desc: 'Routes anything you say to the right place — task, observation, project note, or idea — without you specifying the destination.' },
-      { id: 'feat-link_manager',            label: 'Link manager',                  desc: 'Saves and retrieves links organized by project or person, so references stay findable alongside the context they belong to.' },
-      { id: 'feat-auto_tagging',            label: 'Auto-tagging',                  desc: 'Automatically adds project and person tags to new entries based on context, so your vault stays organized without manual taxonomy.' },
-    ],
-  },
   overview: {
     intro: 'A summary of your current Myna configuration. Click any section to navigate directly to its settings.',
     fields: [],
@@ -2028,18 +1938,6 @@ function attachHelpListeners(tabName) {
     }
   });
 
-  // Feature toggles: checkboxes inside <label> don't reliably fire focus via
-  // label/track clicks. Use click on the entire feature-row instead.
-  if (tabName === 'features') {
-    panel.querySelectorAll('.feature-row').forEach(row => {
-      const checkbox = row.querySelector('input[type="checkbox"]');
-      if (!checkbox) return;
-      const helpId = resolveHelpId(checkbox, tabName, fieldIds);
-      if (!helpId) return;
-      row.addEventListener('click', () => highlightHelpField(helpId));
-    });
-  }
-
   if (!isDynamic) helpListenersAttached.add(tabName);
 }
 
@@ -2069,7 +1967,6 @@ function resolveHelpId(el, tabName, fieldIds) {
     'person-feedback-cycle': 'person-feedback-cycle',
     'person-birthday':       'person-birthday',
     'person-anniversary':    'person-anniversary',
-    // Feature toggle inputs all use feat-* ids
   };
 
   for (const [cls, helpId] of Object.entries(classMap)) {
@@ -2114,7 +2011,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const el = document.getElementById(helpId);
       if (!el) return;
-      // Scroll the row (for feature toggles) or the element itself into view
+      // Scroll the nearest containing row or the element itself into view
       const scrollTarget = el.closest('.feature-row') || el.closest('.field-group') || el;
       scrollTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
       el.focus();
@@ -2178,9 +2075,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── Features: attach save-on-change to every feat-* checkbox dynamically
-  // so that any future toggles added to the HTML are automatically wired up.
-  document.querySelectorAll('#tab-features input[type="checkbox"][id^="feat-"]').forEach(el => {
-    el.addEventListener('change', () => saveTab('features'));
-  });
 });

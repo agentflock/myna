@@ -64,47 +64,6 @@ triage:
 
 feedback_cycle_days: 30
 calendar_event_prefix: "[Myna]"
-
-mcp_servers:
-  email: gmail-mcp
-  slack: slack-mcp
-  calendar: gcal-mcp
-
-prompt_logging: true
-
-features:
-  email_processing: true
-  messaging_processing: true
-  email_triage: true
-  meeting_prep: true
-  process_meeting: true
-  time_blocks: true
-  calendar_reminders: true
-  people_management: true
-  self_tracking: true
-  team_health: true
-  attention_gap_detection: true
-  feedback_gap_detection: true
-  contribution_detection: true
-  milestones: true
-  observations_logging: true
-  recognition_tracking: true
-  person_briefing: true
-  one_on_one_analysis: true
-  performance_narrative: true
-  weekly_summary: true
-  monthly_updates: true
-  park_resume: true
-  meeting_summaries: true
-  email_draft_reply: true
-  message_rewriting: true
-  document_processing: true
-  pre_read_prep: true
-  difficult_conversation: true
-  help_me_say_no: true
-  quick_capture: true
-  link_manager: true
-  auto_tagging: true
 """
 
 PROJECTS_YAML = """\
@@ -250,14 +209,6 @@ class TestBasicParsing(unittest.TestCase):
         try:
             data = load(path)
             self.assertEqual(data["user"]["name"], "Alex Johnson")
-        finally:
-            os.unlink(path)
-
-    def test_workspace_email_processing_toggle(self):
-        path = _write_tmp(WORKSPACE_YAML)
-        try:
-            data = load(path)
-            self.assertIs(data["features"]["email_processing"], True)
         finally:
             os.unlink(path)
 
@@ -573,14 +524,6 @@ class TestFixtureValues(unittest.TestCase):
         try:
             data = load(path)
             self.assertEqual(data["calendar_event_prefix"], "[Myna]")
-        finally:
-            os.unlink(path)
-
-    def test_workspace_prompt_logging_is_bool(self):
-        path = _write_tmp(WORKSPACE_YAML)
-        try:
-            data = load(path)
-            self.assertIs(data["prompt_logging"], True)
         finally:
             os.unlink(path)
 

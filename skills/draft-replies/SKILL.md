@@ -21,7 +21,7 @@ All drafts are for user review — never sent automatically.
 ## Before You Start
 
 Read:
-- `_system/config/workspace.yaml` — user identity, feature toggles
+- `_system/config/workspace.yaml` — user identity, role, and timezone
 - `_system/config/projects.yaml` — get `triage.draft_replies_folder` value
 - `_system/config/communication-style.yaml` — tone presets, sign-offs, style preferences
 - `_system/config/people.yaml` — relationship tiers, aliases

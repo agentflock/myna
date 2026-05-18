@@ -63,6 +63,9 @@ Load `workspace.yaml` to identify the user's own name/email for sender-matching.
 ```
 Unreplied Threads — [date]
 
+### Summary
+[2-3 sentences: total unreplied count split between waiting-on-you and waiting-on-others, and the most overdue or highest-priority thread if any stands out. Synthesize only what's in the vault — do not infer urgency beyond what's recorded.]
+
 Waiting On You ([count])
 - **[person]** — [what you need to reply to] — [X days] — [email/slack]
 

@@ -12,10 +12,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Kiro by transforming frontmatter and scaffolding the vault. Refactors `install/claude.sh`
   to share vault setup logic via `install/lib.sh`.
 
+### Removed
+
+- Learn skill (`/myna:learn`) and emergent memory system. Memory routing now defers to Claude's native memory — say "remember this" and Claude handles it directly without a vault skill.
+
 ### Changed
 
+- Weekly summary output now opens with a narrative summary lead-in synthesizing the week's headline before the breakdown sections. Cleaned up several stale UI and doc references to removed features (prompt logging, delegation/dependency task types, worked examples).
 - Removed prompt_logging config — redundant with Claude Code conversation history and unreliable as a steering-skill instruction
-- Feature toggles are now checked once by the agent before dispatching to a skill, rather than individually inside each skill. When a feature is off and the user invokes it, the agent asks "X isn't enabled — want me to turn it on?" and writes the toggle directly to workspace.yaml on confirmation.
+- Removed the feature-toggle system. Myna now ships an always-on skill set; the `features:` block in workspace.yaml, the Features tab in the Config UI, and the agent's pre-dispatch toggle check are gone. Explicit invocation controls what runs; MCP and data availability drive degradation.
 - Journal folder now shows only the current daily, weekly, and monthly note — older notes move to archive automatically when new ones are created
 - [Fixed] Team health is now available to any role with direct reports — no longer restricted to Engineering Manager
 - Customization override model: per-skill overrides now live at `~/.myna/overrides/skills/myna-{skill-name}.md` and routing overrides at `~/.myna/overrides/routing.md`, replacing the `CUSTOM.md` and `custom-routing.md` files from v1.0.0. Users who set up customizations under the old model will need to migrate their files to the new paths.
@@ -24,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- 24 feature skills covering the full Chief of Staff workflow: email triage, message processing, draft replies, meeting prep and processing, project and person briefings, team health, 1:1 analysis, unreplied thread tracking, blocker scanning, performance narrative, drafting, rewriting, quick capture, calendar time blocks, self-tracking, context parking, emergent memory, and review queue processing.
+- 24 feature skills covering the full Chief of Staff workflow: email triage, message processing, draft replies, meeting prep and processing, project and person briefings, team health, 1:1 analysis, unreplied thread tracking, blocker scanning, performance narrative, drafting, rewriting, quick capture, calendar time blocks, self-tracking, context parking, and review queue processing.
 - 6 steering skills loaded at session start: safety and containment, data conventions, output quality, system behavior, memory model, and vault operations. These enforce cross-cutting rules (draft-never-send, vault-only writes, provenance markers, append-only discipline) without repeating them in every feature skill.
 - Install script (`install.sh`) that copies skills to `~/.claude/skills/`, generates the agent file at `~/.claude/agents/myna.md`, and creates the vault folder structure with config stubs.
 - Vault templates for all entity types: daily note, weekly note, project, person, 1:1 meeting, recurring meeting, ad-hoc meeting, draft, review queue, contributions, and dashboard.

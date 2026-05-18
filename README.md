@@ -117,12 +117,11 @@ Your data, configs, and custom rules are never touched by updates.
 ## Skills
 
 ### Daily Workflow
-`sync` · `capture` · `plan` · `park` / `resume` · `learn` · `wrap up` · `weekly summary`
+`sync` · `capture` · `plan` · `park` / `resume` · `wrap up` · `weekly summary`
 
 > *"sync"* — daily note, meeting prep, overdue tasks, review queue surfaced
 > *"park this"* / *"resume auth caching"* — zero-loss context switching across sessions
 > *"what should I focus on today?"* — ranked priorities with reasoning
-> *"remember that I prefer bullet points in status updates"* — Myna learns your preferences over time
 > *"weekly summary"* — accomplishments, decisions, blockers, tasks completed, self-reflection prompts
 
 ### Email & Messaging

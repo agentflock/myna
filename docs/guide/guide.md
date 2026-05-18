@@ -95,7 +95,7 @@ Steering skills are always active. You don't invoke them directly.
 | **myna-steering-conventions** | Data provenance markers, date format, Obsidian formatting |
 | **myna-steering-output** | Human voice, BLUF for professional writing, output density |
 | **myna-steering-vault-ops** | File I/O patterns, task queries, frontmatter, vault path conventions |
-| **myna-steering-system** | Feature toggles, config reload, graceful degradation, error recovery |
+| **myna-steering-system** | Config reload, graceful degradation, error recovery, date resolution |
 | **myna-steering-memory** | Two-layer memory precedence, session-start loading |
 
 ---
@@ -121,6 +121,7 @@ The primary config file. Required — Myna reads it at every session start.
 | `email.processed_folder` | `per-project` (email moves to each project's Processed/ subfolder) |
 | `feedback_cycle_days` | Days between feedback gap alerts (default: 30) |
 | `calendar_event_prefix` | Prefix on all Myna-created calendar events (default: `[Myna]`) |
+
 ### projects.yaml
 
 One entry per active project. Myna uses this to route emails, Slack messages, and prompts to the right project file.

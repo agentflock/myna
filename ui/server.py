@@ -46,8 +46,6 @@ CONFIG_DEFAULTS = {
         "vault": {"path": "", "subfolder": "myna"},
         "timezone": "",
         "work_hours": {"start": "09:00", "end": "17:00"},
-        "mcp_servers": {"email": "", "slack": "", "calendar": ""},
-        "features": {},
     },
     "projects": {
         "projects": [],

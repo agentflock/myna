@@ -30,6 +30,3 @@ calendar_event_types:
   focus: Focus
   task: Task
   reminder: Reminder
-
-# System settings
-prompt_logging: true

@@ -1,6 +1,6 @@
 # Prompt Log
 
-> Append-only log of user prompts. Enabled by `prompt_logging: true` in workspace.yaml.
+> Sample prompt log fixture for testing.
 
 - [2026-04-06 08:42] sync
 - [2026-04-06 09:14] process my email
