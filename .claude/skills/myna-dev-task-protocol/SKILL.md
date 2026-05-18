@@ -160,7 +160,7 @@ Done — [N] review round(s) — tmp/[feature]/reviews/[short-name]-r1.md[, [sho
 Unresolved: [list each issue briefly] — tmp/[feature]/reviews/[short-name]-r1.md, [short-name]-r2.md, [short-name]-r3.md
 ```
 
-**If any files changed beyond what your T-N brief suggested:** append to the report:
+**If the files you changed differ from what your T-N brief suggested** (extra files touched, or suggested files not needed), append to the report:
 ```
-Also changed: [file1], [file2]
+File changes vs. brief: [extra: file1, file2 | skipped: file3 — reason]
 ```

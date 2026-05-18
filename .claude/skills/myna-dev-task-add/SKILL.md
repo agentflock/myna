@@ -80,7 +80,7 @@ The `changelog-line` field is only required when `changelog: yes`. Format: `- [A
 
 **Context:** only what the implementer genuinely needs that they couldn't find from reading the skill file. Don't pad this.
 
-**Suggested files:** paths, not descriptions. If you don't know, omit — don't guess.
+**Suggested files:** paths, not descriptions — orientation for the implementer, not a requirement. If you don't know, omit. The implementer uses their own judgment if the right change belongs elsewhere.
 
 **Done when:** specific and verifiable. These become the `--criteria` for the review subagent. "The skill correctly handles X" is not verifiable. "The skill's Step 3 reads `_system/config/workspace.yaml` before writing" is verifiable.
 

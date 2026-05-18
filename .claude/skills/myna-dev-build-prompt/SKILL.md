@@ -74,7 +74,7 @@ Read the conversation, extract what you need, and resolve ambiguity before doing
 What was settled? List each as a clear statement. These go into the prompt as "already decided — do not re-debate."
 
 ### 1b. Tasks
-What needs to change? Identify every file that needs creating, editing, or updating. Group by logical unit of work, not by file.
+What needs to change? Identify the key components or areas involved — describe what each task must solve. Name the most obvious files as orientation, not as an exhaustive list. The task subagent will read the actual files and decide if the right change belongs somewhere else.
 
 ### 1c. Verify against reality
 Read the actual files that will be edited. Check whether the brainstorm's assumptions about file structure, naming, and current state are correct.
@@ -344,7 +344,7 @@ Write `tmp/[feature]/[prefix]-summary.md`:
 [Per task: N Critical, N Important found in r1 — resolved/unresolved by final round]
 
 ## Notes
-[Judgment calls: any files changed beyond the suggested list, approach deviations, unresolved issues, conflicts resolved]
+[Judgment calls: any files changed beyond the suggested list, any suggested files not touched and why, approach deviations, unresolved issues, conflicts resolved]
 ```
 
 Then print the final output to the user:

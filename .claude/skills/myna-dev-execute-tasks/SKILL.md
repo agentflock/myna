@@ -1,7 +1,7 @@
 ---
 name: myna-dev-execute-tasks
 description: |
-  Run the Myna dev task queue — reads pending tasks from tmp/tasks.md, executes them sequentially on a single fix branch, each with its own implement→review→fix loop, then creates one PR. Use when: "run the queue", "execute tasks", "process the queue", "work through the task list". Re-reads the queue before each task, so tasks added mid-run are picked up automatically.
+  Run the Myna dev task queue — reads pending tasks from tmp/tasks.md, executes them sequentially on a single branch, each with its own implement→review→fix loop, then creates one PR. Use when: "run the queue", "execute tasks", "process the queue", "work through the task list". Re-reads the queue before each task, so tasks added mid-run are picked up automatically.
 user-invocable: true
 allowed-tools:
   - Read
@@ -43,17 +43,15 @@ Found [N] pending task(s):
 
 ## Step 2 — Create the Branch
 
-Get today's date:
+Get the current date and time:
 ```bash
-date +%Y-%m-%d
+date +%m%d-%H%M
 ```
 
-Try `fix/[date]`:
+Create `queue/[datetime]`:
 ```bash
-git checkout -b fix/[date] 2>/dev/null && echo "ok" || echo "exists"
+git checkout -b queue/[datetime]
 ```
-
-If exists, try `fix/[date]-2`, `fix/[date]-3`, etc. until one succeeds.
 
 Record the branch name — all tasks run on this branch.
 
@@ -63,14 +61,14 @@ Record the branch name — all tasks run on this branch.
 
 Create the run folder and log:
 ```bash
-mkdir -p tmp/[date]/reviews
+mkdir -p tmp/[datetime]/reviews
 ```
 
-Write `tmp/[date]/run.md`:
+Write `tmp/[datetime]/run.md`:
 ```markdown
-# Queue run — [date]
+# Queue run — [datetime]
 
-**Branch:** fix/[date]
+**Branch:** queue/[datetime]
 
 ## Tasks
 | # | Title | Status | Review rounds | Reports |
@@ -112,7 +110,7 @@ Save this SHA as `BEFORE_SHA` for this task. This scopes the review diff to only
 
 #### 4c. Update run log — mark in progress
 
-Update the task's row in `tmp/[date]/run.md` to `in-progress`.
+Update the task's row in `tmp/[datetime]/run.md` to `in-progress`.
 
 #### 4d. Spawn the task subagent
 
@@ -126,9 +124,9 @@ You are a Myna dev task subagent. Implement the task below, then invoke /myna-de
 ---
 
 After implementing, invoke:
-/myna-dev-task-protocol --branch fix/[date] --base [BEFORE_SHA] --criteria "[done-when assertions as comma-separated string]" --short-name [short-name] --feature [date] --commit-msg "[type]([scope]): [description]"
+/myna-dev-task-protocol --branch queue/[datetime] --base [BEFORE_SHA] --criteria "[done-when assertions as comma-separated string]" --short-name [short-name] --feature [datetime] --commit-msg "[type]([scope]): [description]"
 
-Branch fix/[date] already exists and you are already on it — do not create it.
+Branch queue/[datetime] already exists and you are already on it — do not create it.
 
 Report back exactly as implement-task instructs: "Done — [N] round(s) — [paths]" or "Unresolved: [list] — [paths]".
 ```
@@ -143,13 +141,13 @@ Wait for the subagent to complete and report back.
 
 **If "Done":**
 - Update `tmp/tasks.md` table row: status → `done`, fill in review rounds and report paths
-- Update `tmp/[date]/run.md` table row: same
+- Update `tmp/[datetime]/run.md` table row: same
 - **Changelog:** if the task's `changelog` field is `yes` and a `changelog-line` field is present, append that line to the `[Unreleased]` section in `CHANGELOG.md` at the repo root. Read the current `[Unreleased]` block, append the line under it, and write back. Do this once per task at completion — not per commit within the task. Skip silently if `changelog: no` or the field is absent.
 - Continue to the next task
 
 **If "Unresolved":**
 - Update `tmp/tasks.md` table row: status → `failed`, fill in report paths
-- Update `tmp/[date]/run.md` table row: same; add to Notes section: "Task [#] failed: [unresolved issues]"
+- Update `tmp/[datetime]/run.md` table row: same; add to Notes section: "Task [#] failed: [unresolved issues]"
 - Continue to the next task — do not block the queue
 
 **If subagent errors or does not complete:**
@@ -161,12 +159,12 @@ Wait for the subagent to complete and report back.
 
 ## Step 5 — Write the Summary
 
-After all pending tasks have been processed, write `tmp/[date]/summary.md`:
+After all pending tasks have been processed, write `tmp/[datetime]/summary.md`:
 
 ```markdown
-# Queue run — [date]
+# Queue run — [datetime]
 
-**Branch:** fix/[date]
+**Branch:** queue/[datetime]
 **Tasks processed:** [N]
 
 ## Results
@@ -193,11 +191,11 @@ After writing the summary, move all `done` tasks out of `tmp/tasks.md`. Failed a
 ```bash
 mkdir -p tmp/archive
 ```
-Start with `tmp/archive/tasks-[date].md`. If it exists, try `tasks-[date]-2.md`, `tasks-[date]-3.md`, etc. until one is free.
+Start with `tmp/archive/tasks-[datetime].md`. If it exists, try `tasks-[datetime]-2.md`, `tasks-[datetime]-3.md`, etc. until one is free.
 
 **Write the archive file** using the same format as `tasks.md` — table header, then one row per done task, then the full `## Task N — [Title]` body sections for each done task. Include a header line at the top:
 ```markdown
-# Archived tasks — [date] run
+# Archived tasks — [datetime] run
 
 [table with done task rows only]
 
@@ -219,14 +217,14 @@ Do not renumber remaining tasks — preserve original task numbers.
 **If all tasks are done (no failures):**
 
 ```bash
-git push origin fix/[date]
+git push origin queue/[datetime]
 ```
 
 ```bash
 gh pr create \
-  --title "fix: queue run [date] — [N] tasks" \
+  --title "chore: queue run [datetime] — [N] tasks" \
   --body "$(cat <<'EOF'
-## Queue run [date]
+## Queue run [datetime]
 
 [N] task(s) completed.
 
@@ -238,10 +236,10 @@ gh pr create \
 [Brief: total findings across all tasks, all resolved]
 
 ### Files changed
-[git diff main...fix/[date] --name-only output]
+[git diff main...queue/[datetime] --name-only output]
 
-Run log: tmp/[date]/run.md
-Summary: tmp/[date]/summary.md
+Run log: tmp/[datetime]/run.md
+Summary: tmp/[datetime]/summary.md
 EOF
 )"
 ```
@@ -257,10 +255,10 @@ Queue run complete — [N] done, [M] failed.
 Failed tasks:
 - Task [#]: [Title] — [unresolved issues] — [report paths]
 
-The branch fix/[date] has been pushed with the completed tasks.
+The branch queue/[datetime] has been pushed with the completed tasks.
 Failed tasks remain in tmp/tasks.md — fix them and run the queue again, or remove them if no longer needed.
 
-Summary: tmp/[date]/summary.md
+Summary: tmp/[datetime]/summary.md
 ```
 
 ---
@@ -268,7 +266,7 @@ Summary: tmp/[date]/summary.md
 ## What You Do Not Do
 
 - Do not implement tasks yourself — every task goes to a subagent.
-- Do not create per-task branches — all tasks run on `fix/[date]`.
+- Do not create per-task branches — all tasks run on `queue/[datetime]`.
 - Do not merge anything to main — the PR is for human review.
 - Do not stop the queue when a task fails — continue with the remaining tasks.
 - Do not re-read the queue at the start and never again — re-read before each task.
