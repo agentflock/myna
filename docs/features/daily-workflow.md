@@ -129,5 +129,5 @@ One-line summary: Single aggregated view of everything across the vault, always 
 
 - Obsidian-native file at `Dashboards/dashboard.md` with live Dataview queries
 - Always up-to-date — no refresh needed
-- Sections: Immediate Attention, Today's Meetings, Review Queue count, Active Projects with status, Delegation Tracker (overdue/approaching), People Overview (upcoming 1:1s, feedback gaps), Team Health (for managers — see people-management Team Health Overview), Current Drafts with lifecycle state, Recent Activity
+- Sections: Immediate Attention, Today's Meetings, Review Queue count, Active Projects with status, Reply-Needed items (overdue/approaching), People Overview (upcoming 1:1s, feedback gaps), Team Health (for managers — see people-management Team Health Overview), Current Drafts with lifecycle state, Recent Activity
 
