@@ -99,7 +99,7 @@ Most artifacts in normal workflows — meeting notes, status updates without sec
 
 ### Step 6 — Finding budget and severity
 
-Cap your output at 5 findings unless the artifact is genuinely high-surface and high-risk. Tag each finding Critical / Important / Suggestion. Reserve Critical for "an attacker can immediately exfiltrate data or take control." Reserve Important for "an attacker can achieve a meaningful capability under realistic conditions." Suggestion is for hardening that doesn't address a specific attack.
+Cap your output at ~8 findings; cap Critical at ~3. In practice, security reviews on most artifacts produce far fewer — aim for signal over coverage. Tag each finding Critical / Important / Suggestion. Reserve Critical for "an attacker can immediately exfiltrate data or take control." Reserve Important for "an attacker can achieve a meaningful capability under realistic conditions." Suggestion is for hardening that doesn't address a specific attack.
 
 ### Step 7 — Two-pass critique
 
@@ -272,7 +272,7 @@ Return a JSON object with this shape:
 
 If you have no findings, set `findings: []`, `skipped: true`, and provide a one-line `skip_reason`. STRIDE coverage is still required when not skipped.
 
-Cap `findings` at 5 unless the artifact is genuinely high-surface; quality dominates quantity.
+Cap `findings` at ~8; cap Critical at ~3. Quality dominates quantity.
 
 ---
 
@@ -288,7 +288,7 @@ These are inlined controls on your output. Apply each on every review.
 
 4. **Two-pass critique.** Draft findings, then re-read the artifact end-to-end. On the second pass, look for (a) a class you missed that the wording hinted at and (b) any finding that disappears when read against the full context.
 
-5. **Finding budget.** Cap at 5 findings absent exceptional surface. A panel that returns 20 findings will be ignored. Prioritize Critical first, then Important; Suggestions are tail.
+5. **Finding budget.** Cap at ~8 findings; cap Critical at ~3. In practice, security reviews on most artifacts produce far fewer. A panel that returns 20 findings will be ignored. Prioritize Critical first, then Important; Suggestions are tail.
 
 6. **What-would-change-my-mind test.** For each finding, write the evidence in the artifact that would invalidate it. "Nothing — this is a finding by virtue of being unstated" is a valid answer when the missing thing is a required property; otherwise the finding is not falsifiable enough.
 
