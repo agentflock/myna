@@ -54,16 +54,6 @@ The user's voice, structure, and intent stay completely intact. A light touch.
 2. Return the corrected message with a one-line note on what changed ("Fixed 3 grammar issues, clarified one run-on sentence.").
 3. No audience lookup needed.
 
-**Worked example:**
-
-User: "Fix this — 'hey sarah just wanted to check in on the api spec, its been 2 weeks since we last talked about and wanted to see where your at with it'"
-
-Output:
-```
-Hey Sarah — just checking in on the API spec. It's been two weeks since we last talked about it, and I wanted to see where you're at.
-```
-*Fixed: capitalization, missing word ("about it"), contractions (its → it's, your → you're), removed redundant phrasing.*
-
 ---
 
 ### Tone

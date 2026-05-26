@@ -62,7 +62,6 @@ After install, Myna creates the following folder structure inside your vault's `
 | Skill | Description |
 |-------|-------------|
 | **myna-sync** | Set up or refresh your day — creates daily note, generates meeting prep, surfaces overdue tasks and review queue. Handles "plan tomorrow" and weekly note creation. |
-| **myna-plan** | Planning advice — analyzes workload, meetings, and tasks. Three modes: Plan Day, Priority Coaching, Week Optimization. Never writes to vault. |
 | **myna-wrap-up** | Close out your day — compares planned vs actual, logs contributions, moves unfinished items to tomorrow. |
 | **myna-weekly-summary** | Summarize your week — synthesizes daily notes, contributions, decisions, and task completions. Includes team health snapshot for managers. |
 | **myna-email-triage** | Sort inbox emails into folders. Three-step flow: read inbox, write recommendations, then process triage to move emails. |

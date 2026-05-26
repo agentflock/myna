@@ -1,9 +1,9 @@
 ---
 name: capture
 disable-model-invocation: true
-description: Route user input to vault destinations — quick capture, observations, recognition, tasks (single or recurring), links (save or find), project/person file management. One input can produce multiple entries.
+description: Route user input to vault destinations — quick capture, observations, recognition, tasks (single or recurring), project/person file management. One input can produce multiple entries. For saving or finding links, use /myna:links.
 user-invocable: true
-argument-hint: "capture: [anything] | observation about [person]: [text] | add task: [description] | create recurring task: [description] | save link: [url] for [entity] | update status of [project]"
+argument-hint: "capture: [anything] | observation about [person]: [text] | add task: [description] | create recurring task: [description] | update status of [project]"
 ---
 
 If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:setup` and stop.
@@ -39,10 +39,9 @@ When the user says "capture: [text]", decompose the input into its components an
 **Every relevant destination gets its own entry.** If the same capture maps to three destinations, write three entries. Report each one.
 
 **Provenance markers on captures:**
-- User typed it directly → `[User]`
-- Item is explicitly stated → `[Auto]` (e.g., "Sarah did a great job" → recognition is explicit)
-- Item requires interpretation → `[Inferred]` (e.g., if Sarah resolved a blocker, you might have contributed — that's inferred)
-- Genuinely ambiguous (can't determine destination) → review queue
+- Destination (project or person) is clear from what the user wrote → `[User]`
+- Destination was guessed by Claude (ambiguous project or person name) → `[Inferred]`
+- Genuinely ambiguous (can't determine destination at all) → review queue
 
 ---
 
@@ -58,29 +57,29 @@ When the user says "capture: [text]", decompose the input into its components an
    c. Write to the destination file — append-only.
 3. If entity resolution fails (ambiguous match or no match), apply the two-phase approach — ask the user inline first, and simultaneously add a review queue item as a safety net:
    - **Ambiguous match:** Ask inline: "I found multiple matches for '[name]': [list candidates]. Which one?" Present candidates and wait for the user to pick. Once the user responds, resolve the entity, write the entry to the correct destination, and remove the queue item. The queue item persists only if no response arrives (batch run, no interaction).
-   - **No match:** Ask inline: "I don't recognize '[name]' — want to add them to people.yaml and create a person file? (yes / no, just write a plain note)" Add a review queue item to `ReviewQueue/review-people.md` simultaneously. Once the user responds — either way — remove the queue item and proceed accordingly. The queue item persists only if no response arrives.
+   - **No match:** Ask inline: "I don't recognize '[name]' — want to create it? (yes / no, just write a plain note)". Add a review queue item simultaneously (person → `ReviewQueue/review-people.md`, project → `ReviewQueue/review-work.md`). Once the user responds — either way — remove the queue item and proceed. The queue item persists only if no response arrives.
 4. Report all destinations written.
 
 **Entry formats by destination:**
 
 **Project timeline** (prepend to `## Timeline` — newest-first):
 ```
-- {content} [Auto] (capture, {user.name}, {YYYY-MM-DD})
+- {content} [User] (capture, {user.name}, {YYYY-MM-DD})
 ```
 
 **Person Recognition** (prepend to `## Recognition` — newest-first):
 ```
-- {what they did} — {context} [Auto] (capture, {user.name}, {YYYY-MM-DD})
+- {what they did} — {context} [User] (capture, {user.name}, {YYYY-MM-DD})
 ```
 
 **Person Observation** (prepend to `## Observations` — newest-first):
 ```
-- **{strength|growth-area|contribution}:** {observation} [Auto] (capture, {user.name}, {YYYY-MM-DD})
+- **{strength|growth-area|contribution}:** {observation} [User] (capture, {user.name}, {YYYY-MM-DD})
 ```
 
 **Contributions log** (prepend to `## Contributions — Week of {YYYY-MM-DD}` in `Journal/contributions-{YYYY-MM-DD}.md` — Monday date, newest-first):
 ```
-- **{category}:** {description} [Inferred] (capture, {user.name}, {YYYY-MM-DD})
+- **{category}:** {description} [User] (capture, {user.name}, {YYYY-MM-DD})
 ```
 
 **Worked example:**
@@ -88,16 +87,15 @@ When the user says "capture: [text]", decompose the input into its components an
 User: "capture: Sarah did a great job handling the auth incident, and the auth migration is now unblocked"
 
 Decompose:
-- Recognition for Sarah (explicit) → `People/sarah-chen.md` Recognition section → `[Auto]`
-- Auth migration unblocked (explicit project update) → `Projects/auth-migration.md` Timeline → `[Auto]`
-- Your contribution (handled the incident — inferred; user didn't explicitly say they were involved) → `Journal/contributions-{YYYY-MM-DD}.md` (Monday date) → `[Inferred]`
+- Recognition for Sarah (explicit) → `People/sarah-chen.md` Recognition section → `[User]`
+- Auth migration unblocked (explicit project update) → `Projects/auth-migration.md` Timeline → `[User]`
+- No first-person language → no user contribution inferred
 
 Writes:
-1. `People/sarah-chen.md` — Recognition (prepend): `- Great handling of auth incident — resolved within SLA [Auto] (capture, {user.name}, 2026-04-05)`
-2. `Projects/auth-migration.md` — Timeline (prepend): `- Blocker resolved — migration unblocked [Auto] (capture, {user.name}, 2026-04-05)`
-3. `Journal/contributions-2026-03-30.md` — Contributions (prepend): `- **unblocking-others:** Contributed to resolving auth migration blocker [Inferred] (capture, {user.name}, 2026-04-05)`
+1. `People/sarah-chen.md` — Recognition (prepend): `- Great handling of auth incident — resolved within SLA [User] (capture, {user.name}, 2026-04-05)`
+2. `Projects/auth-migration.md` — Timeline (prepend): `- Blocker resolved — migration unblocked [User] (capture, {user.name}, 2026-04-05)`
 
-Output: "Wrote 3 entries: recognition for Sarah, timeline update for auth migration, contribution logged [Inferred]."
+Output: "Wrote 2 entries: recognition for Sarah, timeline update for auth migration."
 
 ---
 
@@ -125,15 +123,6 @@ Output: "Wrote 3 entries: recognition for Sarah, timeline update for auth migrat
 ```
 - {observation} — Coaching note: {framing} [User] (capture, {YYYY-MM-DD})
 ```
-
-**Worked example:**
-
-User: "observation about Alex: he consistently delivers accurate effort estimates — his sprint commitments almost always match actual completion."
-
-1. Resolve: Alex → `People/alex-kumar.md`, tier: peer.
-2. Type: strength (explicit praise).
-3. Prepend to Observations: `- **strength:** Consistently accurate effort estimates — sprint commitments match actuals [User] (capture, {user.name}, 2026-04-05)`
-4. No pending feedback needed (positive observation, nothing to coach).
 
 ---
 
@@ -166,11 +155,11 @@ Different from the observation capture above: this is a recognition entry specif
    - Type: task (default), reply-needed (if "need a reply from...")
    - Person (for tasks with an owner or tasks assigned to others)
 2. Mark each field as `explicit` or `(inferred)`.
-3. **Write directly if all fields are explicit.** If any field is inferred, add `[review-status:: pending]` and write to review queue.
+3. **Write directly if all fields are explicit.** If any field is inferred: add the task with `[review-status:: pending]` to the destination AND add a review queue item to `ReviewQueue/review-work.md` immediately, then ask the user inline to clarify the inferred fields. If the user resolves it, update the task, remove `[review-status:: pending]`, and remove the queue item. If no response, the queue item persists as the safety net.
 
 **Task format:**
 ```
-- [ ] {title} 📅 {YYYY-MM-DD} ⏫ [project:: {name}] [type:: {task|reply-needed}] [person:: {name}] [effort:: {estimate}] [review-status:: pending] [Auto] (capture, {date})
+- [ ] {title} 📅 {YYYY-MM-DD} ⏫ [project:: {name}] [type:: {task|reply-needed}] [person:: {name}] [effort:: {estimate}] [review-status:: pending] [User] (capture, {date})
 ```
 
 Include only fields that have values.
@@ -186,7 +175,7 @@ When the user specifies a project AND a person for a task (e.g., "Add task 'revi
 - Project tasks with an explicit owner (`[type:: task]` with a named person): `[person:: [[{their-name}]]]`
 - Tasks assigned to others or reply-needed: `[person:: [[{their-name}]]]` using the name as it appears in people.yaml
 
-**Destination:** Project file at `Projects/{project-slug}.md` — prepend to `## Tasks` section (newest-first raw task storage). Or the daily note if no project association.
+**Destination:** Project file at `Projects/{project-slug}.md` — prepend to `## Tasks` section (newest-first raw task storage). If no project is specified, ask the user which project before writing.
 
 **Worked examples:**
 
@@ -200,11 +189,11 @@ Parse:
 - Person: not specified (user is the owner — self-assigned)
 
 If project can't be inferred:
-Ask: "Which project is this for? Or should I add it to your personal tasks?"
+Ask: "Which project is this for? Or would you like to create a personal project for standalone tasks like this?"
 
 If user says "auth migration":
 ```
-- [ ] Review Sarah's design doc 📅 2026-04-11 ⏫ [project:: [[Auth Migration]]] [type:: task] [person:: [[Sam Bennett]]] [Auto] (capture)
+- [ ] Review Sarah's design doc 📅 2026-04-11 ⏫ [project:: [[Auth Migration]]] [type:: task] [person:: [[Sam Bennett]]] [User] (capture)
 ```
 
 All fields explicit → write directly, no review queue.
@@ -218,7 +207,7 @@ Parse:
 - Type: task
 
 ```
-- [ ] Review PR [project:: [[Project Alpha]]] [type:: task] [person:: [[Sarah Chen]]] [Auto] (capture)
+- [ ] Review PR [project:: [[Project Alpha]]] [type:: task] [person:: [[Sarah Chen]]] [User] (capture)
 ```
 
 User: "hand the onboarding doc review to Sarah"
@@ -229,7 +218,7 @@ Parse:
 - Type: task (person field carries ownership)
 
 ```
-- [ ] Onboarding doc review [project:: [[{project}]]] [type:: task] [person:: [[Sarah Chen]]] [Auto] (capture)
+- [ ] Onboarding doc review [project:: [[{project}]]] [type:: task] [person:: [[Sarah Chen]]] [User] (capture)
 ```
 
 ---
@@ -252,62 +241,6 @@ Parse:
 ```
 - [ ] {title} 🔁 every {interval} [project:: [[{name}]]] [type:: task] [person:: [[{user.name}]]] [User] (capture, {date})
 ```
-
-**Worked example:**
-
-User: "Create recurring task: weekly team status update, every Monday"
-
-```
-- [ ] Weekly team status update 🔁 every week [type:: task] [person:: [[Sam Bennett]]] [User] (capture)
-```
-
----
-
-## 🔗 Link Manager
-
-**Trigger:** "save link: [url] for [entity]", "save this link: [url]", "save link: [context] [url]"
-
-**How:**
-1. Extract the URL and any context the user provided.
-2. Resolve the entity (project, person, meeting) from the context using fuzzy name resolution.
-   - If entity is explicit ("for auth migration") → match to project.
-   - If context clues exist ("save this dashboard — we use it for incident reviews") → infer entity.
-   - If no context and no match → save to `_system/links.md` only (general reference).
-3. Write to two places:
-   a. Entity's `## Links` section (if entity resolved)
-   b. `_system/links.md` → central index
-
-**Entity Links section entry:**
-```
-- [{YYYY-MM-DD}] [{title}]({url}) — {description}
-```
-
-**Central index entry** (`_system/links.md`):
-```
-- [{YYYY-MM-DD}] [{title}]({url}) — {description} — {entity: [[Projects/project-slug]] or [[People/person-slug]] or general}
-```
-
-**Worked example:**
-
-User: "save link: https://runbook.internal/auth-migration for auth migration"
-
-1. Resolve: auth migration → `Projects/auth-migration.md`
-2. Infer title from URL (or ask user if unclear): "Auth Migration Runbook"
-3. Write to `Projects/auth-migration.md` Links section:
-   `- [2026-04-05] [Auth Migration Runbook](https://runbook.internal/auth-migration) — runbook`
-4. Write to `_system/links.md`:
-   `- [2026-04-05] [Auth Migration Runbook](https://runbook.internal/auth-migration) — runbook — [[Projects/auth-migration]]`
-
-Output: "Saved link to auth-migration.md and central index."
-
-### Find Link
-
-**Trigger:** "find link: [query]", "do I have a link for [entity/topic]?"
-
-**How:**
-1. Search `_system/links.md` for entries matching the query (title, description, or entity).
-2. Also search the `## Links` section of the resolved entity file (if entity is named).
-3. Return matching entries inline. If no matches: "No saved links found for '[query]'."
 
 ---
 
@@ -388,7 +321,7 @@ aliases: ["{full name}"]
 
 **Entity not found (person):** Ask inline: "I don't recognize '[name]' — want to add them to people.yaml and create a person file? (yes / no, just write a plain note)". At the same time, add a review queue item to `ReviewQueue/review-people.md`: `- [ ] Unknown person '[name]' mentioned in capture — create person file or update people.yaml (capture, {date})`. Once the user responds — either way — remove the queue item and proceed accordingly (create person file, or write entry to daily note as plain note). The queue item persists only if no inline response arrives (batch run, no interaction).
 
-**Entity not found (project):** "I don't recognize '[name]' — is this a new project? (yes to create, no to just write a note)"
+**Entity not found (project):** Ask inline: "I don't recognize '[name]' — is this a new project? (yes to create, no to just write a note)". At the same time, add a review queue item to `ReviewQueue/review-work.md`: `- [ ] Unknown project '[name]' mentioned in capture — create project file or update projects.yaml (capture, {date})`. Once the user responds — either way — remove the queue item and proceed accordingly (create project file, or write entry to daily note as plain note). The queue item persists only if no inline response arrives.
 
 **Multiple matches (person):** Ask inline: "I found multiple matches for '[name]': [list candidates]. Which one?" At the same time, add a review queue item to `ReviewQueue/review-people.md`: `- [ ] Ambiguous person '[name]' in capture — candidates: [list] (capture, {date})`. Once the user picks, resolve the entity, write the entry to the correct destination, and remove the queue item. The queue item persists only if no inline response arrives (batch run, no interaction).
 

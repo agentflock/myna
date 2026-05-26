@@ -79,8 +79,9 @@ After install, Myna creates the following folder structure inside your vault's `
 | **/myna:performance-narrative** | Generate a performance narrative for a team member's review cycle. Also calibrates consistency across multiple narratives. |
 | **/myna:draft** | Generate professional written content — email replies, follow-ups, status updates, escalations, recognition, monthly updates. |
 | **/myna:rewrite** | Fix, adjust, or restructure existing text. Three modes: fix (grammar), tone (restyle for audience), rewrite (full restructure). |
-| **/myna:capture** | Route input to vault destinations — quick notes, observations, recognition, tasks (single or recurring), links, project/person updates. |
-| **/myna:calendar** | Create personal calendar time blocks, reminders, and task breakdowns. Finds free slots, proposes options, user confirms. |
+| **/myna:capture** | Route input to vault destinations — quick notes, observations, recognition, tasks (single or recurring), project/person updates. |
+| **/myna:links** | Save and find links — saves to the entity file and central index. |
+| **/myna:block-time** | Create personal calendar time blocks and reminders. Finds free slots, proposes options, user confirms. |
 | **/myna:self-track** | Log contributions and generate self-review documents — brag docs, self-reviews, promo packets. Your contributions only. |
 | **/myna:park** | Save working context for zero-loss resumption in a new session. Resume by name or list all parked items. |
 | **/myna:process-review-queue** | Process review queue items across review-work, review-people, and review-self queues — interactively or from pre-checked items. |

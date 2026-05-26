@@ -145,28 +145,6 @@ Output: "Logged: [feedback] Gave feedback to Sarah — added to review queue for
 - "last quarter" → previous quarter
 - "this year" → January 1 to today
 
-**Worked example:**
-
-User: "How much feedback did I give this quarter?"
-
-1. Date range: Q1 2026 (Jan 1 – Mar 31) or Q2 2026 if current.
-2. Glob `Journal/contributions-*.md`, read files in range.
-3. Filter for `feedback` category entries.
-
-Output:
-```
-## 🔍 Feedback — Q1 2026 (8 entries)
-
-**Week of Mar 30:**
-- **feedback:** Gave written feedback to Sarah on API spec quality — focused on error handling coverage; result: Sarah revised error handling section before review [User] (self-track, {user.name}, 2026-04-02)
-
-**Week of Mar 23:**
-- **feedback:** Delivered feedback on estimation accuracy — coaching session [User] (self-track, {user.name}, 2026-03-25)
-- **feedback:** Gave feedback to Marcus on incident communication; result: Marcus updated the post-mortem [User] (self-track, {user.name}, 2026-03-23)
-
-[... 5 more entries]
-```
-
 ---
 
 ## 📄 Self-Narrative Generation

@@ -12,11 +12,6 @@ If vault_path is not in context, read `~/.myna/config.yaml` first. If the file d
 
 Saves context for later resumption. The point: a brand new session should be able to read the parked file and pick up exactly where you left off — zero orientation needed.
 
-## Before You Start
-
-Read at session start:
-- `_system/config/workspace.yaml` — vault path, subfolder
-
 Parked files live at: `_system/parked/{topic-slug}.md`
 
 ---

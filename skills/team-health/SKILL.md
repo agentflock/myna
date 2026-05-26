@@ -1,7 +1,7 @@
 ---
 name: team-health
 disable-model-invocation: true
-description: Portfolio view of all direct reports — tasks, overdue, tasks assigned to them, feedback gap, attention gap, last 1:1. Team-wide glance, not a deep dive (use /myna:brief-person for that). Invoke for "how is my team doing?" or "team health".
+description: Portfolio view of all direct reports — tasks, overdue, tasks assigned to them, feedback gap, attention gap, last 1:1. Team-wide glance, not a deep dive (use /myna:brief-person for that). Use for any team overview or health check: "how is my team doing?", "team health", "how are my directs doing?"
 user-invocable: true
 argument-hint: "[optional: person name to focus on one person]"
 ---
@@ -44,7 +44,7 @@ For each person in people.yaml with `relationship_tier: direct`:
 
 ### Summary
 
-Show a brief narrative summary before the table. 2-3 sentences: who needs the most attention and why, and the overall team picture. All flags are about the user's own records and follow-through — not about any employee's state or engagement (D018). Synthesize only facts present in the vault.
+Show a brief narrative summary before the table. 2-3 sentences, prefer fewer if the picture is clear. Write a real synthesis — who needs the most attention and why, what the overall team picture looks like — not a restatement of the table counts. All flags are about the user's own records and follow-through — not about any employee's state or engagement (D018). Synthesize only facts present in the vault.
 
 ### Summary Table
 
@@ -54,7 +54,7 @@ Show a table after the summary for quick scanning:
 ## 🏥 Team Health — [date]
 
 ### Summary
-[2-3 sentence narrative: who needs most attention and why, overall team picture. Based on the user's records — not inferences about employee state.]
+[2-3 sentences, prefer fewer if the picture is clear. Real synthesis — who needs attention and why, overall team picture. Not a restatement of the table. Based on the user's records — not inferences about employee state.]
 
 | Person | Open | Overdue | Assigned to them | Feedback | Last 1:1 | Attention |
 |--------|------|---------|------------------|----------|----------|-----------|

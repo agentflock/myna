@@ -1,7 +1,7 @@
 ---
 name: process-meeting
 disable-model-invocation: true
-description: Process a completed meeting — reads Prep + Notes, closes checked items, notes unchecked items for carry-forward, extracts tasks/decisions/blockers/observations/recognition/contributions, and routes each to the vault. Distinct from /myna:prep-meeting (which generates content before). Triggered by "done with 1:1 with Sarah", "process this meeting", or "process my meetings".
+description: Process a completed meeting — reads Prep + Notes, closes checked items, notes unchecked items for carry-forward, extracts tasks/decisions/blockers/observations/recognition/contributions, and routes each to the vault. Distinct from /myna:prep-meeting (which generates content before). Use for any post-meeting processing request: "done with 1:1 with X", "process this meeting", "process my meetings".
 user-invocable: true
 argument-hint: '"done with 1:1 with Sarah", "process this meeting", "process my meetings"'
 ---

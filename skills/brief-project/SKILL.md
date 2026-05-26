@@ -1,7 +1,7 @@
 ---
 name: brief-project
 disable-model-invocation: true
-description: Catch me up on a project — quick (3-5 bullet TL;DR) or full (status, timeline, blockers, tasks, dependencies, upcoming meetings). Invoke for "catch me up on [project]", "project status: [project]", "what's happening with [project]".
+description: Catch me up on a project — quick (3-5 bullet TL;DR) or full (status, timeline, blockers, tasks, dependencies, upcoming meetings). Use for any project status or update request: "catch me up on X", "status of X", "how is X going", "where are we with X", "what's the latest on X".
 user-invocable: true
 argument-hint: "[project name] [quick?]"
 ---
@@ -69,7 +69,7 @@ Open with one sentence summarizing the current phase, any active blocker, and ne
 [One sentence: current phase, whether any blocker is active, and next key date. Synthesize only facts present in the vault.]
 
 - [Status and phase — what's being worked on right now]
-- ⚠️ Blocker: [top blocker if any] — [brief context]
+- ⚠️ Blocker: [top blocker if any] — [brief context] (+N more if applicable)
 - 📅 Next: [next milestone or deadline]
 - [Notable recent development, if any]
 ```
@@ -83,14 +83,14 @@ Skip the blocker bullet if there are no open blockers. Skip recent development i
 ```
 ## 📁 [Project Name]
 
-**Status:** [active | paused | complete]  **Last updated:** [date of most recent timeline entry]
+**Status:** [active | paused | complete]  **Last updated:** [date of most recent timeline entry]  **File:** [[Projects/{project-name}]]
 
 **Key People:** [wiki-linked names]
 
 ---
 
 ### 📊 Current State
-[2-3 sentence narrative lead-in: where the project stands, what's actively being worked on, and whether there are blockers or upcoming deadlines. This is the first thing shown — it gives the "so what" before the structured sections. Pull from the most recent timeline entries and overview. Synthesize only facts present in the vault — do not infer status, team sentiment, or trajectory beyond what's recorded.]
+[3-4 sentence narrative lead-in: where the project stands, what's actively being worked on, any open blockers, and upcoming deadlines. Use fewer sentences if the facts are sparse. This is the first thing shown — it gives the "so what" before the structured sections, and should be comprehensive enough that in many cases the user doesn't need to read further. Write a real synthesis — what the situation actually is, what the risk or concern is, what matters most — not a count of items. Pull from the most recent timeline entries and overview. Synthesize only facts present in the vault — do not infer status, team sentiment, or trajectory beyond what's recorded.]	
 
 ### 🚧 Open Blockers
 > [!warning] [Blocker description]
@@ -99,6 +99,8 @@ Skip the blocker bullet if there are no open blockers. Skip recent development i
 [If no blockers: "No open blockers."]
 
 ### 📋 Open Tasks
+
+[X] open ([Y] overdue, [Z] due this week) · [A] assigned to others ([B] overdue)
 
 **Your tasks:**
 - [ ] [task] — due [date] ⏫/🔼
@@ -119,11 +121,6 @@ Group recurring meetings: if the same meeting title appears on multiple days, co
 ### 📜 Recent Timeline (last 5 entries)
 - [[date]] [entry content] [[provenance]] ([source])
 - ...
-
-
-### 📈 Task Summary
-[X] open tasks — [Y] overdue, [Z] due this week
-[A] assigned to others — [B] overdue
 ```
 
 ## Edge Cases

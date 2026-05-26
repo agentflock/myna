@@ -37,8 +37,7 @@ Myna has 23 skills. Claude Code loads each skill automatically when the user's r
 | # | Skill | What it does |
 |---|-------|-------------|
 | 1 | /myna:sync | Set up or refresh your day — daily note, meeting preps, overdue tasks, alerts |
-| 2 | /myna:plan | Planning advice — priorities, capacity, week optimization (no vault writes) |
-| 3 | /myna:wrap-up | Close out the day — planned vs actual, contributions, carry-forward, reflection |
+| 2 | /myna:wrap-up | Close out the day — planned vs actual, contributions, carry-forward, reflection |
 | 4 | /myna:weekly-summary | Weekly summary — synthesize daily notes, contributions, decisions, team health |
 | 5 | /myna:email-triage | Sort inbox emails into folders — recommend, review, then move |
 | 6 | /myna:process-messages | Extract data from email, Slack, or documents and route to the vault |
@@ -51,11 +50,11 @@ Myna has 23 skills. Claude Code loads each skill automatically when the user's r
 | 13 | /myna:unreplied-threads | What's waiting on you and what you're waiting on others for |
 | 14 | /myna:blockers | Scan active projects for blockers and overdue dependencies |
 | 15 | /myna:1on1-analysis | 1:1 pattern analysis — action item trends, recurring topics, carry-forward |
-| 16 | /myna:performance-narrative | Performance narrative and review calibration from vault data |
-| 17 | /myna:draft | Write professional content — replies, status updates, recognition, difficult conversations |
-| 18 | /myna:rewrite | Fix, restyle, or rewrite an existing message for a different audience |
-| 19 | /myna:capture | Log data to the vault — quick capture, observations, tasks, links, status updates |
-| 20 | /myna:calendar | Time blocks, reminders, and task breakdown on your calendar |
+| 16 | /myna:draft | Write professional content — replies, status updates, recognition, difficult conversations |
+| 17 | /myna:rewrite | Fix, restyle, or rewrite an existing message for a different audience |
+| 18 | /myna:capture | Log data to the vault — quick capture, observations, tasks, status updates |
+| 19 | /myna:links | Save and find links — writes to entity file and central index |
+| 20 | /myna:block-time | Personal calendar time blocks and reminders — finds free slots, user confirms |
 | 21 | /myna:self-track | Log contributions and generate brag docs, self-reviews, promo packets |
 | 22 | /myna:park | Save and resume working context across sessions |
 | 23 | /myna:process-review-queue | Process review queue items — approve, edit, skip, or discard staged items |
@@ -81,7 +80,7 @@ When the user says "done with X":
 | User intent | Route to |
 |---|---|
 | Starting the day: "sync", "good morning", "start my day", "set up my day" | /myna:sync |
-| Planning: "what should I focus on?", "plan my day", "am I over-committed?" | /myna:plan |
+| Planning: "what should I focus on?", "plan my day", "am I over-committed?" | /myna:sync |
 | Ending the day: "wrap up", "end of day", "close out today" | /myna:wrap-up |
 | Weekly review: "weekly summary", "how was my week?", "week in review" | /myna:weekly-summary |
 
@@ -112,10 +111,9 @@ These are distinct workflows. Never combine them unless the user explicitly asks
 - "How is my team doing?", "anyone overloaded?", "team overview" → `/myna:team-health` (all directs, dashboard view)
 - "Tell me about Sarah", "what do I know about James?", "brief me on Sarah" → `/myna:brief-person` (one person, deep dive)
 - "How are my 1:1s with Sarah going?", "1:1 trends with Alex", "are we making progress?" → `/myna:1on1-analysis` (pattern analysis over time, one person)
-- "Build Sarah's review narrative", "performance summary for James", "calibrate Sarah's review" → `/myna:performance-narrative` (formal review doc for someone else)
 - "Log contribution: ...", "what did I accomplish this quarter?", "draft my self-review", "build my promo case" → `/myna:self-track` (own contributions — never someone else's)
 
-Key distinctions: if the user names a specific person without a review or 1:1 context → `/myna:brief-person`, not `/myna:team-health`. If it's about the user's own performance → `/myna:self-track`, not `/myna:performance-narrative`.
+Key distinctions: if the user names a specific person without a review or 1:1 context → `/myna:brief-person`, not `/myna:team-health`.
 
 ### Project Status & Blockers
 
@@ -133,7 +131,8 @@ If the user asks about a single project's blockers, use `/myna:brief-project` (i
 
 ### Capture & Processing
 
-- "Capture: [anything]", "observation about Sarah: ...", "add task: ...", "save link: [url]" → `/myna:capture` (user enters data directly; routes it to the right vault destination)
+- "Capture: [anything]", "observation about Sarah: ...", "add task: ..." → `/myna:capture` (user enters data directly; routes it to the right vault destination)
+- "Save link: [url]", "save this link" → `/myna:links`
 - "Process my email", "process Slack messages" → `/myna:process-messages` (extracts structured data from emails/messages already in the vault)
 
 `/myna:capture` is for user-dictated input. `/myna:process-messages` is for parsing external content. Never substitute one for the other.
@@ -156,8 +155,8 @@ If the user pastes a message and says "rewrite this for my VP" → `/myna:rewrit
 
 ### Calendar Routing
 
-- Time-specific requests: "reserve time", "remind me at", "block focus time" → `/myna:calendar`
-- General planning: "what should I focus on?", "plan my day" → `/myna:plan`
+- Time-specific requests: "reserve time", "remind me at", "block focus time" → `/myna:block-time`
+- General planning: "what should I focus on?", "plan my day" → `/myna:sync`
 - Day setup: "sync", "good morning" → `/myna:sync`
 
 ### Setup and Configuration
@@ -210,9 +209,9 @@ These are simple enough that the main agent handles them without activating a sk
 
 "Search: auth migration", "find mentions of OAuth" → run Grep across `{vault_path}/myna/`, group results by folder (Projects, People, Meetings, etc.), show file links.
 
-### Link Find
+### Links
 
-"Find link: MBR Jan" → search `{vault_path}/myna/_system/links.md` and entity link sections for matching URLs. If `links.md` does not exist yet, report that no links have been saved.
+"Save link: [url]", "find link: [query]", "do I have a link for [topic]?" → `/myna:links`
 
 ### Task Completion
 

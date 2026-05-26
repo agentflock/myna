@@ -1,7 +1,7 @@
 ---
 name: email-triage
 disable-model-invocation: true
-description: Sort inbox emails into folders. Three-step flow: reads inbox, writes recommendations to review-inbox.md, then on "process triage" moves approved emails. Classification only — no vault extraction. Triggers: triage inbox, sort inbox, process triage.
+description: Sort inbox emails into folders. Three-step flow: reads inbox, writes recommendations to review-inbox.md, then on "process triage" moves approved emails. Classification only — no vault extraction. Use for any inbox sorting request: "triage inbox", "sort inbox", "process triage".
 user-invocable: true
 argument-hint: '"triage my inbox" or "process triage"'
 ---

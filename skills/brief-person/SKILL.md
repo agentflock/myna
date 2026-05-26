@@ -48,12 +48,12 @@ Show all sections inline. Always include every section — if a section has no d
 ```
 ## 👤 [Person Name] — [Role], [Team]
 
-**Relationship:** [direct | peer | upward | cross-team]
+**Relationship:** [direct | peer | upward | cross-team]  **File:** [[People/{person-slug}]]
 
 ---
 
 ### Summary
-[2-4 sentences covering the person's current situation, most pressing open item (if any), and one key thing to know before meeting with them. Synthesize only facts present in the vault. Do not infer tone, mood, relationship quality, or any internal state.]
+[3-4 sentences covering the person's current situation, most pressing open item (if any), and one key thing to know before meeting with them. Use fewer sentences if the facts are sparse. Write a real synthesis — what's actually going on with this person, what matters most, what to watch — not a count of tasks or interactions. Synthesize only facts present in the vault. Do not infer tone, mood, relationship quality, or any internal state.]
 
 ### Overview
 [Role description and context from person file. 1-2 sentences.]

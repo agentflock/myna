@@ -1,7 +1,7 @@
 ---
 name: blockers
 disable-model-invocation: true
-description: Scan the entire vault for blockers — explicit blocker callouts and overdue tasks. Separates your blockers from tasks assigned to others. Invoke for "what's blocked?", "show me blockers", "any blockers?".
+description: Scan the entire vault for blockers — explicit blocker callouts and overdue tasks. Separates your blockers from tasks assigned to others. Use for any blockers query: "what's blocked?", "show me blockers", "any blockers?", "what's holding things up?"
 user-invocable: true
 argument-hint: "[optional: scope to a specific file or folder]"
 ---

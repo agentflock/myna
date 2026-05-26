@@ -1,7 +1,7 @@
 ---
 name: 1on1-analysis
 disable-model-invocation: true
-description: Analyze 1:1 patterns with a specific person — action item follow-through, recurring topics, carry-forward rate. Reports facts from notes only. Does NOT assess relationship quality. Invoke for "analyze my 1:1s with Sarah", "1:1 trends with Alex", "1:1 patterns".
+description: Analyze 1:1 patterns with a specific person — action item follow-through, recurring topics, carry-forward rate. Reports facts from notes only. Does NOT assess relationship quality. Use for any 1:1 pattern analysis: "analyze my 1:1s with X", "1:1 trends with X", "1:1 patterns", "how are my 1:1s with X going?"
 user-invocable: true
 argument-hint: "[person name]"
 ---
@@ -81,12 +81,12 @@ Carry-forward rate per session = unchecked items / total prep items. Report the 
 ```
 ## 1:1 Analysis — [Person Name]
 
-**Sessions analyzed:** [N] sessions ([date range])
+**Sessions analyzed:** [N] sessions ([date range])  **File:** [[Meetings/1-1s/{person-slug}]]
 
 ---
 
 ### Summary
-[2-4 sentences covering: overall follow-through rate, whether any recurring topics are a concern, and carry-forward trend. Apply the same strict data boundary here: synthesize counts and patterns, not assessments. Do not infer relationship quality, engagement, or morale — report only what the numbers show.]
+[3-4 sentences covering: overall follow-through rate, whether any recurring topics are a concern, and carry-forward trend. Use fewer sentences if the facts are sparse. Write a real synthesis — what the pattern actually means in practice, what stands out, what warrants attention — not a restatement of the counts below. Apply the same strict data boundary: synthesize patterns, not assessments. Do not infer relationship quality, engagement, or morale — report only what the data shows.]
 
 ### Action Item Follow-Through
 

@@ -78,23 +78,7 @@ Sets up or refreshes your day. Creates the daily note (or prepends a new snapsho
 
 ---
 
-#### 2. myna-plan
-
-Provides ephemeral planning advice without writing to the vault. Analyzes your current workload, meetings, and tasks to suggest priorities. Supports day planning, priority coaching, and week optimization.
-
-**Features covered:** Planning: plan day, priority coaching, week optimization (ephemeral inline advice, no vault writes)
-
-**Example invocations:** "what should I focus on today?", "priority coaching", "week optimization", "plan my week", "am I over-committed?"
-
-**Reads:** daily note, calendar MCP, task items, project files, workspace.yaml
-
-**Writes:** inline output only (no vault writes)
-
-**Example:** User says "what should I focus on?" → analyzes: 3 meetings (2 hrs), 6 hrs task effort, 5 hrs focus time → "You're slightly over-capacity. Top 3 priorities: (1) API spec review — due tomorrow, blocks Sarah, (2) follow up with Marcus — assigned task overdue, (3) MBR draft — deferred twice. Consider moving the MBR to Thursday when you have a lighter calendar."
-
----
-
-#### 3. myna-wrap-up
+#### 2. myna-wrap-up
 
 Closes out the day. Compares planned vs actual, logs contributions, moves unfinished items to tomorrow, and saves any behavioral corrections observed during the session to Claude Code memory.
 
@@ -464,7 +448,7 @@ These operations are simple enough that the main agent handles them without acti
 - **Draft deletion:** "delete the MBR draft" → removes the draft file from Drafts/.
 - **Universal Done routing:** "done with X" → resolves X via fuzzy name resolution. If meeting → activates myna-process-meeting. If task → marks complete directly. If draft → updates state directly. If ambiguous → asks (never guesses between a meeting and a task with similar names).
 - **Inbox routing:** "process my inbox", "sort my inbox", "what's in my inbox?" → always routes to myna-email-triage, not myna-process-messages. Inbox = unsorted email that needs classification first.
-- **Planning routing:** Calendar-specific requests ("reserve time", "remind me", "block focus time") → routes to myna-calendar. General planning ("what should I focus on?", "plan my day") → routes to myna-plan. Day setup ("sync", "good morning") → routes to myna-sync.
+- **Planning routing:** Calendar-specific requests ("reserve time", "remind me", "block focus time") → routes to myna-calendar. General planning ("what should I focus on?", "plan my day") → routes to myna-sync. Day setup ("sync", "good morning") → routes to myna-sync.
 - **File creation from template:** "create project file for auth migration" → reads projects.yaml, creates `Projects/auth-migration.md` from template. Same for person files. Simple enough for the main agent.
 
 ---
@@ -871,7 +855,7 @@ All agent content — skills, steering, main agent, config schemas — is plain 
 
 **Agent frontmatter** includes `name: agent`, `description`, and `skills` (listing the 6 steering skills for preloading using `myna:` prefix). Other fields (`model`, `tools`, `mcpServers`, `permissionMode`, `memory`) are omitted so Myna inherits session defaults.
 
-**Invocation model:** Plugin-scoped. `myna:agent` is the agent reference. `/myna:sync`, `/myna:plan`, etc. invoke individual skills. Users can set `alias myna="claude --agent myna:agent"` in their shell for the `myna` shorthand. Update flow: plugin updates are managed by Claude Code's plugin system; vault configs are never touched.
+**Invocation model:** Plugin-scoped. `myna:agent` is the agent reference. `/myna:sync`, `/myna:wrap-up`, etc. invoke individual skills. Users can set `alias myna="claude --agent myna:agent"` in their shell for the `myna` shorthand. Update flow: plugin updates are managed by Claude Code's plugin system; vault configs are never touched.
 
 The previous two-layer architecture (content layer + adapter layer, D038) has been superseded. See D046 for rationale. The previous install-script model (D047, D049) has been superseded by D053 (plugin distribution).
 
