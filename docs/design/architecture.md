@@ -4,9 +4,11 @@
 
 Myna is a set of AI agent instructions that turn Claude Code into a Chief of Staff for tech professionals. The user types natural language prompts inside Claude Code. Myna reads from external sources (email, Slack, calendar) via MCP servers and writes exclusively to a local Obsidian vault under a single `myna/` subfolder. All agent instructions are plain markdown — readable by any LLM, but designed and tested for Claude Code (D045, D046).
 
-Architecturally, Myna is one main agent with 23 skills. The main agent handles routing and simple operations. Cross-cutting rules live in 6 steering skills, preloaded via the subagent's `skills:` frontmatter field. Feature skills are loaded on demand (progressive disclosure — only their name and description are in context until activated). Config lives in 6 YAML files read at session start.
+Architecturally, Myna is one main agent with 24 skills. The main agent handles routing and simple operations. Cross-cutting rules live in 6 steering skills, preloaded via the subagent's `skills:` frontmatter field. Feature skills are loaded on demand (progressive disclosure — only their name and description are in context until activated). Config lives in 6 YAML files read at session start.
 
-There are no subagents in v1. No automatic skill chaining — each skill outputs its result and tells the user what to do next if a follow-up action is needed.
+Skills that require multi-perspective synthesis can invoke persona subagents via the Task tool. Each persona subagent (`agents/myna-reviewer-*.md`) is input-agnostic — it takes a generic content + context contract, applies its reasoning persona, and returns structured findings. The orchestrating skill fans out subagents in parallel and synthesizes their output. See D066 for rationale.
+
+No automatic skill chaining — each skill outputs its result and tells the user what to do next if a follow-up action is needed.
 
 ### How Myna Runs on Claude Code
 
@@ -15,9 +17,10 @@ Myna distributes as a Claude Code plugin (D053). Installation is a single comman
 1. **Plugin install** — `/plugin install myna@agentflock` installs the plugin from the agentflock marketplace. Skills live at `skills/*/SKILL.md` inside the plugin directory. The plugin name is `myna`; the skill namespace is `myna:`.
 2. **Main agent** — `agents/agent.md` contains identity, routing logic, and direct operations. Referenced as `myna:agent`. Frontmatter lists steering skills via the `skills:` field for preloading.
 3. **Steering skills** — 6 skills with `user-invocable: false` preloaded at startup via the agent's `skills:` field. Always in context. Referenced as `myna:steering-safety`, `myna:steering-conventions`, etc.
-4. **Feature skills** — 23 skills at `skills/{name}/SKILL.md` in the plugin directory. Only names and descriptions in context at startup. Full content loaded on demand when invoked as `/myna:{name}`.
-5. **Config** — vault path stored in `~/.myna/config.yaml` (written by `install/claude.sh` on first run via `/myna:setup`). Six YAML config files read at session start from `{vault_path}/{subfolder}/_system/config/`.
-6. **First-time setup** — `/myna:setup` is the single entry point. It runs `install/claude.sh` (vault directory creation and `~/.myna/config.yaml`), then opens the Config UI or doc import for configuration.
+4. **Feature skills** — 24 skills at `skills/{name}/SKILL.md` in the plugin directory. Only names and descriptions in context at startup. Full content loaded on demand when invoked as `/myna:{name}`.
+5. **Reviewer subagents** — 11 persona subagents at `agents/myna-reviewer-*.md`. Each is input-agnostic and reusable across skills. Invoked via the Task tool with a generic content + context contract. First consumer: `review-doc`. (D066)
+6. **Config** — vault path stored in `~/.myna/config.yaml` (written by `install/claude.sh` on first run via `/myna:setup`). Six YAML config files read at session start from `{vault_path}/{subfolder}/_system/config/`.
+7. **First-time setup** — `/myna:setup` is the single entry point. It runs `install/claude.sh` (vault directory creation and `~/.myna/config.yaml`), then opens the Config UI or doc import for configuration.
 
 External MCP servers (email, Slack, calendar) are registered with Claude Code via `claude mcp add` and are available as tools in every session. Skills call MCP tools directly by name. Vault operations use Claude Code's built-in tools guided by the `myna:steering-vault-ops` steering skill — no MCP server required for vault access.
 
@@ -52,6 +55,7 @@ External MCP servers (email, Slack, calendar) are registered with Claude Code vi
 | 21 | self-track | Log contributions and generate self-review docs | "build my promo case" |
 | 22 | park | Save and resume context | "park this" |
 | 23 | process-review-queue | Process review queue items | "review my queue" |
+| 24 | review-doc | Multi-persona review of any technical document | "review this PRFAQ", "review this design doc" |
 
 Skills are invoked as `/myna:{name}` (e.g., `/myna:sync`, `/myna:plan`). The full plugin-qualified form is `myna:{name}`.
 
@@ -505,7 +509,7 @@ Cross-cutting rules preloaded at startup via the agent's `skills:` frontmatter f
 
 ### Feature Skills
 
-23 feature skills at `skills/{name}/SKILL.md` in the plugin directory. At startup, only each skill's name and description are in context (progressive disclosure). When the user's request matches a skill's description — or the user invokes it with `/myna:{name}` plus natural language arguments — Claude Code loads the full SKILL.md content.
+24 feature skills at `skills/{name}/SKILL.md` in the plugin directory. At startup, only each skill's name and description are in context (progressive disclosure). When the user's request matches a skill's description — or the user invokes it with `/myna:{name}` plus natural language arguments — Claude Code loads the full SKILL.md content.
 
 Skills read config files and vault files as needed. Each skill's instructions describe what to do, where to read, where to write, and what rules to follow.
 
@@ -538,6 +542,8 @@ myna/
 │   ├── [Email] Reply to James.md
 │   ├── [Status] Auth Migration April.md
 │   └── ...
+├── Reviews/                     # Doc review reports saved by review-doc skill
+│   └── sources/                 # Preserved source text for paste-type reviews
 ├── Journal/                     # Daily/weekly notes, contributions
 │   ├── 2026-04-05.md                # Daily note ({YYYY-MM-DD}.md)
 │   ├── 2026-W14.md                  # Weekly note ({YYYY-WNN}.md, Monday start)
@@ -848,7 +854,8 @@ All agent content — skills, steering, main agent, config schemas — is plain 
 |----------|--------------------|--------|
 | Main agent | `agents/agent.md` | `myna:agent` |
 | Steering skills (6) | `skills/steering-{name}/SKILL.md` | `myna:steering-{name}` (preloaded) |
-| Feature skills (23) | `skills/{name}/SKILL.md` | `/myna:{name}` (on demand) |
+| Feature skills (24) | `skills/{name}/SKILL.md` | `/myna:{name}` (on demand) |
+| Reviewer subagents (11) | `agents/myna-reviewer-*.md` | Invoked via Task tool by orchestrating skills |
 | Plugin metadata | `.claude-plugin/plugin.json` | Read by Claude Code at install |
 
 **Vault config (`~/.myna/config.yaml`):** Written by `install/claude.sh` on first run (invoked by `/myna:setup`). Stores `vault_path` and `subfolder`. Read at the start of every session. The six user config YAML files live in `{vault_path}/{subfolder}/_system/config/` — these are never overwritten by plugin updates.

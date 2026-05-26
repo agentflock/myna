@@ -9,6 +9,10 @@
 - Vault templates — folder structure, dashboards, config files
 - Customization layer — per-skill override files at `~/.myna/overrides/skills/`, routing overrides at `~/.myna/overrides/routing.md`, user-namespaced skills
 
+**v1.x (shipped)**
+- Document Review skill — multi-persona orchestrated review (PRFAQ, design doc/RFC, HLD, LLD, one-pager, generic) with Chief-of-Staff context layer. Saved to `Reviews/`.
+- Reviewer subagent primitives — 11 input-agnostic persona subagents at `agents/myna-reviewer-*.md` available for cross-skill orchestration (PE, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor).
+
 **v1.x (post-launch)**
 - Config UI — visual setup interface for all config domains
 - Guided onboarding skill — interactive first-run setup via `myna-setup`
@@ -20,7 +24,6 @@
 
 ## Coming Next
 
-- Document review skill — doc-type-specific briefing and review criteria
 - Customizable email triage — user-defined triage rules and folder behaviors
 
 ## Backlog

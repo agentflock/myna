@@ -129,3 +129,18 @@ One-line summary: Prepare you to engage intelligently with a document before a r
 - Written to meeting prep file if tied to a meeting, or standalone note
 - Different from Document Processing: processing extracts data for the vault, pre-read prepares YOU to engage with the content
 
+### Document Review
+
+One-line summary: Multi-persona critique of any technical document — PRFAQ, design doc/RFC, HLD, LLD, one-pager, or generic — synthesized by Myna as Chief of Staff.
+
+- **Six doc types supported:** PRFAQ, design doc/RFC, HLD (high-level design), LLD (low-level design), one-pager, generic. Type detected automatically from filename, headings, or user-stated type.
+- **Panel composition:** each doc type has a default reviewer panel selected from 11 input-agnostic persona subagents (Principal Engineer, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor). User can override: "skip writing feedback", "focus on security", "add the skeptic".
+- **Three modes:**
+  - **Full review** — all assigned personas run in parallel; synthesized multi-section report. Default.
+  - **Quick CoS read** — Myna reads as Chief of Staff only, no subagents; 5-bullet executive summary. Invoked with "quick" or "compact" in the prompt.
+  - **Targeted review** — subset of personas specified by user; same synthesis as full review.
+- **Chief-of-Staff context layer:** Myna layers vault evidence before subagents run (project links, audience tier from `people.yaml`, communication style from `communication-style.yaml`). This context is injected into every subagent's input as a "Myna context" block.
+- **Save by default:** review report written to `Reviews/{YYYY-MM-DD}-{doc-slug}.md` with `type: review` frontmatter. For paste-type reviews, source text preserved at `Reviews/sources/{YYYY-MM-DD}-{doc-slug}.md`. User can say "don't save" to skip.
+- **Input modes:** paste content directly, provide a file path, or provide a URL.
+- **Persona override examples:** "review my PRFAQ", "review this design doc with security focus", "review this LLD, skip writing feedback", "have the PE look at this", "compact review of this one-pager"
+

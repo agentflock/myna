@@ -30,6 +30,8 @@ myna/
 │       ├── Weekly/                   # Previous weekly notes
 │       └── Monthly/                  # Previous monthly notes
 ├── Team/                             # Team health tracking files (managers)
+├── Reviews/                          # Doc review reports saved by review-doc skill
+│   └── sources/                      # Preserved source text for paste-type reviews
 ├── ReviewQueue/
 │   ├── review-work.md                # Ambiguous tasks, decisions, blockers
 │   ├── review-people.md              # Ambiguous observations, recognition
@@ -70,6 +72,8 @@ myna/
 - Draft files: `[{Type}] {topic}.md` (e.g., `[Email] Reply to James.md`, `[Status] Auth Migration April.md`, `[Self] Q1 brag doc.md`). Types: Email, Meeting, Status, Escalation, Recognition, Self, Say-No, Conversation-Prep
 - Source files: match the entity file name (e.g., `_system/sources/auth-migration.md` for `Projects/auth-migration.md`)
 - Parked files: `{topic-slug}.md`
+- Review report files: `Reviews/{YYYY-MM-DD}-{doc-slug}.md` — frontmatter `type: review`. Written by the review-doc skill.
+- Review source files: `Reviews/sources/{YYYY-MM-DD}-{doc-slug}.md` — frontmatter `type: review-source`. Preserved verbatim source for paste-type reviews.
 
 ---
 

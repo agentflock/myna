@@ -26,7 +26,7 @@ Obsidian Vault     Company MCP Servers
 
 When you type a prompt, the Myna agent reads it and determines which skill to invoke. Skills are loaded on demand — at startup, only their names and one-line descriptions are in context. When a skill is triggered, its full instructions are loaded and executed. Cross-cutting rules (safety, output style, vault conventions, memory) live in 6 steering skills that are always preloaded.
 
-Myna has 23 feature skills covering every domain of your workflow, and 6 steering skills that enforce consistent behavior across all of them. Every skill is a plain markdown file — there is no compiled code, no binary, no framework.
+Myna has 24 feature skills covering every domain of your workflow, and 6 steering skills that enforce consistent behavior across all of them. Every skill is a plain markdown file — there is no compiled code, no binary, no framework.
 
 ---
 
@@ -42,6 +42,8 @@ After install, Myna creates the following folder structure inside your vault's `
 | `Meetings/Recurring/` | Files for recurring team meetings |
 | `Meetings/Adhoc/` | Files for one-off meetings |
 | `Drafts/` | Email drafts, message drafts, status updates created by Myna |
+| `Reviews/` | Doc review reports saved by the review-doc skill |
+| `Reviews/sources/` | Preserved source text for paste-type reviews |
 | `Journal/` | Daily notes and weekly notes |
 | `Journal/Archive/` | Previous daily, weekly, and monthly notes (moved automatically when new ones are created) |
 | `Team/` | Team health snapshots (managers only) |
@@ -57,7 +59,7 @@ After install, Myna creates the following folder structure inside your vault's `
 
 ## 4. Skills Reference
 
-### Feature Skills (23)
+### Feature Skills (24)
 
 | Skill | Description |
 |-------|-------------|
@@ -85,6 +87,7 @@ After install, Myna creates the following folder structure inside your vault's `
 | **/myna:self-track** | Log contributions and generate self-review documents — brag docs, self-reviews, promo packets. Your contributions only. |
 | **/myna:park** | Save working context for zero-loss resumption in a new session. Resume by name or list all parked items. |
 | **/myna:process-review-queue** | Process review queue items across review-work, review-people, and review-self queues — interactively or from pre-checked items. |
+| **/myna:review-doc** | Multi-persona review of a technical document (PRFAQ, design doc/RFC, HLD, LLD, one-pager, or generic). Composes the right panel of reviewer subagents, runs them in parallel, layers Myna's CoS context, and saves the synthesized report to `Reviews/`. |
 
 ### Steering Skills (6)
 
