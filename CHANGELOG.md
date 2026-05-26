@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `review-doc` skill — multi-persona doc review with Chief-of-Staff context layer; supports PRFAQ, design doc/RFC, HLD, LLD, one-pager, and generic doc types. Results saved to `Reviews/`.
+- Reviewer subagent primitives — 11 input-agnostic persona subagents at `agents/myna-reviewer-*.md` (PE, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor). Available for cross-skill orchestration via the Task tool.
+- `Reviews/` and `Reviews/sources/` vault folders — created by the install script. `Reviews/` holds doc review reports; `Reviews/sources/` preserves verbatim source text for paste-type reviews.
 - [Added] process-meeting now handles meetings without prep — pass rough notes directly or process a meeting file that has no Prep section
 - Install script for Kiro (`install/kiro.sh` + `install/lib.sh`). Ports Myna's skills to
   Kiro by transforming frontmatter and scaffolding the vault. Refactors `install/claude.sh`

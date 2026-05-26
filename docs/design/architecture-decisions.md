@@ -19,6 +19,15 @@ Each entry:
 
 ---
 
+### D066 — Persona subagents as Myna primitives
+
+**Date:** 2026-05-26
+**Context:** Doc review needed multi-perspective synthesis (PE, SRE, security, product, etc.). Building one large skill that embeds all personas would lose true context isolation, prevent parallel invocation, and force every review to compete for context window. The persona angles are also clearly reusable beyond doc review — draft critique, decision support, status update review all want the same primitives.
+**Decision:** Myna ships persona subagent files at `agents/myna-reviewer-*.md`. Each subagent describes how a specific persona thinks (input-agnostic), takes a generic input contract (content + artifact_type + artifact_subtype + audience + context + focus), and produces structured findings. The first consumer is review-doc (multi-persona doc review). Future Myna skills (draft critique, decision support, etc.) reuse the same subagents.
+**Alternatives rejected:** Embed personas as content in one large skill (loses true context isolation, parallel invocation, per-persona depth). Separate repo for technical thinking primitives (defeats CoS-as-orchestrator framing — Myna IS the coordinator that hands work to specialists). Doc-type-specific skills (review-prfaq, review-lld) instead of orchestrator + personas (combinatorial explosion as lenses and types multiply; personas alone are reusable).
+
+---
+
 ### D065 — Content-first log entry format: category/content before date
 
 **Date:** 2026-05-10

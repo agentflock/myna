@@ -47,7 +47,7 @@ EOF
   fi
 
   # ---------------------------------------------------------------------------
-  # Step 2: Create 17 vault directories
+  # Step 2: Create 19 vault directories
   # ---------------------------------------------------------------------------
 
   local DIRS=(
@@ -57,6 +57,8 @@ EOF
     "Meetings/Recurring"
     "Meetings/Adhoc"
     "Drafts"
+    "Reviews"
+    "Reviews/sources"
     "Journal/Archive/Daily"
     "Journal/Archive/Weekly"
     "Journal/Archive/Monthly"
@@ -74,7 +76,7 @@ EOF
     mkdir -p "$MYNA_ROOT/$dir"
   done
 
-  echo "[2/10] Created 17 vault directories"
+  echo "[2/10] Created 19 vault directories"
 
   # ---------------------------------------------------------------------------
   # Step 3: Create starter YAML config files (only if they do not exist)
