@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- [Added] process-meeting now handles meetings without prep — pass rough notes directly or process a meeting file that has no Prep section
 - Install script for Kiro (`install/kiro.sh` + `install/lib.sh`). Ports Myna's skills to
   Kiro by transforming frontmatter and scaffolding the vault. Refactors `install/claude.sh`
   to share vault setup logic via `install/lib.sh`.
@@ -18,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- [Changed] process-meeting normalizes grammar and expands shorthand in tasks and decisions; preserves close-to-verbatim wording for observations and personal notes
 - Weekly summary output now opens with a narrative summary lead-in synthesizing the week's headline before the breakdown sections. Cleaned up several stale UI and doc references to removed features (prompt logging, delegation/dependency task types, worked examples).
 - Removed prompt_logging config — redundant with Claude Code conversation history and unreliable as a steering-skill instruction
 - Removed the feature-toggle system. Myna now ships an always-on skill set; the `features:` block in workspace.yaml, the Features tab in the Config UI, and the agent's pre-dispatch toggle check are gone. Explicit invocation controls what runs; MCP and data availability drive degradation.

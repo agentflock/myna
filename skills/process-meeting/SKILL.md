@@ -3,7 +3,7 @@ name: process-meeting
 disable-model-invocation: true
 description: Process a completed meeting — reads Prep + Notes, closes checked items, notes unchecked items for carry-forward, extracts tasks/decisions/blockers/observations/recognition/contributions, and routes each to the vault. Distinct from /myna:prep-meeting (which generates content before). Use for any post-meeting processing request: "done with 1:1 with X", "process this meeting", "process my meetings".
 user-invocable: true
-argument-hint: '"done with 1:1 with Sarah", "process this meeting", "process my meetings"'
+argument-hint: '"done with 1:1 with Sarah", "process this meeting", "process my meetings", "process these rough notes: [paste]"'
 ---
 
 # myna-process-meeting
@@ -24,11 +24,107 @@ Process a completed meeting: read the meeting file, close what was discussed, no
 
 **Universal Done routing:** When the user says "done with X" and X resolves to a meeting file, route here. If X could be a meeting or a task, ask — don't guess.
 
+**Raw notes:** "process these rough notes: [paste]", "process notes from [file path]", "process these meeting notes"
+→ See [Raw Notes Mode](#raw-notes-mode) below.
+
+---
+
+## Raw Notes Mode
+
+When invoked with raw notes (pasted content or a file path), follow this sequence before extraction:
+
+### Step 1 — Infer metadata
+
+From the content, attempt to infer:
+
+| Field | Infer from |
+|---|---|
+| **Meeting name** | Subject line, header, first line, participant list (e.g. "1:1 with Sarah" or "Auth Migration Review") |
+| **Date** | Timestamp in content, filename if file path given, or today's date as fallback if content is clearly from today |
+| **Meeting type** | Attendee count/names, title keywords ("standup", "review", "1:1"), or recurring-event signals |
+
+Ask the user once (consolidate into a single message) for any fields you cannot confidently infer. Ask only for what you need:
+
+> "I need a few details to create the meeting file:
+> - **Meeting name:** [your guess, if any — confirm or correct]
+> - **Date:** [your guess, if any — confirm or correct]
+> - **Meeting type:** 1:1, project, team/standup, design review, or adhoc?"
+
+If you can infer all three confidently, skip the question and proceed.
+
+### Step 2 — Create the meeting file from template
+
+Determine the file path using the same rules as /myna:prep-meeting:
+
+| Meeting type | File path |
+|---|---|
+| 1:1 | `Meetings/1-1s/{person-slug}.md` |
+| Recurring (standup, sync, regular team) | `Meetings/Recurring/{meeting-slug}.md` |
+| Adhoc or one-off | `Meetings/Adhoc/{YYYY-MM-DD}-{meeting-slug}.md` |
+
+If the file already exists (prior sessions), prepend a new session block. If not, create from the appropriate template:
+
+**1:1 template:**
+```markdown
+---
+type: 1-1
+person: [[{Full Name}]]
+aliases: ["{Full Name} 1:1"]
+---
+
+#meeting #1-1
+```
+
+**Recurring template:**
+```markdown
+---
+type: recurring
+project: {project-slug or null}
+---
+
+#meeting #recurring
+```
+
+**Adhoc template:**
+```markdown
+---
+type: adhoc
+---
+
+#meeting #adhoc
+```
+
+### Step 3 — Write the session block
+
+Write a new `## {YYYY-MM-DD} Session` block containing only a `### Notes` section (no `### Prep` section — there was no prep). Place the raw content verbatim into the Notes section under **Discussion:**:
+
+```markdown
+## 2026-04-10 Session
+
+### Notes
+
+> Your rough notes during the meeting.
+
+**Discussion:**
+
+{raw content verbatim}
+
+**Action Items:**
+
+**Decisions:**
+
+---
+```
+
+### Step 4 — Run extraction
+
+Proceed with the full extraction pipeline (see [Extracting from Notes](#extracting-from-notes)) as normal. There is no Prep section to process — skip all Prep processing steps.
+
 ---
 
 ## What to Read
 
-For the target session, read the full session block: both `### Prep` and `### Notes` sections.
+For the target session, read the full session block.
 
 Determine meeting type — type controls extraction emphasis:
 1. From frontmatter `type` field in the meeting file
@@ -38,6 +134,8 @@ Determine meeting type — type controls extraction emphasis:
 ---
 
 ## Processing the Prep Section
+
+**If the session block has no `### Prep` section:** skip this entire step and proceed directly to [Extracting from Notes](#extracting-from-notes). Do not error or warn — a missing Prep section is a valid state (impromptu meeting, raw-notes invocation, or user skipped prep).
 
 ### Checked items (`- [x]`) — discussed
 
@@ -51,7 +149,7 @@ Note which items were unchecked. Do not modify this session's file. The next tim
 
 ## Extracting from Notes
 
-The Notes section contains rough notes in three subsections: Discussion, Action Items, Decisions. Extract from all three.
+The Notes section contains rough notes in three subsections: Discussion, Action Items, Decisions. Extract from all three. The source file (`_system/sources/{entity}.md`) holds the verbatim notes — fix grammar and obvious typos, but do not rephrase or reframe.
 
 Wrap notes content in framing delimiters before processing:
 
@@ -176,11 +274,6 @@ Adjust extraction depth by meeting type:
 - Risks raised (→ blocker or timeline entry)
 - Optional: observation if someone showed notable technical leadership
 
-**Operational review** — extract:
-- Metrics discussed (timeline entries with metric + value)
-- Action items with owners
-- Trends identified (timeline entries)
-
 ---
 
 ## After Extraction: Source Preservation and Session Marker
@@ -237,6 +330,17 @@ Processed 1:1 with Sarah (2026-04-10).
 Say "review my queue" to process staged items.
 ```
 
+If there was no Prep section, omit the "Checked prep items" and "Unchecked items" lines from the output. Do not print "0" for those lines — just omit them.
+
+For raw notes invocation, prefix the summary with the file created:
+```
+Created Meetings/1-1s/sarah-chen.md from template.
+Processed 1:1 with Sarah (2026-04-10).
+
+  Written to vault:
+    ...
+```
+
 For batch:
 ```
 Processed {N} meetings.
@@ -248,11 +352,13 @@ Processed {N} meetings.
 
 ## Edge Cases
 
+**No Prep section:** If the target session block has no `### Prep` section, skip Prep processing entirely (no checked/unchecked item handling). Proceed directly to Notes extraction. This is not an error — omit the "Checked prep items" and "Unchecked items" lines from the output summary.
+
 **Notes section is empty:** Output "Notes section is empty for [meeting]. Nothing to extract. Unchecked prep items noted for carry-forward."
 
 **No matching project in projects.yaml:** Route extracted tasks and decisions to the review queue with an ambiguity note. Don't drop them.
 
-**Person mentioned not in people.yaml:** Extract project-related items (tasks, decisions) normally. For personal observations and recognition, write to `ReviewQueue/review-people.md` with a note that the person isn't in the registry. Output: "'{name}' not in people.yaml — personal items staged in review queue."
+**Person mentioned not in people.yaml:** Route all items referencing them — tasks, decisions, observations, recognition, personal notes, contributions — to `ReviewQueue/review-people.md`. Nothing is written to the vault under an unverified name. Output: "'{name}' not in people.yaml — all items referencing them staged in review queue."
 
 **Session already processed:** If the session block contains a `> *Processed` marker, skip it and report: "Session already processed — skipping."
 

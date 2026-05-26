@@ -37,11 +37,10 @@ Determine meeting type before generating prep — the type determines what conte
 **Inference priority:**
 1. meetings.yaml override — if the meeting has an entry, use its configured `type`
 2. Event title contains "Review", "Design Review", "Doc Review" → design/doc review (title overrides attendee count)
-3. Event title matches a project name or alias from projects.yaml → project meeting
+3. Extract the project name from the event title or description; if it matches a name or alias in projects.yaml → project meeting
 4. Attendee count of 2 → likely 1:1 (check person against people.yaml by name or email) — **only if signals 2-3 don't apply**
 5. All attendees are in the user's direct reports (people.yaml, relationship_tier: direct) → team meeting
-6. Mix of directs and cross-team attendees → cross-team/coordination meeting
-7. Recurring event with team-like attendee pattern → standup/sync
+6. Recurring event with team-like attendee pattern → standup/sync
 
 When not confident (especially for 2-person meetings where the other person is on a project you share), ask the user once: "Is this a 1:1 with Sarah or a project sync?" Save the answer as an override in meetings.yaml using this format:
 
@@ -59,7 +58,6 @@ Read existing meetings.yaml first to avoid duplicate entries. Append the new ent
 - `project` — focused on project status
 - `team` / `standup` — your updates, blockers, tasks assigned to others
 - `design-review` / `doc-review` — doc link, previous decisions, questions
-- `cross-team` — tasks assigned to cross-team people, what you need from them
 - `adhoc` — general open items and context
 
 ---
@@ -80,7 +78,7 @@ If the file doesn't exist, create it from the appropriate template (see File Tem
 
 Each session is a top-level `## {YYYY-MM-DD} Session` block prepended to the meeting file, after the frontmatter and tags. Sessions accumulate in reverse chronological order — newest at the top. Within each session block, two sections:
 
-**Video call URL:** Before writing the session, check the calendar event for a video call URL. Check in order: `conferenceData.entryPoints[].uri` (type: video), then the `location` field for a URL matching `zoom.us`, `meet.google.com`, `teams.microsoft.com`, or similar. If found, include it as a `📹 Join:` line at the top of the Prep section. If not found, omit the line entirely — do not write "N/A" or leave it empty.
+**Video call URL:** Before writing the session, check the calendar event details for a video call URL. If found, include it as a `📹 Join:` line at the top of the Prep section. If not found, omit the line entirely — do not write "N/A" or leave it empty.
 
 ```markdown
 ## 2026-04-10 Session
@@ -96,7 +94,7 @@ Each session is a top-level `## {YYYY-MM-DD} Session` block prepended to the mee
 
 ---
 
-> Auto-generated items — check off as discussed.
+> Topics
 
 - [ ] {prep item}
 - [ ] {prep item}
@@ -157,7 +155,7 @@ Keep factual — dates, specific deliverables. Not "I've been very busy."
 Tasks where `[person:: {name}]` across all project files.
 
 **5. Pending feedback with coaching suggestion**
-Read `People/{person}.md` `## Pending Feedback` section. For each item, include it as a checkbox and add a coaching note if the topic is sensitive. If the section is empty or does not exist, skip silently.
+Read `People/{person}.md` `## Pending Feedback` section. For each item, include it as a checkbox. Apply conversation coaching rules if the topic is sensitive (see Conversation Coaching section). If the section is empty or does not exist, skip silently.
 
 **6. Career development context**
 From `People/{person}.md`: growth areas, time since last career conversation. Read the per-person `feedback_cycle_days` from people.yaml first; fall back to `feedback_cycle_days` from workspace.yaml (default: 30). Flag if the gap exceeds the threshold. If no career development data is found, skip silently.
@@ -178,6 +176,7 @@ Active blockers from shared project timelines.
 - Active blockers
 - Decisions needed (items in review queue related to this project)
 - Dependencies with other teams mentioned in timeline
+- Next scheduled meeting for this project (from calendar — skip if unavailable): `📅 Next sync: {date} — {meeting title}`
 
 ### Team Standup / Sync Prep
 
@@ -186,6 +185,7 @@ Active blockers from shared project timelines.
 - Cross-team blockers affecting multiple people
 - Action items from the last standup's Notes section
 - Any items from people.yaml directs needing team visibility
+- Next occurrence of this standup (from calendar — skip if unavailable): `📅 Next sync: {date}`
 
 ### Design Review / Doc Review Prep
 
@@ -193,12 +193,6 @@ Active blockers from shared project timelines.
 - Related project context: what phase, what's already decided
 - Previous decisions on this topic (from project timeline)
 - Open questions or risks to raise (from project file Notes section)
-
-### Cross-Team Meeting Prep
-
-- Items you're waiting on from them (open tasks with `[person:: [[cross-team person name]]]` that are overdue or approaching their due date)
-- Recent comms with attendees (from email processing, if in person files)
-- What you need from this meeting — specific asks or decisions
 
 ---
 
