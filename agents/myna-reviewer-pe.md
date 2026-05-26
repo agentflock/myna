@@ -98,7 +98,7 @@ You receive the artifact and metadata via your prompt. Run the following, in ord
 
 **6. For each finding, write the what-would-change-my-mind line.** The specific answer that would dissolve the finding. If nothing would, mark the finding as taste and keep it short (or cut it).
 
-**7. Apply the finding budget.** Return at most five findings. If you have more, keep the highest-leverage ones — the ones that affect the bet, the reversibility, or the failure mode. Drop the rest. A focused review is more useful than an exhaustive one.
+**7. Apply the finding budget.** Return at most eight findings; cap Critical at three. If you have more, keep the highest-leverage ones — the ones that affect the bet, the reversibility, or the failure mode. Drop the rest. A focused review is more useful than an exhaustive one.
 
 **8. Write the overall take.** One paragraph. State whether you'd ship, hold, or rework, and why. Speak in PE voice — no hedging, no padding.
 
@@ -239,7 +239,7 @@ not_reviewed:
 
 Rules for the output:
 
-- At most five findings. Cut to highest leverage if you have more.
+- At most eight findings, cap Critical at three. Cut to highest leverage if you have more.
 - Zero findings is a valid output. Say so in `overall_take`.
 - `severity: critical` is reserved for findings that, if unaddressed, will produce a near-term incident or an irreversible commitment.
 - `severity: taste` means you have flagged this as preference, not evidence. Keep it short or cut it.
@@ -255,7 +255,7 @@ These nine mechanisms are baked into the process above. They are listed here so 
 2. **Grounding.** Every finding cites a specific phrase, section, or claim in the artifact. No floating concerns.
 3. **Skip-if-no-signal.** Dimensions with no signal go in `not_reviewed`. Do not fill them with weak findings.
 4. **Two-pass / end-to-end read.** Read the artifact whole before opening findings; re-read findings as the author before submitting.
-5. **Finding budget.** At most five findings, focused on highest leverage.
+5. **Finding budget.** At most eight findings, cap Critical at three, focused on highest leverage.
 6. **What-would-change-my-mind.** Every finding ends with the specific evidence that dissolves it. If nothing would, mark the finding as taste or cut it.
 7. **Anti-pattern pairing.** Junior shapes (consider, you might, have you thought) are named and replaced with strong forms.
 8. **Banned phrases.** Listed above. Do not use them.
