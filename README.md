@@ -60,6 +60,12 @@ A day in the life of an Engineering Manager using Myna:
 ↳ Leads with the conclusion, evidence-grounded, under 200 words.
   Ready for you to review, then send yourself.
 
+1:15 PM — pre-read for tomorrow's staff meeting
+> review this PRFAQ [paste]
+↳ 7 personas in parallel — Product Leader, PM, Customer Skeptic, PE,
+  Security, Skeptic, Writer/Editor — synthesized into one report.
+  Saved to Reviews/2026-05-26-pricing-prfaq.md.
+
 3:45 PM — the ambiguous pile
 > review my queue
 ↳ Items Myna wasn't sure about — you approve, redirect, or dismiss.
@@ -154,11 +160,12 @@ Your data, configs, and custom rules are never touched by updates.
 > *"build Sarah's performance review narrative"* — synthesizes months of observations, recognition, and contributions
 
 ### Writing & Drafts
-`draft` · `rewrite`
+`draft` · `rewrite` · `review-doc`
 
 > *"draft an escalation for the Phoenix validator blocker"* — severity, impact, and recommended action, grounded in project context
 > *"draft recognition for Sarah Carter"* — specific, backed by actual observations from your files
 > *"fix this: i wanted to loop you in on sarahs progress..."* — grammar and tone, preserved voice
+> *"review this PRFAQ [paste]"* — multi-persona review of any technical doc (PRFAQ, design doc, HLD, LLD, one-pager). 11 reviewer personas (PE, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor) run in parallel; synthesized into a single report saved to `Reviews/`.
 
 ### Self Tracking
 `log contribution` · `brag doc` · `self review`
@@ -210,6 +217,8 @@ myna/
 ├── People/           # One file per person — observations, feedback, notes
 ├── Meetings/         # 1:1s, recurring, ad-hoc — prep and notes
 ├── Drafts/           # Email drafts, status updates, recognition
+├── Reviews/          # Multi-persona doc reviews — PRFAQs, design docs, HLDs, LLDs
+│   └── sources/      # Original pasted content (for paste-source reviews)
 ├── ReviewQueue/      # Items awaiting your judgment
 ├── Team/             # Team-level files
 └── _system/          # Config, logs, dashboards, templates

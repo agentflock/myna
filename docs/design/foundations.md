@@ -1260,3 +1260,50 @@ Behavioral rules in Myna live in two layers with explicit precedence. The layers
 At the end of each day, myna-wrap-up saves behavioral corrections observed during the session to Claude Code memory (feedback type). These corrections persist across sessions as part of Claude Code's native memory mechanism. No separate skill or vault folder is required.
 
 The full resolution rule lives in the myna-steering-memory skill.
+
+---
+
+## 12. Reviewer Subagent Primitive (D066)
+
+Myna ships 11 input-agnostic reviewer subagents at `agents/myna-reviewer-*.md`. Each describes how a specific persona thinks: PE, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor. Subagents are invoked via Claude Code's Task tool by an orchestrating skill — the first consumer is myna-review-doc. The same subagents are reusable by other skills (draft critique, decision support, etc.) since they take a generic content + context contract.
+
+### 12.1 Input Contract
+
+Passed by the orchestrating skill via the Task tool prompt:
+
+| Field | Purpose |
+|-------|---------|
+| `content` | The artifact being reviewed, verbatim |
+| `artifact_type` | Broad category: proposal, decision, claim, status, plan, message, snippet |
+| `artifact_subtype` | Narrower hint (e.g., `prfaq`, `lld`, `one-line-claim`); may be empty |
+| `audience` | Who the artifact is for — sets rigor bar |
+| `context` | Surrounding decisions, prior commitments, stakes; also carries `self-review` or `peer-review` |
+| `focus` | Optional steer ("focus on coupling", "skip writing"); may be empty |
+
+### 12.2 Output Contract
+
+Canonical YAML, single fenced block:
+
+```yaml
+doc_steel_man: <one sentence>
+summary: <one paragraph in persona voice>
+findings:
+  - dimension: <persona-specific>
+    severity: critical | important | minor
+    is_taste: <optional bool>
+    location: <quote or section>
+    steel_man: <one sentence>
+    observation: <what is true>
+    why_it_matters: <impact>
+    what_to_address: <concrete step>
+    what_would_change_my_mind: <specific evidence>
+not_reviewed:
+  - dimension: <name>
+    reason: <one sentence>
+```
+
+Persona-specific extensions allowed at top level (PE: `bet`/`reversibility`; Skeptic: `load_bearing_assumptions`; DM: `meta`) or per-finding (Security: `stride_class`/`attacker_capability`/`violated_assumption`; QA: `test_idea`; WE: `quote`; Skeptic: `confidence`).
+
+### 12.3 Finding Budget
+
+5 findings max per persona; 2 Critical max. Synthesis at the orchestrator level caps the per-report total at ~8 findings / ~3 Critical.

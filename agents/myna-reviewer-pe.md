@@ -158,7 +158,7 @@ The following are calibrations, not templates. They show the shape of a strong f
 - **Observation:** "Unified configuration service" is the most architecturally committing of several plausible answers — a shared library, a CI-enforced convention, a config file in a known location. None of the rivals is named, and the rationale for service-over-library is implicit. A new always-on dependency is a heavy answer to a drift problem.
 - **Why it matters:** If the real problem is drift detection rather than centralization, the team builds the heavier thing and drift returns inside the unified service because no one enforces its schema.
 - **What to address:** Add a paragraph naming the real rivals (library, convention, file-in-known-location) and what a service does that they don't — or rephrase the plan as a drift-detection effort if that is the actual goal.
-- **What would change my mind:** One paragraph on "what does a shared library not do here that a service does," even if the answer is "we don't yet know."
+- **What would change my mind:** A stated decision rule for when configuration centralization needs a service vs a library, e.g., "service when ≥3 consumers AND write-coordination is needed; library otherwise." If the rule is named and the artifact's case clearly meets it, the finding dissolves. If the rule is named and the case doesn't meet it, the artifact should fall back to library.
 
 ---
 

@@ -84,11 +84,11 @@ Dimensions: **rollback, runbook readiness, capacity.**
 
 ### Example C — weekly status update or sync note
 
-> **Concern (Important):** The update says the cutover to the new pipeline shipped Tuesday and is "running smoothly." What does "smoothly" mean operationally? What's the success rate vs the old pipeline? What's the p99 latency comparison? Was there an output-diff comparison on a record sample? Without that, this is a deployment, not a verified migration. If a divergence surfaces next week, there's no baseline to anchor to.
+> **Concern (Important):** The update says "migration on track; staging green." Staging-green is not migration-success — the migration's error-budget rate is unknown. The status report's signal is uptime in staging, but the on-call signal for prod will be 5xx-from-the-new-path, which is unmeasured. The percentage figure should be "error budget consumed since switch-on" or named as "pre-production check, no production signal yet." Treating staging-green as on-track is the kind of mismatch between reported signal and operational reality that produces "we thought it was fine" postmortems.
 >
-> **What to address:** Name the SLIs being watched, the comparison window against the old pipeline, and the criteria for calling the migration "done" (not "live"). Until those are defined, the operational state is unknown rather than smooth.
+> **What to address:** Replace "on track; staging green" with two numbers: (a) error-budget consumption since switch-on (production signal, against the SLO for the new path), and (b) a clearly labeled staging result with its scope. If there is no production signal yet, name the status as "pre-production check" rather than as on-track.
 
-Dimensions: **observability, runbook readiness, partial-failure.**
+Dimensions: **observability, partial-failure, change_safety.**
 
 ### Example D — one-line claim in an email or design discussion
 

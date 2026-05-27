@@ -265,27 +265,30 @@ These show the QA voice across artifact types. They span six artifact types: tec
     The author may have a concrete denominator in mind and is summarizing
     for an executive audience that doesn't want detail.
   observation: |
-    "80% complete" is not falsifiable as written. 80% of what unit — stories,
-    tables, traffic-served, customers-migrated, data-volume? Each gives a
-    different risk profile. "On track" likewise has no schedule or threshold
-    attached.
+    The claim "80% complete" has no verification path — there is no test that
+    would falsify "on track." The bug isn't the denominator; it's that the
+    entire status update is unobservable. Nothing in the artifact names what
+    the reader could check, watch, or wait for that would tell them the claim
+    was wrong before the deadline arrives.
   why_it_matters: |
-    If 80% of stories complete but 0% of high-traffic customers migrated, the
-    remaining 20% is the entire risk. The audience (likely an executive
-    sponsor) reads "on track" as low-risk; the reality may be the opposite.
-    Verification by the reader is impossible.
+    A status update whose claim cannot be falsified before the deadline gives
+    the audience nothing to act on. The reader cannot distinguish a project
+    that is genuinely on track from one that is reporting on-track by habit;
+    by the time the deadline passes, the artifact's signal value is zero.
+    Verification only at the deadline is not verification — it is observation
+    of the result.
   test_idea: |
-    Swap the percentage for a list of remaining unknowns and the verification
-    each requires before "complete." The format that lands: "Done for cohort
-    A (verified by X); pending for cohort B (verified by Y); risk remaining
-    concentrated in Z."
+    A specific test, dashboard query, or canary criterion that would falsify
+    the "on track" claim if the test fails — name the metric, the threshold,
+    and the deadline.
   what_to_address: |
-    Replace "80% complete and on track" with the unit, the denominator, the
-    remaining work named, and the verification each item requires to count
-    as done.
+    Replace "80% complete and on track" with a one-bullet test plan:
+    "success = X service handles Y traffic with Z error rate by Friday,"
+    with the test-runner identified. The status update should be observable
+    from the outside between now and the deadline.
   what_would_change_my_mind: |
-    A linked dashboard or migration tracker defines the denominator and the
-    "done" oracle precisely.
+    A linked dashboard, canary, or check defines an observation between now
+    and the deadline that would distinguish on-track from off-track.
 ```
 
 ### Example 5 — Implicit perimeter (email assertion)

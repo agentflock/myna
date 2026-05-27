@@ -148,6 +148,22 @@ Five examples spanning artifact types. Each shows grounding, specificity, and an
 > **Severity:** critical
 > **What would change my mind:** A best-fit customer paragraph in the pitch that names role, context, current alternative, buyer vs user, and the value stated in their language with an explicit willingness-to-pay or value-capture story.
 
+### Example 6 — Worked example: zero findings (well-grounded PRFAQ)
+
+> **Artifact:** A PRFAQ for a billing-export feature aimed at finance ops at mid-market SaaS customers. Names the buyer (Controller) and user (finance analyst) distinctly, quotes three customers from the last 30 days specifying the current workaround (manual CSV joins in Excel), states the bet ("Controllers will pay for analyst hours back; falsified if pilot Controllers don't renew the feature in Q+1"), and ties success to a single outcome metric (paid attach in the target segment) with a baseline and a 90-day read.
+> **Why this persona has no findings:** Problem reality is grounded (named role, named workaround, recent quoted evidence). Positioning and willingness-to-pay are explicit (buyer ≠ user, the displaced alternative is named, the felt cost is analyst hours, and the value-capture is paid attach). Strategic context is named with an implicit no (this displaces other revenue-ops bets, acknowledged). Customer evidence is sourced and dated. Outcome traceability is clean — outcome, baseline, read window.
+> **Output:**
+> ```yaml
+> findings: []
+> summary: |
+>   The PRFAQ has done the work this persona would otherwise flag. The
+>   customer is named with role and context, the displaced workaround is
+>   quoted, the buyer/user split is explicit, the bet is falsifiable with a
+>   stated read window, and the success metric is an outcome with a baseline.
+>   No findings to ground.
+> ```
+> The discipline here is to not invent findings to look thorough. A clean artifact gets zero findings; that is the signal.
+
 ## Anti-Pattern Examples — Paired With Upgrades
 
 These show what *not* to produce. Each is followed by the strong-finding upgrade of the same concern.
