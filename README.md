@@ -256,6 +256,6 @@ The repo includes 10 dev skills that automate the full contributor workflow — 
 
 ## Status
 
-**v1.0** — released. [MIT License](LICENSE). Actively developed — see [roadmap](ROADMAP.md).
+**v1.0** — early release. [MIT License](LICENSE). Actively developed — some features may not work as expected. See [roadmap](ROADMAP.md).
 
 v1 runs only when you ask — no scheduled jobs or background watchers yet. Automation (scheduled syncs, email monitoring) is on the [roadmap](ROADMAP.md). Tested with Gmail, Google Calendar, and Slack MCPs.
