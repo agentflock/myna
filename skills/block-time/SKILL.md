@@ -47,7 +47,7 @@ No attendees.
 Create this event? (yes / pick a different slot / cancel)
 ```
 
-Event type labels (`[Myna:Focus]`, `[Myna:Reminder]`) and the base prefix (`[Myna]`) are configurable in workspace.yaml.
+Event type labels and the base prefix are hardcoded: `[Myna]`, `[Myna:Focus]`, `[Myna:Reminder]`.
 
 **Step 4: Create the event**
 

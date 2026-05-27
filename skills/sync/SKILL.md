@@ -25,10 +25,10 @@ Sets up or refreshes your day. Rerunnable at any time — each run prepends a fr
 ## Step 1: Read Config
 
 Read from `_system/config/workspace.yaml`:
-- `vault.path` → vault root; Myna subfolder is always `myna` (hardcoded)
 - `work_hours.start` and `work_hours.end` → for capacity calculations
 - `timezone` → for date resolution
-- `calendar_event_prefix` → prefix for naming calendar events (event type labels are hardcoded: Focus, Task, Reminder)
+
+The calendar event prefix is hardcoded as `[Myna]`. Event type labels are also hardcoded: Focus, Task, Reminder.
 
 Read from `_system/config/projects.yaml`, `_system/config/people.yaml`, `_system/config/meetings.yaml`.
 

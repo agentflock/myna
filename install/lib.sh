@@ -92,16 +92,8 @@ projects: []
 # ---
 triage:
   inbox_source: ""
-  folders:
-    - name: Reply
-      description: "Needs a response from me"
-    - name: FYI
-      description: "Informational, no action needed"
-    - name: Follow-Up
-      description: "Waiting on someone else — check back later"
-    - name: Schedule
-      description: "Needs a meeting or calendar action"
-  draft_replies_folder: ""'
+  draft_replies_folder: ""
+  folders: []'
 
   _myna_create_if_missing "$MYNA_ROOT/_system/config/people.yaml" \
 '# Run /myna:setup for guided configuration.
@@ -120,20 +112,10 @@ user:
   email: ""
   role: ""              # engineering-manager | tech-lead | senior-engineer | pm
 
-vault:
-  path: ""              # Not used at runtime — vault path is stored in ~/.myna/config.yaml
-
 timezone: ""            # IANA timezone, e.g. America/Los_Angeles
 work_hours:
   start: "09:00"
   end: "17:00"
-
-email:
-  processed_folder: per-project
-
-feedback_cycle_days: 30
-
-calendar_event_prefix: "[Myna]"
 '
 
   _myna_create_if_missing "$MYNA_ROOT/_system/config/communication-style.yaml" \
@@ -147,16 +129,12 @@ presets_per_tier:
   direct: ""
   cross-team: ""
 
-sign_off: ""
-
-difficult_message_approach: direct-but-kind
-
-email_preferences:
-  max_length: ""               # short | medium | long
-  greeting_style: ""           # first-name | formal | none'
+sign_off: ""'
 
   _myna_create_if_missing "$MYNA_ROOT/_system/config/tags.yaml" \
-'# Run /myna:setup for guided configuration.
+'# Custom tags for vault entries.
+# Project, person, and source tags are auto-derived from projects.yaml and people.yaml.
+# Add entries here only for keyword-based tags not covered by those sources.
 tags: []'
 
   echo "[3/10] Starter config files done"

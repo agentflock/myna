@@ -75,7 +75,7 @@ One-line summary: Surfaces factual patterns in your 1:1 notes — action item fo
 
 One-line summary: Configurable feedback cycle per person — when the gap exceeds threshold, it automatically surfaces as a topic in 1:1 prep.
 
-- Configured in workspace config: `feedback_cycle_days` (default: 30 days). Can also be overridden per person in registry if some people need different cadences.
+- Default threshold is 30 days. Can be overridden per person in people.yaml via `feedback_cycle_days` for people who need different cadences.
 - When the gap between now and last logged feedback exceeds the threshold, the 1:1 prep for that person automatically includes: "No feedback logged in X days — consider discussing growth areas or recent work"
 - Also surfaced in Team Health Overview as a flag per person
 - Not a standalone feature the user has to remember to ask for — it's woven into the prep flow. The user sees it when they need it (before the 1:1), not as a separate report they have to pull.

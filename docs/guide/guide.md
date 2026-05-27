@@ -115,14 +115,8 @@ The primary config file. Required — Myna reads it at every session start.
 | `user.name` | Your full name |
 | `user.email` | Your work email (used to identify your messages) |
 | `user.role` | `engineering-manager`, `tech-lead`, `senior-engineer`, or `pm` |
-| `vault.path` | Absolute path to your Obsidian vault |
-| `vault.subfolder` | Myna subfolder name (default: `myna`) |
 | `timezone` | IANA timezone, e.g. `America/Los_Angeles` |
 | `work_hours.start` / `.end` | Your workday bounds, e.g. `09:00` / `17:00` |
-| `journal.archive_after_days` | Auto-archive daily notes older than this many days (default: 30) |
-| `email.processed_folder` | `per-project` (email moves to each project's Processed/ subfolder) |
-| `feedback_cycle_days` | Days between feedback gap alerts (default: 30) |
-| `calendar_event_prefix` | Prefix on all Myna-created calendar events (default: `[Myna]`) |
 
 ### projects.yaml
 
@@ -153,13 +147,13 @@ One entry per person you work with. Start with direct reports and close collabor
 | `relationship_tier` | `direct`, `peer`, `upward`, or `cross-team` |
 | `role` | Their title |
 | `team` | Their team |
-| `feedback_cycle_days` | Override workspace default for this person |
+| `feedback_cycle_days` | Days between feedback gap alerts for this person (default: 30) |
 | `birthday` | MM-DD format (for milestone alerts in daily note) |
 | `work_anniversary` | YYYY-MM-DD format (for milestone alerts) |
 
 ### meetings.yaml
 
-Optional overrides. Most meetings need no entry — Myna infers type from calendar data. Only add meetings with custom type assignments or special processing.
+Machine-managed state written by Myna's skills. You rarely need to edit this file directly. Optional overrides let you set custom type assignments for specific meetings — most meetings need no entry since Myna infers type from calendar data.
 
 | Field | What to put |
 |-------|-------------|
@@ -181,8 +175,6 @@ Controls how Myna drafts emails, messages, and other written content.
 | `presets_per_tier.direct` | Preset for messages to direct reports |
 | `presets_per_tier.cross-team` | Preset for messages to other teams |
 | `sign_off` | Email sign-off (e.g. `Best`, `Thanks`) |
-| `difficult_message_approach` | Style for tough conversations (e.g. `direct-but-kind`) |
-| `email_preferences.max_length` | `short`, `medium`, or `long` |
 
 ---
 

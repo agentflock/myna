@@ -4,28 +4,17 @@ user:
   email: "sam.bennett@acme.io"
   role: engineering-manager
 
-# Vault settings
-vault:
-  path: "/Users/test/Vault"
-  subfolder: myna
-
 # Time settings
 timezone: America/Los_Angeles
 work_hours:
   start: "09:00"
   end: "17:00"
-timestamp_format: "YYYY-MM-DD"
 
 # Email processing settings
 email:
-  processed_folder: per-project
   notes_email: "notes@example.com"  # Forward threads here with your notes to trigger draft-replies
 
-# People management settings
-feedback_cycle_days: 30
-
 # Calendar settings
-calendar_event_prefix: "[Myna]"
 calendar_event_types:
   focus: Focus
   task: Task

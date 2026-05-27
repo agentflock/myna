@@ -117,13 +117,9 @@ The primary config file. Required — Myna reads it at every session start.
 | `user.name` | Your full name |
 | `user.email` | Your work email (used to identify your messages) |
 | `user.role` | `engineering-manager`, `tech-lead`, `senior-engineer`, or `pm` |
-| `vault.path` | Absolute path to your Obsidian vault |
 | `timezone` | IANA timezone, e.g. `America/Los_Angeles` |
 | `work_hours.start` / `.end` | Your workday bounds, e.g. `09:00` / `17:00` |
 | (journal archiving) | Automatic — Myna moves old notes to `Journal/Archive/` when new ones are created; no config needed |
-| `email.processed_folder` | `per-project` (email moves to each project's Processed/ subfolder) |
-| `feedback_cycle_days` | Days between feedback gap alerts (default: 30) |
-| `calendar_event_prefix` | Prefix on all Myna-created calendar events (default: `[Myna]`) |
 
 ### projects.yaml
 
@@ -154,13 +150,12 @@ One entry per person you work with. Start with direct reports and close collabor
 | `relationship_tier` | `direct`, `peer`, `upward`, or `cross-team` |
 | `role` | Their title |
 | `team` | Their team |
-| `feedback_cycle_days` | Override workspace default for this person |
 | `birthday` | MM-DD format (for milestone alerts in daily note) |
 | `work_anniversary` | YYYY-MM-DD format (for milestone alerts) |
 
 ### meetings.yaml
 
-Optional overrides. Most meetings need no entry — Myna infers type from calendar data. Only add meetings with custom type assignments or special processing.
+Machine-managed state written by Myna's skills. You rarely need to edit this file directly. Optional overrides let you set custom type assignments for specific meetings — most meetings need no entry since Myna infers type from calendar data.
 
 | Field | What to put |
 |-------|-------------|
@@ -182,18 +177,16 @@ Controls how Myna drafts emails, messages, and other written content.
 | `presets_per_tier.direct` | Preset for messages to direct reports |
 | `presets_per_tier.cross-team` | Preset for messages to other teams |
 | `sign_off` | Email sign-off (e.g. `Best`, `Thanks`) |
-| `difficult_message_approach` | Style for tough conversations (e.g. `direct-but-kind`) |
-| `email_preferences.max_length` | `short`, `medium`, or `long` |
 
 ### tags.yaml
 
-Optional auto-tagging rules. Myna applies tags based on project, keyword, person, or source rules.
+Custom keyword tags for vault entries. Project tags, person tags, and source tags (`#from-email`, `#from-slack`, `#from-meeting`) are auto-derived by Myna from projects.yaml and people.yaml — no entries needed here for those. Use this file only for keyword-based tags not covered by those sources.
 
 | Field | What to put |
 |-------|-------------|
-| `name` | Tag name (e.g. `auth-migration`) |
-| `type` | `project-based`, `keyword-based`, `person-based`, or `source-based` |
-| `project` / `keywords` / `person` / `source` | Matching criteria depending on type |
+| `name` | Tag name (e.g. `my-team-convention`) |
+| `type` | `keyword-based` |
+| `keywords` | Words that trigger this tag |
 
 > Note: meetings.yaml and tags.yaml are manual-only today — the Config UI does not expose them. Edit the YAML files directly.
 
@@ -324,20 +317,10 @@ user:
   email: ""                 # Your work email — used to identify your messages
   role: ""                  # engineering-manager | tech-lead | senior-engineer | pm
 
-vault:
-  path: ""                  # Absolute path to your Obsidian vault (set by install script)
-
 timezone: ""                # IANA timezone, e.g. America/Los_Angeles (default: system timezone)
 work_hours:
   start: "09:00"            # Workday start
   end: "17:00"              # Workday end
-
-email:
-  processed_folder: per-project  # How processed emails are filed (per-project moves to each project's Processed/)
-
-feedback_cycle_days: 30     # Days between feedback gap alerts (default: 30)
-
-calendar_event_prefix: "[Myna]"  # Prefix on all Myna-created calendar events
 ```
 
 ### communication-style.yaml
@@ -354,12 +337,6 @@ presets_per_tier:
   cross-team: ""           # Messages to other teams
 
 sign_off: ""               # Email sign-off (e.g. Best, Thanks, Cheers)
-
-difficult_message_approach: direct-but-kind
-
-email_preferences:
-  max_length: ""           # short | medium | long
-  greeting_style: ""       # first-name | formal | none
 ```
 
 ### projects.yaml
@@ -388,16 +365,8 @@ projects: []
 # ---
 triage:
   inbox_source: ""          # Email folder/label to read for triage (e.g. INBOX)
-  folders:
-    - name: Reply
-      description: "Needs a response from me"
-    - name: FYI
-      description: "Informational, no action needed"
-    - name: Follow-Up
-      description: "Waiting on someone else — check back later"
-    - name: Schedule
-      description: "Needs a meeting or calendar action"
   draft_replies_folder: ""  # Email folder for draft reply requests
+  folders: []               # Custom triage folder definitions. Leave empty to use built-in defaults (Reply, FYI, Follow-Up, Schedule).
 ```
 
 ### people.yaml
@@ -417,7 +386,6 @@ people: []
 #     relationship_tier: direct          # direct | peer | upward | cross-team
 #     role: Senior Engineer              # Their role/title
 #     team: Platform                     # Their team
-#     feedback_cycle_days: 21            # Override workspace default for this person
 #     birthday: "03-15"                  # MM-DD (for milestone alerts in daily note)
 #     work_anniversary: "2023-06-01"     # YYYY-MM-DD (for milestone alerts)
 ```

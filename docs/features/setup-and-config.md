@@ -32,12 +32,12 @@ One-line summary: Creates the complete folder structure, templates, dashboards, 
 
 One-line summary: Six YAML config files that define the user's workspace, projects, people, meetings, communication style, and tags.
 
-- **workspace.yaml** — user identity (name, email, role), vault path, timezone, work hours, MCP server names, calendar event prefix, email settings
-- **projects.yaml** — projects with aliases, mapped email folders, Slack channels. Top-level `triage:` section holds inbox triage settings (`inbox_source`, `folders`, `draft_replies_folder`)
-- **people.yaml** — people registry with display name, full name, aliases, email, Slack handle, relationship tier, feedback cycle override
-- **meetings.yaml** — optional meeting overrides for type inference (D022). Most meetings don't need entries here
-- **communication-style.yaml** — tone presets per audience tier (upward, peer, direct, cross-team), email preferences, sign-off style, difficult message approach
-- **tags.yaml** — tag definitions and mapping rules for auto-tagging
+- **workspace.yaml** — user identity (name, email, role), timezone, work hours
+- **projects.yaml** — projects with aliases, mapped email folders, Slack channels. Top-level `triage:` section holds inbox triage settings (`inbox_source`, `draft_replies_folder`, `folders` — defaults to built-in categories if empty)
+- **people.yaml** — people registry with display name, full name, aliases, email, Slack handle, relationship tier
+- **meetings.yaml** — machine-managed state written by Myna's skills. Optional overrides for meeting type inference (D022). Most meetings don't need entries here; users rarely edit this file directly
+- **communication-style.yaml** — tone presets per audience tier (upward, peer, direct, cross-team), sign-off style
+- **tags.yaml** — custom keyword tags. Project, person, and source tags are auto-derived from projects.yaml and people.yaml; this file is an extension point for keyword-based tags not covered by those sources
 - Config files live at `{vault}/myna/_system/config/`; the manifest at `~/.myna/config.yaml` stores vault path and subfolder
 - Config is read at session start — not on every prompt (saves tokens)
 - Missing config sections cause graceful degradation (feature skipped, not error)

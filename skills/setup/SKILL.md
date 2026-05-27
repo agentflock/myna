@@ -18,7 +18,7 @@ Single entry point for all Myna configuration — new installs and returning use
 
 Read `~/.myna/config.yaml`.
 
-- If it **exists**: parse `vault_path` from it. Subfolder is always `myna`. Skip to Step 3 (Config UI).
+- If it **exists**: parse `vault_path` from it. Skip to Step 3 (Config UI).
 - If it **does not exist**: say "Welcome! Let's get Myna set up." and continue to Step 1.
 
 ---
@@ -73,8 +73,7 @@ brew --version
 - `{vault_path}/myna/_system/config/projects.yaml` — the projects you're working on, with names, aliases, and which email folders or Slack channels map to each.
 - `{vault_path}/myna/_system/config/people.yaml` — the people you work with: direct reports, manager, key collaborators, and their roles.
 - `{vault_path}/myna/_system/config/communication-style.yaml` — how you like to write: tone and style presets for different audiences.
-- `{vault_path}/myna/_system/config/meetings.yaml` — optional overrides for how Myna handles specific meeting types. Safe to leave blank for now.
-- `{vault_path}/myna/_system/config/tags.yaml` — rules for auto-tagging vault entries. Safe to leave blank for now.
+- `{vault_path}/myna/_system/config/tags.yaml` — custom keyword tags beyond what Myna auto-derives from projects and people. Safe to leave blank.
 
 For annotated examples of each file's format, see the "Sample configuration" section in `myna/guide.md`.
 
@@ -85,7 +84,7 @@ For annotated examples of each file's format, see the "Sample configuration" sec
 3. Tell the user: "Config UI is open at {url}. Fill in what you can, then type 'done' here when you're finished."
 4. Wait for the user to type 'done' (or similar confirmation) before continuing.
 5. Kill the server: send SIGTERM to the captured PID. If PID capture failed, run `pkill -f server.py` as fallback.
-6. Read all six config files from `{vault_path}/myna/_system/config/`. Show a human-readable summary of what is configured and what is still blank.
+6. Read the five user config files from `{vault_path}/myna/_system/config/`: workspace.yaml, projects.yaml, people.yaml, communication-style.yaml, tags.yaml. (meetings.yaml is machine-managed — skip it.) Show a human-readable summary of what is configured and what is still blank.
 7. Ask: "Do you have any existing docs — project notes, a team roster, meeting notes — you'd like me to read to fill in what's missing?" If yes, proceed with the doc import flow below.
 
 ---
@@ -163,8 +162,7 @@ Tell the user: "Run `myna` (or `claude --agent myna:agent`) and type `sync` to s
 - For `projects.yaml` and `people.yaml`: append new entries — never overwrite existing ones.
 - For `people.yaml`: omit `relationship_tier` unless the source explicitly states it. Never default to "direct".
 - Write valid YAML matching the schemas shown in the "Sample configuration" section of `myna/guide.md`.
-- `vault.path` in `workspace.yaml` is set by the install script — don't ask about it, don't overwrite it. The subfolder is always `myna` (D055: fixed, not configurable, not stored in workspace.yaml).
-- Internal plumbing fields — keep at defaults, never ask: `calendar_event_prefix`.
-- `meetings.yaml` and `tags.yaml` are not part of the guided flow — don't write them unless the user explicitly asks.
+- `meetings.yaml` is machine-managed state written by Myna's skills — do not include it in user-facing config summaries or write it during setup unless the user explicitly asks.
+- `tags.yaml` is an extension point for custom keyword tags — not part of the guided flow. Don't write it unless the user explicitly asks.
 - **Import write-back: write only what was in the review file.** When writing config after an import review (option 3 in the doc import section), write only the entries and fields present in the review file. Do not add blocks, sections, or fields — such as triage, defaults, or schema examples — that were not explicitly included by the user.
 - **Filter blank values from all list fields before writing.** Before writing any YAML config file, drop every item in every list field that is an empty string, null, or whitespace-only string. This applies to all list fields across all config files — do not enumerate fields by name. Only non-empty, non-null values with at least one non-whitespace character are written.

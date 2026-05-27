@@ -26,7 +26,7 @@ For each person in people.yaml with `relationship_tier: direct`:
 | Tasks assigned to them | Grep `[person:: {name}]` + `- [ ]` + `[type:: task]` across `Projects/` — same multi-form search | Count open, count overdue (📅 date < today) |
 | Last 1:1 date | `Meetings/1-1s/{person-slug}.md` | Most recent session header (`## {YYYY-MM-DD} Session`) |
 | Last feedback date | `People/{person-slug}.md` Observations section | Date of most recent `strength`, `growth-area`, or `contribution` observation entry — this is the feedback gap signal. Do not count Recognition or Personal Notes entries — those don't reset the feedback clock. |
-| Feedback gap | Compare last observation entry date to today vs `feedback_cycle_days` from workspace.yaml (default: 30; per-person override from people.yaml takes precedence) | Flag if gap > threshold. |
+| Feedback gap | Compare last observation entry date to today vs 30 days | Flag if gap > threshold. |
 | Attention gap | `People/{person-slug}.md` observations + `Meetings/1-1s/{person-slug}.md` session headers and prep sections | Signals below |
 | Recent contributions | `People/{person-slug}.md` Recognition section | Entries dated in the last 14 days. Do not use `Journal/contributions-{week}.md` — that log records the user's own contributions, not the direct report's. |
 
@@ -34,7 +34,7 @@ For each person in people.yaml with `relationship_tier: direct`:
 - No observation logged in 45+ days → "No observations in [N] days"
 - Last 3+ 1:1 sessions had no new topics added by you → check prep sections for items you added vs. carried from previous session
 - No career development topics logged in 4+ months → Grep `career` or `growth` in `Meetings/1-1s/{person-slug}.md`
-- No feedback logged since {date} (beyond feedback_cycle_days threshold) → already reflected in the Feedback column; repeat in Attention if gap is 2× the threshold
+- No feedback logged since {date} (beyond 30-day feedback threshold) → already reflected in the Feedback column; repeat in Attention if gap is 2× the threshold
 
 **D018 anchor:** All flags in this output are about the user's own records and follow-through — not about the employee's morale, engagement, or relationship quality. Do not infer or label people's internal states. "45-day feedback gap" means the user hasn't logged an observation in 45 days. It says nothing about the employee.
 
@@ -68,7 +68,7 @@ Columns:
 - **Open** — count of open tasks assigned to this person
 - **Overdue** — count of tasks past due date
 - **Assigned to them** — count of open tasks assigned to this person; flag overdue with ⚠️
-- **Feedback** — days since last logged observation. Flag with ⚠️ if gap exceeds `feedback_cycle_days` threshold.
+- **Feedback** — days since last logged observation. Flag with ⚠️ if gap exceeds 30 days.
 - **Last 1:1** — date of most recent 1:1 session (from vault). If calendar MCP is available, append "Next: [date]" after the last date.
 - **Attention** — ✅ if no gaps, or brief flag description if gaps detected
 

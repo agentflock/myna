@@ -158,7 +158,7 @@ Tasks where `[person:: {name}]` across all project files.
 Read `People/{person}.md` `## Pending Feedback` section. For each item, include it as a checkbox. Apply conversation coaching rules if the topic is sensitive (see Conversation Coaching section). If the section is empty or does not exist, skip silently.
 
 **6. Career development context**
-From `People/{person}.md`: growth areas, time since last career conversation. Read the per-person `feedback_cycle_days` from people.yaml first; fall back to `feedback_cycle_days` from workspace.yaml (default: 30). Flag if the gap exceeds the threshold. If no career development data is found, skip silently.
+From `People/{person}.md`: growth areas, time since last career conversation. Flag if the gap since last career conversation exceeds 30 days. If no career development data is found, skip silently.
 
 **7. Personal notes**
 From `People/{person}.md` `## Personal Notes`. Include any notes about things they mentioned (marathon, vacation, family). If the section is empty or does not exist, skip silently.

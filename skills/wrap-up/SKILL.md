@@ -17,7 +17,6 @@ Closes out the day. Reads today's daily note and vault state, writes an End of D
 ## Step 1: Read Config and Today's Note
 
 Read `workspace.yaml`:
-- `vault.path` → vault root; Myna subfolder is always `myna` (hardcoded)
 - `timezone` → today's date
 - `user.role` → determines contribution categories
 

@@ -164,7 +164,17 @@ The agent always creates formatted tasks from natural language. The user never t
 
 ### Tags
 
-Inline `#tags` at the top of files (not YAML frontmatter arrays). Auto-applied based on tags.yaml rules.
+Inline `#tags` at the top of files (not YAML frontmatter arrays). Tags are derived automatically:
+
+- **Project tags** — derived from project names in `projects.yaml` (slug form, e.g. `#auth-migration`)
+- **Person tags** — derived from person names in `people.yaml` (slug form, e.g. `#sarah-chen`)
+- **Source tags** — derived from the entry source: `#from-email`, `#from-slack`, `#from-meeting`
+- **Keyword tags** — applied when content matches known keyword sets:
+  - `#urgent` — urgent, critical, ASAP, blocker, P0, P1
+  - `#hiring` — interview, candidate, hiring, onboarding, offer, debrief
+  - `#incident` — incident, outage, postmortem, rollback, SEV1, SEV2
+  - `#security` — CVE, vulnerability, security, pentest, audit
+- **Custom tags** — any entries in `tags.yaml` (keyword-based only; extension point for teams)
 
 ```
 #project #auth-migration #from-email

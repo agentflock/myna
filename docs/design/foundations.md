@@ -623,35 +623,14 @@ user:
   email: "sid@company.com"          # required — identifies your messages
   role: engineering-manager          # required — engineering-manager | tech-lead | senior-engineer | pm
 
-# Vault settings
-vault:
-  path: "/Users/sid/Documents/Vault" # required — Obsidian vault root
-  subfolder: myna                     # default: myna
-
 # Time settings
 timezone: America/Los_Angeles         # default: system timezone
 work_hours:
   start: "09:00"                      # default: 09:00
   end: "17:00"                        # default: 17:00
-timestamp_format: "YYYY-MM-DD"        # default: YYYY-MM-DD
-
-# Email processing settings
-email:
-  processed_folder: per-project       # per-project (subfolder in each project folder)
-
-# People management settings
-feedback_cycle_days: 30               # default: 30 — gap threshold for feedback alerts
-
-# Calendar settings
-calendar_event_prefix: "[Myna]"       # default: [Myna] — prefix on created events
-calendar_event_types:                 # labels appended to prefix
-  focus: Focus                        # → [Myna:Focus]
-  task: Task                          # → [Myna:Task]
-  reminder: Reminder                  # → [Myna:Reminder]
-
-# System settings
-ai_model: claude-code                  # reference only — not enforced by Myna
 ```
+
+Note: vault root is stored in `~/.myna/config.yaml`, not in workspace.yaml. Subfolder is always `myna` (hardcoded). Calendar event prefix is hardcoded as `[Myna]` in skills that create events. Feedback cycle threshold defaults to 30 days (per-person override available in people.yaml).
 
 ### 3.2 projects.yaml
 
@@ -672,19 +651,13 @@ projects:
 
 triage:                               # optional — inbox classification config
   inbox_source: "INBOX"              # which email folder/label to read for triage
-  folders:                            # triage + custom folders — agent uses descriptions to classify
-    - name: Reply
-      description: "Needs a response from me"
-    - name: FYI
-      description: "Informational, no action needed"
-    - name: Follow-Up
-      description: "Waiting on someone else"
-    - name: Schedule
-      description: "Needs a meeting or calendar action"
-    - name: Trainings                 # custom folder example — user adds as many as needed
-      description: "Training invitations, course materials, learning resources"
   draft_replies_folder: DraftReplies  # email folder for draft reply requests
                                       # myna-process-messages skips this folder — handled by myna-draft-replies only
+  folders: []                         # custom triage folders. If empty, built-in defaults are used:
+                                      #   Reply, FYI, Follow-Up, Schedule
+                                      # Add entries to override or extend:
+                                      #   - name: Trainings
+                                      #     description: "Training invitations, course materials"
 ```
 
 ### 3.3 people.yaml
@@ -699,7 +672,7 @@ people:
     relationship_tier: direct         # required — direct | peer | upward | cross-team
     role: Senior Engineer             # optional
     team: Platform                    # optional
-    feedback_cycle_days: 21           # optional — overrides workspace default
+    feedback_cycle_days: 21           # optional — overrides default 30 days for this person
     birthday: "03-15"                 # optional — MM-DD, for milestones
     work_anniversary: "2023-06-01"    # optional — for milestones
 ```
@@ -732,48 +705,38 @@ presets_per_tier:                      # optional — different preset per audie
   cross-team: diplomatic
 
 sign_off: "Best"                      # email sign-off
-difficult_message_approach: direct-but-kind
-
-# Advanced (populated by full interview)
-email_preferences:
-  max_length: medium                  # short | medium | long
-  greeting_style: first-name          # first-name | formal | none
 ```
 
 ### 3.6 tags.yaml
 
+Extension point for custom keyword tags. Project tags, person tags, and source tags (`#from-email`, `#from-slack`, `#from-meeting`) are auto-derived by Myna from projects.yaml and people.yaml — no entries needed here for those.
+
 ```yaml
-tags:
-  - name: auth-migration
-    type: project-based               # auto-tag files related to this project
-    project: Auth Migration
+# Custom tags for vault entries.
+# Project, person, and source tags are auto-derived from projects.yaml and people.yaml.
+# Add entries here only for keyword-based tags not covered by those sources.
+tags: []
 
-  - name: urgent
-    type: keyword-based
-    keywords: [urgent, critical, ASAP, blocker, P0]
-
-  - name: hiring
-    type: keyword-based
-    keywords: [interview, candidate, hiring, onboarding]
-
-  - name: platform
-    type: project-based
-    project: Platform API
-
-  - name: sarah-chen
-    type: person-based                 # tag files mentioning a person
-    person: Sarah Chen
-
-  - name: from-email
-    type: source-based                # tag based on data source
-    source: email
-
-  - name: from-slack
-    type: source-based
-    source: slack
+# Example:
+#   - name: urgent
+#     type: keyword-based
+#     keywords: [urgent, critical, ASAP, blocker, P0]
+#
+#   - name: hiring
+#     type: keyword-based
+#     keywords: [interview, candidate, hiring, onboarding]
 ```
 
-**Tag types:** project-based (auto-applied to files related to a project), keyword-based (applied when keywords appear in content), person-based (applied to files mentioning a person), source-based (applied based on where data came from).
+**Auto-derived tags (no config needed):**
+- `#{project-slug}` — from each project name in projects.yaml (e.g., `#auth-migration`)
+- `#{person-slug}` — from each person name in people.yaml (e.g., `#sarah-chen`)
+- `#from-email`, `#from-slack`, `#from-meeting` — from the data source of each entry
+
+**Built-in keyword tags (hardcoded, no config needed):**
+- `#urgent` — urgent, critical, ASAP, blocker, P0, P1
+- `#hiring` — interview, candidate, hiring, onboarding, offer, debrief
+- `#incident` — incident, outage, postmortem, rollback, SEV1, SEV2
+- `#security` — CVE, vulnerability, security, pentest, audit
 
 ---
 

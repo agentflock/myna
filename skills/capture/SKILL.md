@@ -18,7 +18,6 @@ Read at session start:
 - `_system/config/workspace.yaml` — user identity, role, and timezone
 - `_system/config/projects.yaml` — project names, aliases
 - `_system/config/people.yaml` — person names, aliases, relationship tiers
-- `_system/config/tags.yaml` — tagging rules
 
 ---
 

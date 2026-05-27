@@ -29,7 +29,6 @@ Weekly note path: `Journal/{YYYY-W\d\d}.md` (e.g. `2026-W18.md`)
 ## Step 2: Read Config
 
 Read `workspace.yaml`:
-- `vault.path` → vault root; Myna subfolder is always `myna` (hardcoded)
 - `user.role` → determines framing of contribution categories
 
 ---
@@ -147,7 +146,7 @@ Append under `## Health Snapshots`:
 ```
 
 Flag entries:
-- Feedback gap > `feedback_cycle_days` (from workspace.yaml) → append ` ⚠️` to the gap cell
+- Feedback gap > 30 days → append ` ⚠️` to the gap cell
 - Overdue > 2 → append ` ⚠️` to the overdue cell
 - Last 1:1 > 14 days → append ` ⚠️` to the date cell
 

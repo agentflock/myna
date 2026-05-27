@@ -608,16 +608,11 @@ User identity, preferences, and global settings.
 | user.name | Yes | — | Display name |
 | user.email | Yes | — | Identifies your messages in email/Slack |
 | user.role | Yes | — | engineering-manager, tech-lead, senior-engineer, pm. Drives contribution categories and feature defaults |
-| vault.path | Yes | — | Obsidian vault root |
-| vault.subfolder | No | myna | Subfolder name for Myna files |
 | timezone | No | system | Used for relative date resolution |
 | work_hours.start | No | 09:00 | For capacity calculations |
 | work_hours.end | No | 17:00 | For capacity calculations |
-| timestamp_format | No | YYYY-MM-DD | Used in all vault entries |
-| feedback_cycle_days | No | 30 | Gap threshold for feedback gap detection |
-| calendar_event_prefix | No | [Myna] | Prefix for time blocks/reminders |
-| email.processed_folder | No | per-project | per-project (subfolder in each project folder) |
-| features | No | role-based defaults | Map of feature_name → true/false |
+
+Note: vault root is stored in `~/.myna/config.yaml`, not here. Vault subfolder is always `myna` (hardcoded). Calendar event prefix is hardcoded as `[Myna]` in the skills that create events. Feedback cycle threshold defaults to 30 days; per-person override is in people.yaml.
 
 ### projects.yaml
 
@@ -641,16 +636,8 @@ projects:
 
 triage:
   inbox_source: "INBOX"
-  folders:
-    - name: Reply
-      description: Needs a response from me
-    - name: FYI
-      description: Informational, no action needed
-    - name: Follow-Up
-      description: Waiting on someone else
-    - name: Schedule
-      description: Needs a meeting or calendar action
   draft_replies_folder: DraftReplies
+  folders: []  # custom folders; built-in defaults (Reply, FYI, Follow-Up, Schedule) used when empty
 ```
 
 ### people.yaml
@@ -681,7 +668,7 @@ Only `display_name` and `relationship_tier` are required during setup. Other fie
 
 ### meetings.yaml
 
-Optional overrides for meetings where type inference gets it wrong.
+Machine-managed state written by Myna's skills. Contains optional overrides for meetings where type inference gets it wrong.
 
 ```yaml
 meetings:
@@ -691,7 +678,7 @@ meetings:
     project: Platform API
 ```
 
-Most meetings need no entry — the agent infers type from calendar data (D022).
+Most meetings need no entry — the agent infers type from calendar data (D022). Users rarely edit this file directly.
 
 ### communication-style.yaml
 
@@ -705,26 +692,17 @@ presets_per_tier:
   direct: coaching
   cross-team: diplomatic
 sign_off: Best
-difficult_message_approach: direct-but-kind
 ```
 
 Built-in presets: professional, conversational, executive, casual, coaching, diplomatic, concise. Users can mix presets per audience tier.
 
 ### tags.yaml
 
-Tag definitions and auto-tagging rules.
+Extension point for custom keyword tags. Project tags, person tags, and source tags are auto-derived from projects.yaml and people.yaml — no entries needed here for those.
 
 ```yaml
-tags:
-  - name: auth-migration
-    type: project-based
-    project: Auth Migration
-  - name: urgent
-    type: keyword-based
-    keywords: [urgent, critical, ASAP, blocker]
-  - name: hiring
-    type: keyword-based
-    keywords: [interview, candidate, hiring]
+# Empty by default. Add keyword-based tags for your team's conventions.
+tags: []
 ```
 
 ---
