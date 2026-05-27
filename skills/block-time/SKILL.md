@@ -51,10 +51,10 @@ Event type labels and the base prefix are hardcoded: `[Myna]`, `[Myna:Focus]`, `
 
 **Step 4: Create the event**
 
-Only after explicit user confirmation. Apply the three-layer calendar protection from the safety steering skill: verify no attendees and title has configured prefix before calling the MCP tool. If either check fails, stop and report.
+Only after explicit user confirmation. Apply the three-layer calendar protection from the safety steering skill: verify no attendees and title has hardcoded prefix `[Myna]` before calling the MCP tool. If either check fails, stop and report.
 
 Call the calendar MCP to create the event with:
-- `title`: `[Myna:Focus] {purpose}` (using configured type label)
+- `title`: `[Myna:Focus] {purpose}`
 - `start`: ISO datetime
 - `end`: ISO datetime
 - `description`: optional context about the task
