@@ -15,8 +15,10 @@ Transforms an existing message. The user provides the text; you return the trans
 ## Before You Start
 
 Read at session start:
-- `_system/config/communication-style.yaml` — presets per tier, sign-off, preferences
 - `_system/config/people.yaml` — relationship tiers (to look up named audience)
+
+Read only when producing an email with a sign-off:
+- `_system/config/communication-style.yaml` — for the user's preferred sign-off only. If not found, use "Best,"
 
 ---
 
@@ -70,11 +72,10 @@ The user's voice, structure, and intent stay completely intact. A light touch.
    - If user names a person ("for Sarah"), look up their tier in people.yaml.
    - If user names a tier directly ("for my VP", "upward"), use that tier.
    - If unclear, ask: "Who is this going to? (upward, peer, direct, cross-team)"
-2. Read the preset for that tier in communication-style.yaml.
-3. Rephrase for the audience: adjust formality, vocabulary, sentence structure. Apply BLUF if the message is long or goes upward.
-4. For Slack messages: keep shorter, more casual even for peer/upward.
-5. For emails: apply more structure.
-6. Show the rewritten version. Note the changes briefly.
+2. Rephrase for the audience: adjust formality, vocabulary, and sentence structure to fit the tier. Lead with the key point for upward communications.
+3. For Slack messages: keep shorter, more casual even for peer/upward.
+4. For emails: apply more structure.
+5. Show the rewritten version. Note the changes briefly.
 
 **Worked example:**
 
@@ -98,16 +99,34 @@ Happy to put together the specific concerns in writing if that would help.
 - Fabricate new facts, figures, or positions not in the input
 - Change the user's intended message or ask
 
+**Writing principles (apply regardless of audience or channel):**
+- Concise — cut everything that doesn't add meaning: filler phrases, redundant restatements, padding ("I just wanted to", "As mentioned", "Hope this finds you well")
+- Clear — one main point or ask per message; lead with it, don't bury it
+- Direct — active voice; no hedging ("I think", "maybe", "just wanted to flag") and no weakening qualifiers ("very", "pretty", "rather", "quite", "a bit"); state positions and ownership plainly
+- Plain language — simple words over impressive ones ("use" not "utilize", "help" not "facilitate"); no corporate buzzwords unless the user's input uses them deliberately
+- Specific — concrete details over vague claims; preserve numbers, dates, names, and owners from the input. "5 of 7 services migrated; auth and billing remaining" beats "migration mostly done"; "decide by Friday" beats "soon". Don't invent specifics the input doesn't have.
+- Human voice — flowing prose, not bullets; no AI writing patterns (em dashes, "It's worth noting", "Furthermore/Moreover"); bullets only when content is genuinely list-like
+
 **How:**
-1. Determine target audience (same as Tone mode above). If not specified, ask before proceeding — audience drives the entire output.
-2. Read the preset for that tier.
-3. Extract the user's core intent and key points from the rough input.
-4. Write a polished message: BLUF structure for professional emails and upward communications, conversational flow for casual messages. Apply channel-specific rules (see below).
-5. Show the result. Note major structural changes.
+1. Determine target audience (same as Tone mode above). If not specified, proceed with a neutral professional register — don't ask.
+2. Extract the user's core intent and key points from the rough input.
+3. Write a polished message applying the principles above. Lead with the key point(s) for professional emails and upward communications; conversational flow for casual messages. Apply channel-specific rules (see below).
+4. Show the result. Briefly note what was strengthened in patterned terms the user can learn from ("Removed 3 hedging phrases; led with the ask; condensed background to one line") — not vague ones ("Restructured for clarity"). One or two sentences.
+5. **Strengthen further** — only when the message would meaningfully benefit. Skip for low-stakes, conversational, or already-complete messages. Apply when the message carries a decision, recommendation, status update, ask, or pushback — i.e. when the recipient needs to act, understand impact, or weigh a position.
+
+   Look for these gaps:
+   - **Missing the "why"** — decision or recommendation without reasoning
+   - **Missing the "so-what"** — update without impact ("migrated 5 services" → what changed for users?)
+   - **Missing the recommendation** — input is all facts, no stance
+   - **Missing alternatives considered** — recommendation without showing what else was weighed
+   - **Missing acknowledgment** — pushback or disagreement that doesn't acknowledge the other position
+   - **Missing deadline, owner, or concrete ask** — action items that float
+
+   Surface at most 3 suggestions, the highest-leverage ones. Frame each as a specific, actionable addition ("Add why you chose B over A"), not a critique ("This is incomplete"). If nothing meaningful is missing, skip the section entirely — silence is better than filler.
 
 **Channel-specific rules:**
-- **Slack message:** Keep under 5 lines. Skip formalities. Don't sign off.
-- **Email:** Use greeting, body with BLUF structure, sign-off from communication-style.yaml.
+- **Slack message:** Skip formalities. Don't sign off. Keep it as short as the content allows — don't pad, but don't cut content that belongs.
+- **Email:** Use greeting, body that leads with the key point(s) (don't bury the ask or conclusion), sign-off from communication-style.yaml.
 - If channel isn't clear, use the user's request context to infer. Ask only if genuinely unclear.
 
 **Worked example:**
@@ -128,7 +147,7 @@ Next: staging deploy April 14.
 
 ## Saving
 
-Output is always shown inline first. If the user says "save":
+Output is always shown inline first. For Tone and Rewrite modes, append a one-liner at the end: "Say **save** to store this in Drafts." If the user says "save":
 
 1. Write to `Drafts/[{Type}] {topic}.md` with this structure:
 ```
@@ -154,11 +173,12 @@ created: {YYYY-MM-DD}
 
 ## Edge Cases
 
-**No audience specified and mode is Tone or Rewrite:** Ask before proceeding — the audience determines the entire output. "Who's this going to? (upward, peer, direct, cross-team, or name someone)"
+**No audience specified and mode is Tone:** Ask before proceeding — restyling requires a target. "Who's this going to? (upward, peer, direct, cross-team, or name someone)"
+
+**No audience specified and mode is Rewrite:** Proceed with a neutral professional register using the writing principles above. If the output would benefit from audience tuning, note it once at the end: "Specify an audience to tune further."
 
 **Person not in registry:** If user says "rewrite for Marcus" and Marcus isn't in people.yaml, ask for relationship tier. "What's your relationship with Marcus? (upward, peer, direct, cross-team)"
 
-**communication-style.yaml not found:** Fall back to these defaults: upward = concise and formal, peer = conversational, direct = clear and warm, cross-team = professional and collaborative.
 
 **Input is very short (under 10 words):** For Fix mode, apply corrections. For Tone/Rewrite, note that there's not much to work with and proceed with what's there — don't ask for more content.
 

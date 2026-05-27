@@ -37,7 +37,8 @@ myna/
 │   ├── review-people.md              # Ambiguous observations, recognition
 │   ├── review-self.md                # Uncertain contribution candidates
 │   ├── review-triage.md              # Email triage folder recommendations
-│   └── processed-{YYYY-MM-DD}.md     # Audit trail of processed items (dated)
+│   └── processed/                    # Audit trail of processed items
+│       └── {YYYY-MM-DD}.md
 └── _system/
     ├── config/                       # 6 YAML config files (gitignored)
     │   ├── workspace.yaml
@@ -917,7 +918,7 @@ Other queues — two interaction modes:
 - **Chat mode:** user says "review my queue" → assistant presents items. User approves, edits, skips, or discards through conversation.
 - **File mode:** user opens queue files in Obsidian, checks items they've verified, then says "process my queue" → assistant processes only checked items.
 
-Approved items are written to destinations with [Verified] tag, removed from the active queue file, and appended to `ReviewQueue/processed-{YYYY-MM-DD}.md` for audit trail. Unchecked/skipped items remain in the queue for later.
+Approved items are written to destinations with [Verified] tag, removed from the active queue file, and appended to `ReviewQueue/processed/{YYYY-MM-DD}.md` for audit trail. Unchecked/skipped items remain in the queue for later.
 
 ---
 

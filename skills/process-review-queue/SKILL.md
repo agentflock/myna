@@ -10,7 +10,7 @@ argument-hint: "review my queue | process review queue | what's in my queue? | p
 
 If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:setup` and stop.
 
-Processes pending review queue items. Writes approved items to their destinations with `[Verified]` tag. Logs all processed items to `ReviewQueue/processed-{YYYY-MM-DD}.md` for audit trail.
+Processes pending review queue items. Writes approved items to their destinations with `[Verified]` tag. Logs all processed items to `ReviewQueue/processed/{YYYY-MM-DD}.md` for audit trail.
 
 **Does NOT handle `review-inbox.md`** — email triage is handled by /myna:email-triage. If the glob for queue files picks up `review-inbox.md`, skip it without parsing.
 
@@ -26,7 +26,7 @@ Queue files:
 - `ReviewQueue/review-people.md` — ambiguous observations, recognition
 - `ReviewQueue/review-self.md` — uncertain contribution candidates
 
-Audit trail: `ReviewQueue/processed-{YYYY-MM-DD}.md`
+Audit trail: `ReviewQueue/processed/{YYYY-MM-DD}.md`
 
 ---
 
@@ -78,11 +78,11 @@ Approve / Edit / Skip / Discard?
 ```
 
 5. Wait for user response per item:
-   - **approve** (or "yes", "looks good") → write to destination with `[Verified]` tag
+   - **approve** → write to destination with `[Verified]` tag
    - **approve and assign to me** → same, but add `[person:: [[{user.name}]]]` to the entry
    - **edit** → user provides corrected content → write the corrected version with `[Verified]`
    - **skip** → leave in queue file untouched, move to next item
-   - **discard** (or "no", "ignore this") → remove from queue file, log to audit trail only
+   - **discard** → remove from queue file, log to audit trail only
 
 6. After all items: summarize what was approved, edited, skipped, discarded. Write audit trail entry.
 
@@ -127,13 +127,12 @@ Continue to item 2.
 **How:**
 1. Read all three queue files.
 2. Find all checked items (`- [x]`).
-3. If none checked: "No items are checked in your queue files. Open them in Obsidian, check the items you want to approve, then say 'process approved items'."
-4. If 5 or more items are checked: present the full list and confirm before writing: "About to write {n} items to {n} files. Proceed?"
-5. For each checked item: parse `Proposed destination` and `Content` fields. Before writing, check for near-duplicates (same action + entity from same source) in the destination file. If a near-duplicate is found: skip that item and inform the user.
-6. Write each approved item to its destination with `[Verified]` tag (see Writing Approved Items below).
-7. Remove checked items from the queue file. Leave unchecked items untouched.
-8. Write audit trail.
-9. Summarize: how many items processed, from which queues, to which destinations.
+3. If none checked: "No items are checked in your queue files. Check the items you want to approve, then say 'process approved items'."
+4. For each checked item: parse `Proposed destination` and `Content` fields. Before writing, check for near-duplicates (same action + entity from same source) in the destination file. If a near-duplicate is found: skip that item and inform the user.
+5. Write each approved item to its destination with `[Verified]` tag (see Writing Approved Items below).
+6. Remove checked items from the queue file. Leave unchecked items untouched.
+7. Write audit trail.
+8. Summarize: how many items processed, from which queues, to which destinations. Include count of remaining unchecked items across all queue files.
 
 ---
 
@@ -166,7 +165,7 @@ The `[Verified]` marker and provenance conventions are defined in /myna:steering
 
 ## Audit Trail
 
-After each processing run, append to `ReviewQueue/processed-{YYYY-MM-DD}.md`:
+After each processing run, append to `ReviewQueue/processed/{YYYY-MM-DD}.md`:
 
 ```markdown
 ## Processed — {YYYY-MM-DD HH:MM}
@@ -226,24 +225,19 @@ Total: 6 items. Say 'review my queue' to go through them interactively, or open 
 
 **review-inbox.md:** If the user asks to process triage items, redirect: "Email triage is handled separately. Say 'process triage' to move approved emails to their folders." Do not parse `review-inbox.md` entries as work queue items.
 
-**Bulk write (file mode):** 5 or more checked items — present the full list and confirm before writing: "About to write {n} items to {n} files. Proceed?"
-
 ---
 
 ## Queue-Specific Notes
 
 ### review-work
-Contains: ambiguous tasks, delegations, decisions, blockers, timeline entries.
 Destination examples: `[[Auth Migration]]` → `## Timeline` or `## Tasks` section.
 
 **Destination path resolution:** Strip any folder prefix from the wiki-link (e.g., `[[Projects/auth-migration]]` → `auth-migration`). Look up the file under the configured `myna/` subfolder using Glob. Require the file to exist before writing — do not create files automatically.
 
 ### review-people
-Contains: ambiguous observations, recognition entries.
 Destination examples: `[[Sarah Chen]]` → `## Observations` or `## Recognition` section.
 
 ### review-self
-Contains: uncertain contribution candidates.
 Destination: `Journal/contributions-{week-monday}.md`
 
 Extra care: contribution claims — especially manager-type ones — should be confirmed thoughtfully. The user's career record depends on accuracy here.

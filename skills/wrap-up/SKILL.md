@@ -28,7 +28,7 @@ If no daily note exists, create a minimal one (no sync snapshot) and proceed. Th
 Also read:
 - Today's completed tasks: Grep `myna/` for `- \[x\]` with today's completion date
 - Today's meeting files: check `Meetings/` for files with today's date section
-- `Journal/contributions-{YYYY-MM-DD}.md` (Monday date) — to check for existing entries before adding new ones
+- `Journal/contributions-{YYYY-W\d\d}.md` (ISO week, e.g. `contributions-2026-W18.md`) — to check for existing entries before adding new ones
 
 ---
 
@@ -88,7 +88,7 @@ Scan for items from today that look like contributions worth tracking:
 - Contributions involving ambiguous "we" language
 - Manager-type contributions ("drove alignment", "enabled the team") without explicit evidence
 
-**Before writing any contribution**, check the current week's `Journal/contributions-{YYYY-MM-DD}.md` for near-duplicates (same action + same entity). Skip if already logged.
+**Before writing any contribution**, check the current week's `Journal/contributions-{YYYY-W\d\d}.md` for near-duplicates (same action + same entity). Skip if already logged.
 
 **Contribution entry format** (content-first):
 ```
@@ -99,7 +99,7 @@ Categories by role (from `user.role` in workspace.yaml):
 - **IC / tech-lead:** decisions-and-influence, unblocking-others, issue-prevention, code-reviews, feedback-given, documentation, escalations-handled, delegation-management, best-practices, risk-mitigation, coaching-and-mentoring
 - **engineering-manager / pm:** people-development, operational-improvements, strategic-alignment, hiring-and-team-building, cross-team-leadership, stakeholder-management
 
-Prepend all `[Auto]` and `[Inferred]` contributions to the top of the `## Contributions — Week of {YYYY-MM-DD}` section in `Journal/contributions-{YYYY-MM-DD}.md` (create file if it doesn't exist — include frontmatter `week_start:` and `#contributions` tag). Add review-self items to `ReviewQueue/review-self.md`.
+Prepend all `[Auto]` and `[Inferred]` contributions to the top of the `## Contributions — {YYYY-W\d\d}` section in `Journal/contributions-{YYYY-W\d\d}.md` (create file if it doesn't exist — include frontmatter `week:` and `#contributions` tag). Add review-self items to `ReviewQueue/review-self.md`.
 
 ---
 
@@ -178,7 +178,7 @@ Then suggest:
 
 **No tasks completed today:** Planned vs Actual shows all items as "not started" or "partially done". No contributions detected. Carry everything forward. Omit Contributions Detected section from End of Day if no contributions are detected.
 
-**contributions-{week}.md doesn't exist yet:** Create it with frontmatter (`week_start: {YYYY-MM-DD}`) and `#contributions` tag, plus a `## Contributions — Week of {YYYY-MM-DD}` section header. Write new entries into the section (newest-first from the start).
+**contributions-{YYYY-W\d\d}.md doesn't exist yet:** Create it with frontmatter (`week: {YYYY-W\d\d}`) and `#contributions` tag, plus a `## Contributions — {YYYY-W\d\d}` section header. Write new entries into the section (newest-first from the start).
 
 **User runs wrap-up twice:** The End of Day section already exists. Read it for context. Append a new "End of Day — {HH:MM} (re-run)" section below the existing one, noting what changed. Do not overwrite the original.
 
