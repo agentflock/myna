@@ -103,6 +103,12 @@ Run these commands inside Claude Code:
 
 Email, Slack, and calendar connections are optional — skip what you don't have. Myna works without them from day one.
 
+**Kiro (and other runtimes)**
+
+Clone the repo and run `./install.sh`. The script detects your installed AI runtime and runs the right installer automatically. To update a script-installed runtime, run `./update.sh` from the same directory. Codex support is planned.
+
+Claude Code users: use the plugin commands above — `./install.sh` redirects you there anyway.
+
 Once installed, run from any directory — pick the mode that fits:
 
 ```

@@ -1,8 +1,140 @@
 #!/usr/bin/env bash
-# lib.sh — Shared Myna vault scaffolding
-# Source this file and call: run_vault_setup <vault_path> <subfolder> <skill_dir>
+# lib.sh — Shared Myna helpers
+#
+# Exports (bash 3.2+ compatible):
+#   detect_runtimes        <varname>                — set varname to space-separated list of runtimes on PATH
+#   detect_script_installs <varname>                — set varname to space-separated list of script-installed runtimes
+#   resolve_vault_path                              — set VAULT_PATH in caller scope (config or prompt)
+#   pick_runtime           <varname> <r...>         — interactive numbered pick; set varname to chosen runtime
+#   run_vault_setup        <vault_path> <subfolder> <skill_dir>  — vault scaffolding
+#
 # Note: <subfolder> is always "myna" (hardcoded per D055); the parameter is kept for
 # compatibility with the call signature in claude.sh and kiro.sh.
+
+# ---------------------------------------------------------------------------
+# detect_runtimes <varname>
+#
+# Detects which of claude/kiro/codex are present on PATH.
+# Sets the named variable (in the caller's scope) to a space-separated list
+# of detected runtime names, in order.  Compatible with bash 3.2+.
+#
+# Usage:
+#   detect_runtimes DETECTED
+#   # read the results back as an array:
+#   read -ra detected <<< "$DETECTED"
+# ---------------------------------------------------------------------------
+detect_runtimes() {
+  local _varname="$1"
+  local _found=""
+  local _runtime
+  for _runtime in claude kiro codex; do
+    if command -v "$_runtime" > /dev/null 2>&1; then
+      if [[ -n "$_found" ]]; then
+        _found="$_found $_runtime"
+      else
+        _found="$_runtime"
+      fi
+    fi
+  done
+  eval "${_varname}=\"\${_found}\""
+}
+
+# ---------------------------------------------------------------------------
+# detect_script_installs <varname>
+#
+# Detects which runtimes were installed by Myna's own scripts (not merely
+# present on PATH).  Currently checks:
+#   kiro  — presence of ~/.kiro/skills/myna-* directories
+#   codex — always false (no script install yet; stub for future use)
+#
+# Sets the named variable (in the caller's scope) to a space-separated list
+# of script-installed runtime names, in order.  Compatible with bash 3.2+.
+#
+# Usage:
+#   detect_script_installs INSTALLED
+#   read -ra installed <<< "$INSTALLED"
+# ---------------------------------------------------------------------------
+detect_script_installs() {
+  local _varname="$1"
+  local _found=""
+
+  # Kiro: Myna installs skills under ~/.kiro/skills/myna-*
+  if compgen -G "$HOME/.kiro/skills/myna-*" > /dev/null 2>&1; then
+    _found="kiro"
+  fi
+
+  # Codex: no script install yet — always false
+  # (placeholder for future: check ~/.codex/skills/myna-* or equivalent)
+
+  eval "${_varname}=\"\${_found}\""
+}
+
+# ---------------------------------------------------------------------------
+# resolve_vault_path
+#
+# Resolves the vault path for use in install/update scripts:
+#   1. If ~/.myna/config.yaml exists and contains vault_path, use it silently.
+#   2. Otherwise, prompt the user and validate the directory exists.
+#
+# Sets VAULT_PATH in the caller's scope.  Compatible with bash 3.2+.
+# ---------------------------------------------------------------------------
+resolve_vault_path() {
+  local _config="$HOME/.myna/config.yaml"
+
+  if [[ -f "$_config" ]]; then
+    local _raw
+    _raw=$(grep '^vault_path:' "$_config" 2>/dev/null | sed 's/vault_path: *"*//;s/"*$//' || true)
+    if [[ -n "$_raw" ]]; then
+      VAULT_PATH="$_raw"
+      return 0
+    fi
+  fi
+
+  # No config or no vault_path entry — prompt until user supplies a valid directory.
+  while true; do
+    printf 'Enter the absolute path to your Obsidian vault: '
+    read -r VAULT_PATH
+    if [[ -d "$VAULT_PATH" ]]; then
+      break
+    else
+      echo "  Error: directory does not exist: $VAULT_PATH" >&2
+      echo "  Please enter a valid absolute path." >&2
+    fi
+  done
+}
+
+# ---------------------------------------------------------------------------
+# pick_runtime <varname> <runtime1> [runtime2 ...]
+#
+# Displays a numbered menu of the supplied runtimes, reads a choice from
+# stdin, and sets the named variable to the chosen runtime name.
+# Compatible with bash 3.2+.
+#
+# Usage:
+#   pick_runtime CHOSEN claude kiro
+#   chosen="$CHOSEN"
+# ---------------------------------------------------------------------------
+pick_runtime() {
+  local _varname="$1"
+  shift
+  local _options=("$@")
+  local _n="${#_options[@]}"
+  local _pick _i
+
+  while true; do
+    echo "Which runtime would you like to install Myna for?"
+    for (( _i = 0; _i < _n; _i++ )); do
+      printf '  %d) %s\n' "$(( _i + 1 ))" "${_options[$_i]}"
+    done
+    printf 'Enter a number [1-%d]: ' "$_n"
+    read -r _pick
+    if [[ "$_pick" =~ ^[0-9]+$ ]] && (( _pick >= 1 && _pick <= _n )); then
+      eval "${_varname}=\"\${_options[\$(( _pick - 1 ))]}\""
+      return 0
+    fi
+    echo "  Invalid choice — please enter a number between 1 and $_n." >&2
+  done
+}
 
 _myna_create_if_missing() {
   local path="$1"
