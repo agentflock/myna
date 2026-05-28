@@ -43,7 +43,6 @@ CONFIG_NAMES = ["workspace", "projects", "people", "communication-style", "meeti
 CONFIG_DEFAULTS = {
     "workspace": {
         "user": {"name": "", "email": "", "role": ""},
-        "vault": {"path": "", "subfolder": "myna"},
         "timezone": "",
         "work_hours": {"start": "09:00", "end": "17:00"},
     },
@@ -57,11 +56,7 @@ CONFIG_DEFAULTS = {
     },
     "people": {"people": []},
     "communication-style": {
-        "default_preset": "professional",
-        "presets_per_tier": {"upward": "", "peer": "", "direct": "", "cross-team": ""},
         "sign_off": "",
-        "email_preferences": {"max_length": "", "greeting_style": ""},
-        "messaging_preferences": {"formality": ""},
     },
     "meetings": {"meetings": []},
     "tags": {"tags": []},

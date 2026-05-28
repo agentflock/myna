@@ -147,7 +147,6 @@ One entry per person you work with. Start with direct reports and close collabor
 | `relationship_tier` | `direct`, `peer`, `upward`, or `cross-team` |
 | `role` | Their title |
 | `team` | Their team |
-| `feedback_cycle_days` | Days between feedback gap alerts for this person (default: 30) |
 | `birthday` | MM-DD format (for milestone alerts in daily note) |
 | `work_anniversary` | YYYY-MM-DD format (for milestone alerts) |
 
@@ -165,15 +164,10 @@ Machine-managed state written by Myna's skills. You rarely need to edit this fil
 
 ### communication-style.yaml
 
-Controls how Myna drafts emails, messages, and other written content.
+Controls how Myna drafts emails, messages, and other written content. Myna applies built-in tier-aware shaping (BLUF for upward, conversational for peer, etc.) — no preset selection required.
 
 | Field | What to put |
 |-------|-------------|
-| `default_preset` | `professional`, `conversational`, `executive`, `casual`, `coaching`, `diplomatic`, or `concise` |
-| `presets_per_tier.upward` | Preset for messages to your manager and execs |
-| `presets_per_tier.peer` | Preset for messages to peers |
-| `presets_per_tier.direct` | Preset for messages to direct reports |
-| `presets_per_tier.cross-team` | Preset for messages to other teams |
 | `sign_off` | Email sign-off (e.g. `Best`, `Thanks`) |
 
 ---

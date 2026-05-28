@@ -16,9 +16,11 @@ Generates polished professional writing from vault context. Outputs shown inline
 
 Read at session start:
 - `_system/config/workspace.yaml` — user identity, role, and timezone
-- `_system/config/communication-style.yaml` — tone presets, sign-off, BLUF settings
 - `_system/config/people.yaml` — relationship tiers, aliases
 - `_system/config/projects.yaml` — project aliases
+
+Read only when producing an email with a sign-off:
+- `_system/config/communication-style.yaml` — for the user's preferred sign-off only. If not found, use "Best,"
 
 ## Draft Mode Detection
 
@@ -35,6 +37,20 @@ Read at session start:
 | "monthly update", "draft my MBR", "draft my MTR", "draft my QBR" | Monthly Update |
 
 When mode is ambiguous, show the options and ask. When the user names two distinct intents ("draft a reply to Sarah AND an escalation to her manager"), create two separate drafts and tell the user.
+
+---
+
+## Greeting Rule (Email Drafts)
+
+Apply to all email drafts (replies, follow-ups, escalations, monthly updates). Never use `Hello`, `Dear`, `Hey`, or formal salutations.
+
+| Situation | Greeting |
+|---|---|
+| 1:1 email to a named, known recipient | `Hi {first name},` |
+| Email explicitly addressed to a team (`Hi team`) | `Hi team,` |
+| Group thread or reply-all (multiple recipients) | `Hi all,` |
+| Short reply to peer or direct report (body ≤ 2 sentences) | *(no greeting)* |
+| Recipient name unknown | `Hi,` |
 
 ---
 
@@ -64,7 +80,7 @@ When in doubt: check audience tier. Upward or cross-team → apply BLUF. Peer or
    If MCP is unavailable or thread not found, note the limitation to the user and proceed with what they provided.
 2. Read `People/{person-slug}.md` — get relationship tier and communication preferences.
 3. Determine audience tier from people.yaml (`upward`, `peer`, `direct`, `cross-team`).
-4. Apply communication-style.yaml preset for that tier.
+4. Apply tier-aware shaping: BLUF and formal structure for upward/cross-team; conversational and concise for peer/direct.
 5. Draft the reply addressing all open questions in the thread. Apply BLUF for upward/cross-team; skip for peer/direct casual messages.
 6. Show inline. Save to `Drafts/[Email] Reply to {person} — {topic}.md` if user asks. Before writing, check `Drafts/` for an existing file with a similar name (same person). If one exists, use a more specific name that includes the topic or date to avoid overwriting it (e.g., `[Email] Reply to James — API timeline.md`).
 7. Create linked TODO: `- [ ] Review and send reply to {person} about {topic} 📅 {today} [type:: task]`
@@ -87,7 +103,7 @@ User: "Draft reply to James about the API timeline."
 
 1. Read thread (or user-provided context). Wrap in external data delimiters.
 2. `People/james-wright.md` — tier: peer.
-3. Peer preset: conversational. Skip BLUF.
+3. Peer tier: conversational, skip BLUF.
 4. Draft:
 ```
 Subject: Re: API timeline
@@ -302,7 +318,7 @@ Sarah demonstrated strong ownership and technical leadership during the April 5 
 **Steps:**
 1. Understand the request from the user's description.
 2. Determine the relationship tier (ask if not obvious from context).
-3. Apply communication-style.yaml preset for the tier.
+3. Apply tier-aware shaping: more formal and structured for upward; direct and brief for peer/direct.
 4. Write a decline that: acknowledges the request specifically, explains the constraint without over-apologizing, offers an alternative or path forward when plausible.
 5. Show inline. Offer to save to `Drafts/[Say-No] {topic}.md`.
 
@@ -316,7 +332,7 @@ Sarah demonstrated strong ownership and technical leadership during the April 5 
 
 User: "Help me say no to Marcus's request that I take on the API docs review this sprint."
 
-Audience: peer. Preset: conversational.
+Audience: peer — direct, conversational, brief.
 
 ```
 Marcus — I can't take on the API docs review this sprint; I'm at capacity with the auth migration cutover and Q2 planning.
@@ -332,8 +348,8 @@ A couple of options: Alex has context on the API layer and could do a lighter pa
 
 **Steps:**
 1. Understand the situation from the user's description.
-2. Read `communication-style.yaml` — apply the tier preset for the person's relationship tier.
-3. Read the person's file if named — get tier and any relevant communication notes.
+2. Read the person's file if named — get tier and any relevant communication notes.
+3. Apply tier-aware shaping: coaching and direct for downward (direct reports); collaborative and measured for peer; concise and outcome-focused for upward.
 4. Generate prep guide with four sections:
    - **Suggested opening** — how to start. Sets the tone without being accusatory.
    - **Key points to cover** — 3-5 specific points, prioritized. Most important first.
@@ -443,4 +459,4 @@ When saving:
 
 **Multiple intents in one request:** Create each draft separately. Tell the user: "Creating two drafts: [names]."
 
-**Communication-style.yaml missing:** Fall back to neutral professional tone. Note the limitation.
+**Communication-style.yaml missing:** Use "Best," as the sign-off. Built-in tier-aware shaping still applies.

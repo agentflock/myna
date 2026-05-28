@@ -29,7 +29,7 @@ Weekly note path: `Journal/{YYYY-W\d\d}.md` (e.g. `2026-W18.md`)
 ## Step 2: Read Config
 
 Read `workspace.yaml`:
-- `user.role` → determines framing of contribution categories
+- `user.role` → context only (used for display in output, does not select categories)
 
 ---
 

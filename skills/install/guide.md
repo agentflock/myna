@@ -116,7 +116,7 @@ The primary config file. Required — Myna reads it at every session start.
 |-------|-------------|
 | `user.name` | Your full name |
 | `user.email` | Your work email (used to identify your messages) |
-| `user.role` | `engineering-manager`, `tech-lead`, `senior-engineer`, or `pm` |
+| `user.role` | Your role — display/context only. Full list: `engineering-manager`, `tech-lead`, `staff-engineer`, `principal-engineer`, `sde`, `security-engineer`, `data-engineer`, `ml-engineer`, `devops-sre`, `product-manager`, `program-manager`, `designer`, `director-engineering`, `vp-engineering`, `cto`, or a custom value. |
 | `timezone` | IANA timezone, e.g. `America/Los_Angeles` |
 | `work_hours.start` / `.end` | Your workday bounds, e.g. `09:00` / `17:00` |
 | (journal archiving) | Automatic — Myna moves old notes to `Journal/Archive/` when new ones are created; no config needed |
@@ -167,15 +167,10 @@ Machine-managed state written by Myna's skills. You rarely need to edit this fil
 
 ### communication-style.yaml
 
-Controls how Myna drafts emails, messages, and other written content.
+Controls how Myna drafts emails, messages, and other written content. Myna applies built-in tier-aware shaping (BLUF for upward, conversational for peer, etc.) — no preset selection required.
 
 | Field | What to put |
 |-------|-------------|
-| `default_preset` | `professional`, `conversational`, `executive`, `casual`, `coaching`, `diplomatic`, or `concise` |
-| `presets_per_tier.upward` | Preset for messages to your manager and execs |
-| `presets_per_tier.peer` | Preset for messages to peers |
-| `presets_per_tier.direct` | Preset for messages to direct reports |
-| `presets_per_tier.cross-team` | Preset for messages to other teams |
 | `sign_off` | Email sign-off (e.g. `Best`, `Thanks`) |
 
 ### tags.yaml
@@ -315,7 +310,7 @@ These samples show the full structure of each config file, derived from what the
 user:
   name: ""                  # Your full name
   email: ""                 # Your work email — used to identify your messages
-  role: ""                  # engineering-manager | tech-lead | senior-engineer | pm
+  role: ""                  # display/context only; full list defined in the config UI
 
 timezone: ""                # IANA timezone, e.g. America/Los_Angeles (default: system timezone)
 work_hours:
@@ -327,14 +322,6 @@ work_hours:
 
 ```yaml
 # Run /myna:setup for guided configuration.
-
-default_preset: professional  # professional | conversational | executive | casual | coaching | diplomatic | concise
-
-presets_per_tier:
-  upward: ""               # Messages to your manager, VP, execs
-  peer: ""                 # Messages to peers and other managers
-  direct: ""               # Messages to direct reports
-  cross-team: ""           # Messages to other teams
 
 sign_off: ""               # Email sign-off (e.g. Best, Thanks, Cheers)
 ```

@@ -18,7 +18,7 @@ Closes out the day. Reads today's daily note and vault state, writes an End of D
 
 Read `workspace.yaml`:
 - `timezone` → today's date
-- `user.role` → determines contribution categories
+- `user.role` → context only (display in output, does not affect category selection)
 
 Read today's daily note: `Journal/{YYYY-MM-DD}.md`
 
@@ -94,9 +94,12 @@ Scan for items from today that look like contributions worth tracking:
 - **{category}:** {description} [{provenance}] (wrap-up, {user.name}, {YYYY-MM-DD})
 ```
 
-Categories by role (from `user.role` in workspace.yaml):
-- **IC / tech-lead:** decisions-and-influence, unblocking-others, issue-prevention, code-reviews, feedback-given, documentation, escalations-handled, delegation-management, best-practices, risk-mitigation, coaching-and-mentoring
-- **engineering-manager / pm:** people-development, operational-improvements, strategic-alignment, hiring-and-team-building, cross-team-leadership, stakeholder-management
+Five universal categories — role-agnostic. A junior IC and a VP both log in the same buckets:
+- `delivery` — things you built, shipped, or completed: features, designs, documents, processes
+- `decisions` — calls you made when a direction was needed: architecture, scope, escalations resolved
+- `feedback` — developmental input you gave to others: code reviews, written feedback, growth conversations
+- `people` — helping, growing, or unblocking others: mentoring, coaching, unblocking teammates, onboarding
+- `quality` — making things more reliable, maintainable, or efficient: documentation, process improvements, risk mitigation, issue prevention
 
 Prepend all `[Auto]` and `[Inferred]` contributions to the top of the `## Contributions — {YYYY-W\d\d}` section in `Journal/contributions-{YYYY-W\d\d}.md` (create file if it doesn't exist — include frontmatter `week:` and `#contributions` tag). Add review-self items to `ReviewQueue/review-self.md`.
 
@@ -181,4 +184,4 @@ Then suggest:
 
 **User runs wrap-up twice:** The End of Day section already exists. Read it for context. Append a new "End of Day — {HH:MM} (re-run)" section below the existing one, noting what changed. Do not overwrite the original.
 
-**Tasks with no project:** These are personal tasks in the daily note itself. Include them in completed/not-started tracking. For contribution detection, skip project-specific categorization — log as `decisions-and-influence` or `unblocking-others` based on task description.
+**Tasks with no project:** These are personal tasks in the daily note itself. Include them in completed/not-started tracking. For contribution detection, skip project-specific categorization — log as `decisions` or `people` based on task description.

@@ -242,7 +242,7 @@ meetings: []'
 user:
   name: ""
   email: ""
-  role: ""              # engineering-manager | tech-lead | senior-engineer | pm
+  role: ""              # display/context only; full list defined in the config UI
 
 timezone: ""            # IANA timezone, e.g. America/Los_Angeles
 work_hours:
@@ -252,14 +252,6 @@ work_hours:
 
   _myna_create_if_missing "$MYNA_ROOT/_system/config/communication-style.yaml" \
 '# Run /myna:setup for guided configuration.
-
-default_preset: professional   # professional | conversational | executive | casual | coaching | diplomatic | concise
-
-presets_per_tier:
-  upward: ""
-  peer: ""
-  direct: ""
-  cross-team: ""
 
 sign_off: ""'
 

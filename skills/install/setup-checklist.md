@@ -44,7 +44,7 @@ Option B: Edit the files directly:
 - [ ] `myna/_system/config/projects.yaml` — active projects you want Myna to track
 - [ ] `myna/_system/config/people.yaml` — direct reports, peers, manager, key cross-team contacts
 - [ ] `myna/_system/config/meetings.yaml` — meeting type overrides (optional)
-- [ ] `myna/_system/config/communication-style.yaml` — your tone preference and feedback approach
+- [ ] `myna/_system/config/communication-style.yaml` — your email sign-off (Myna handles tone automatically)
 
 **Custom routing (advanced).** `~/.myna/overrides/routing.md` is available for routing rules if you add your own skills. It is never overwritten by updates. Most users won't need this right away — it's there when you do.
 

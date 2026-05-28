@@ -407,11 +407,13 @@ week_start: {YYYY-MM-DD}
 - [{YYYY-MM-DD}] **{category}:** {description} [{provenance}] ({source-detail})
 ```
 
-**Categories (IC):** decisions-and-influence, unblocking-others, issue-prevention, code-reviews, feedback-given, documentation, escalations-handled, delegation-management, best-practices, risk-mitigation, coaching-and-mentoring
+**Categories (universal — role-agnostic):** `delivery`, `decisions`, `feedback`, `people`, `quality`
 
-**Categories (Manager/PM):** people-development, operational-improvements, strategic-alignment, hiring-and-team-building, cross-team-leadership, stakeholder-management
-
-Category set determined by `user.role` in workspace.yaml. Manager categories require conservative inference — when in doubt, route to review-self queue.
+- `delivery` — things built, shipped, or completed: features, designs, documents, processes
+- `decisions` — calls made when a direction was needed: architecture, scope, escalations resolved
+- `feedback` — developmental input given to others: code reviews, written feedback, growth conversations
+- `people` — helping, growing, or unblocking others: mentoring, coaching, onboarding
+- `quality` — making things more reliable, maintainable, or efficient: documentation, process improvements, risk mitigation, issue prevention
 
 ### 2.9 Draft File
 
@@ -621,7 +623,7 @@ All config files live under `_system/config/` and are gitignored. `.example` fil
 user:
   name: "Siddharth Bathla"          # required
   email: "sid@company.com"          # required — identifies your messages
-  role: engineering-manager          # required — engineering-manager | tech-lead | senior-engineer | pm
+  role: engineering-manager          # required — display/context only; full list defined in the config UI
 
 # Time settings
 timezone: America/Los_Angeles         # default: system timezone
@@ -672,7 +674,6 @@ people:
     relationship_tier: direct         # required — direct | peer | upward | cross-team
     role: Senior Engineer             # optional
     team: Platform                    # optional
-    feedback_cycle_days: 21           # optional — overrides default 30 days for this person
     birthday: "03-15"                 # optional — MM-DD, for milestones
     work_anniversary: "2023-06-01"    # optional — for milestones
 ```
@@ -692,17 +693,9 @@ meetings:
 ### 3.5 communication-style.yaml
 
 ```yaml
-# Populated by communication style interview or preset selection.
-# Falls back to role-based defaults when not present.
-
-default_preset: professional          # professional | conversational | executive |
-                                      # casual | coaching | diplomatic | concise
-
-presets_per_tier:                      # optional — different preset per audience
-  upward: executive
-  peer: conversational
-  direct: coaching
-  cross-team: diplomatic
+# Populated by /myna:setup or the config UI.
+# Myna applies built-in tier-aware shaping (BLUF for upward, conversational
+# for peer, etc.) — no preset selection required.
 
 sign_off: "Best"                      # email sign-off
 ```

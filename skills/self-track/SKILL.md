@@ -15,7 +15,7 @@ Logs your contributions and lets you query them. Log what you did; query it late
 ## 📋 Before You Start
 
 Read at session start:
-- `_system/config/workspace.yaml` — for `user.name` and `user.role` (determines contribution categories)
+- `_system/config/workspace.yaml` — for `user.name` and `user.role` (context only — used to disambiguate ambiguous contributions, does not select categories)
 - `_system/config/projects.yaml` — for cross-referencing project-level impact
 
 **Contributions log path:** `Journal/contributions-{YYYY-W\d\d}.md` (ISO week, e.g. `contributions-2026-W18.md`).

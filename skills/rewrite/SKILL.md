@@ -126,7 +126,7 @@ Happy to put together the specific concerns in writing if that would help.
 
 **Channel-specific rules:**
 - **Slack message:** Skip formalities. Don't sign off. Keep it as short as the content allows — don't pad, but don't cut content that belongs.
-- **Email:** Use greeting, body that leads with the key point(s) (don't bury the ask or conclusion), sign-off from communication-style.yaml.
+- **Email:** Apply the greeting rule from `/myna:draft` (`Hi {first name}`, `Hi team`, `Hi all`, omit for short peer replies, `Hi` when name unknown — never `Hello`, `Dear`, or `Hey`). Body leads with the key point(s) (don't bury the ask or conclusion). Sign-off from communication-style.yaml.
 - If channel isn't clear, use the user's request context to infer. Ask only if genuinely unclear.
 
 **Worked example:**

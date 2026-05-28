@@ -32,7 +32,7 @@ One-line summary: Draft a reply to an email, triggered from the agent conversati
 - Reads the full thread; addresses all open questions and requests
 - Uses sender's audience tier and communication preferences from registry
 - BLUF structure by default (D016): lead with the answer or ask, then context
-- Style from `communication-style.md` config
+- Tier-aware shaping built in: BLUF for upward, conversational for peer; sign-off from `communication-style.yaml`
 - For agent conversation trigger: output shown inline; saved to `Drafts/Email/` if user asks
 - Auto-creates linked TODO ("review and send reply to [person] about [topic]")
 
@@ -57,7 +57,7 @@ One-line summary: Rewrite any Slack message or email for the right tone and audi
 - Default mode: rewrite
 - Audience tiers from registry: upward, peer, direct, cross-team
 - Channel-specific rules: Slack messages are shorter and more casual; emails are more structured
-- Reads from `communication-style.md` for tone, sign-off, and style preferences
+- Reads from `communication-style.yaml` for sign-off only; tier-aware shaping is built in
 - Output shown inline
 
 ### Structured Draft
@@ -101,7 +101,7 @@ One-line summary: Prepare for a hard conversation with a structured guide coveri
 - "Help me prepare for [describe the conversation]" → generates prep guide
 - Sections: suggested opening, key points to cover (prioritized), things to avoid saying, how to close constructively
 - Flags if the conversation likely requires follow-up documentation (e.g., performance concerns → document afterwards)
-- Tone calibrated to coaching/feedback style from `communication-style.md`
+- Tone calibrated to tier (coaching for direct reports, measured for peer, concise for upward)
 - Output shown inline or saved as a note
 
 ### Document Processing

@@ -1,9 +1,1 @@
-default_preset: professional
-
-presets_per_tier:
-  upward: executive
-  peer: conversational
-  direct: coaching
-  cross-team: diplomatic
-
 sign_off: "Thanks"

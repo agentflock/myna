@@ -81,10 +81,6 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         Identity
       </button>
-      <button class="nav-tab" data-tab="calendar" onclick="switchTab('calendar')">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-        Calendar
-      </button>
       <button class="nav-tab" data-tab="communication" onclick="switchTab('communication')">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
         Communication
@@ -97,9 +93,9 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
         Projects
       </button>
-      <button class="nav-tab" data-tab="integrations" onclick="switchTab('integrations')">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-        Integrations
+      <button class="nav-tab" data-tab="email" onclick="switchTab('email')">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Email
       </button>
 
       <div class="pt-5 pb-2">
@@ -132,24 +128,13 @@
               </div>
             </div>
 
-            <!-- Calendar card -->
-            <div class="overview-card" id="card-calendar" onclick="switchTab('calendar')">
+            <!-- Email card -->
+            <div class="overview-card" id="card-email" onclick="switchTab('email')">
               <div class="flex items-center justify-between mb-3">
-                <span class="card-title">Calendar</span>
-                <span class="status-badge" id="badge-calendar"></span>
+                <span class="card-title">Email</span>
+                <span class="status-badge" id="badge-email"></span>
               </div>
-              <div class="card-body" id="overview-calendar-body">
-                <span class="text-slate-400 text-sm">Loading...</span>
-              </div>
-            </div>
-
-            <!-- Integrations card -->
-            <div class="overview-card" id="card-integrations" onclick="switchTab('integrations')">
-              <div class="flex items-center justify-between mb-3">
-                <span class="card-title">Integrations</span>
-                <span class="status-badge" id="badge-integrations"></span>
-              </div>
-              <div class="card-body" id="overview-integrations-body">
+              <div class="card-body" id="overview-email-body">
                 <span class="text-slate-400 text-sm">Loading...</span>
               </div>
             </div>
@@ -217,9 +202,20 @@
                   <option value="">Select a role</option>
                   <option value="engineering-manager">Engineering Manager</option>
                   <option value="tech-lead">Tech Lead</option>
-                  <option value="senior-engineer">Senior Engineer</option>
-                  <option value="pm">PM</option>
-                  <option value="_custom">Custom...</option>
+                  <option value="staff-engineer">Staff Engineer</option>
+                  <option value="principal-engineer">Principal Engineer</option>
+                  <option value="sde">Software Development Engineer</option>
+                  <option value="security-engineer">Security Engineer</option>
+                  <option value="data-engineer">Data Engineer</option>
+                  <option value="ml-engineer">ML Engineer</option>
+                  <option value="devops-sre">DevOps Engineer / SRE</option>
+                  <option value="product-manager">Product Manager</option>
+                  <option value="program-manager">Program Manager</option>
+                  <option value="designer">Designer</option>
+                  <option value="director-engineering">Director of Engineering</option>
+                  <option value="vp-engineering">VP Engineering</option>
+                  <option value="cto">CTO</option>
+                  <option value="_custom">Custom…</option>
                 </select>
                 <input type="text" id="user-role-custom" class="field-input mt-2 hidden" placeholder="Enter your role" />
               </div>
@@ -314,78 +310,19 @@
               </div>
             </div>
 
-            <div class="form-section">
-              <h2 class="section-title">Cadence</h2>
-
-              <div class="field-group">
-                <label class="field-label" for="feedback-cycle">Feedback cycle</label>
-                <select id="feedback-cycle" class="field-input" onchange="saveTab('identity')">
-                  <option value="14">Every 2 weeks</option>
-                  <option value="30" selected>Every month</option>
-                  <option value="90">Quarterly</option>
-                </select>
-              </div>
-
-
-            </div>
 
           </form>
         </div>
       </div>
 
-      <!-- ===================== CALENDAR ===================== -->
-      <div id="tab-calendar" class="tab-panel hidden p-8">
+      <!-- ===================== EMAIL ===================== -->
+      <div id="tab-email" class="tab-panel hidden p-8">
         <div class="max-w-xl">
-          <h1 class="text-xl font-semibold text-slate-900 mb-1">Calendar</h1>
-          <p class="text-slate-500 text-sm mb-8">How Myna labels the calendar events it creates.</p>
+          <h1 class="text-xl font-semibold text-slate-900 mb-1">Email</h1>
+          <p class="text-slate-500 text-sm mb-8">Configure how Myna triages your inbox.</p>
 
-          <form id="calendar-form" onsubmit="return false;">
+          <form id="email-form" onsubmit="return false;">
             <div class="form-section">
-              <h2 class="section-title">Event Labels</h2>
-
-              <div class="field-group">
-                <label class="field-label" for="calendar-prefix">Event prefix</label>
-                <input type="text" id="calendar-prefix" class="field-input font-mono" placeholder="[Myna]" />
-                <p class="field-hint">Prepended to every calendar event Myna creates, e.g. <code>[Myna]:Focus</code>.</p>
-              </div>
-
-            </div>
-
-          </form>
-        </div>
-      </div>
-
-      <!-- ===================== INTEGRATIONS ===================== -->
-      <div id="tab-integrations" class="tab-panel hidden p-8">
-        <div class="max-w-xl">
-          <h1 class="text-xl font-semibold text-slate-900 mb-1">Integrations</h1>
-          <p class="text-slate-500 text-sm mb-8">Connect Myna to your email, calendar, and messaging tools via MCP servers.</p>
-
-          <div class="info-box mb-8">
-            Enter the MCP server names you registered with Claude Code. Run <code>claude mcp list</code> to see your registered servers. Leave empty if not set up — Myna works without them.
-          </div>
-
-          <form id="integrations-form" onsubmit="return false;">
-            <div class="form-section">
-              <h2 class="section-title">MCP Servers</h2>
-
-              <div class="field-group">
-                <label class="field-label" for="mcp-email">Email MCP server</label>
-                <input type="text" id="mcp-email" class="field-input font-mono" placeholder="e.g. gmail-mcp" oninput="updateDraftRepliesVisibility(); saveTab('integrations')" />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="mcp-calendar">Calendar MCP server</label>
-                <input type="text" id="mcp-calendar" class="field-input font-mono" placeholder="e.g. gcal-mcp" />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="mcp-slack">Messaging MCP server</label>
-                <input type="text" id="mcp-slack" class="field-input font-mono" placeholder="e.g. slack-mcp" />
-              </div>
-            </div>
-
-            <div class="form-section" id="draft-replies-section" style="display:none">
               <h2 class="section-title">Email Triage</h2>
 
               <div class="field-group">
@@ -398,12 +335,6 @@
                 <label class="field-label" for="triage-draft-replies-folder">Draft replies folder</label>
                 <input type="text" id="triage-draft-replies-folder" class="field-input font-mono" placeholder="DraftReplies" />
                 <p class="field-hint">Email folder where you forward threads with reply notes. Myna reads this folder to create draft replies.</p>
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="email-processed-folder">Processed email folder</label>
-                <input type="text" id="email-processed-folder" class="field-input font-mono" placeholder="e.g. Processed" />
-                <p class="field-hint">Folder where Myna moves emails after triage to prevent reprocessing.</p>
               </div>
 
             </div>
@@ -420,110 +351,11 @@
 
           <form id="communication-form" onsubmit="return false;">
             <div class="form-section">
-              <h2 class="section-title">Default style</h2>
-
-              <div class="field-group">
-                <label class="field-label" for="comm-default-preset">Default preset</label>
-                <select id="comm-default-preset" class="field-input" onchange="handleCommStyleChange('default')">
-                  <option value="">Select a style</option>
-                  <option value="professional">Professional — polished, clear, appropriate for any audience</option>
-                  <option value="conversational">Conversational — warm, natural, collegial tone</option>
-                  <option value="executive">Executive — BLUF, outcome-focused, so-what first</option>
-                  <option value="casual">Casual — relaxed, informal, no-formality needed</option>
-                  <option value="coaching">Coaching — encouraging, growth-oriented, forward-looking</option>
-                  <option value="diplomatic">Diplomatic — tactful, balances honesty with relationship care</option>
-                  <option value="concise">Concise — shortest possible, essentials only</option>
-                  <option value="_custom">Custom</option>
-                </select>
-                <input type="text" id="comm-default-preset-custom" class="field-input mt-2 hidden" placeholder="Describe your communication style" />
-              </div>
-            </div>
-
-            <div class="form-section">
-              <h2 class="section-title">Per-tier overrides</h2>
-              <p class="text-slate-500 text-sm mb-4">Override the default style for specific relationship tiers.</p>
-
-              <div class="field-group">
-                <label class="field-label" for="comm-upward">Upward (manager, leadership)</label>
-                <select id="comm-upward" class="field-input" onchange="handleCommStyleChange('upward')">
-                  <option value="">Use default</option>
-                  <option value="professional">Professional — polished, clear, appropriate for any audience</option>
-                  <option value="conversational">Conversational — warm, natural, collegial tone</option>
-                  <option value="executive">Executive — BLUF, outcome-focused, so-what first</option>
-                  <option value="casual">Casual — relaxed, informal, no-formality needed</option>
-                  <option value="coaching">Coaching — encouraging, growth-oriented, forward-looking</option>
-                  <option value="diplomatic">Diplomatic — tactful, balances honesty with relationship care</option>
-                  <option value="concise">Concise — shortest possible, essentials only</option>
-                  <option value="_custom">Custom</option>
-                </select>
-                <input type="text" id="comm-upward-custom" class="field-input mt-2 hidden" placeholder="Describe your communication style" />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="comm-peer">Peer</label>
-                <select id="comm-peer" class="field-input" onchange="handleCommStyleChange('peer')">
-                  <option value="">Use default</option>
-                  <option value="professional">Professional — polished, clear, appropriate for any audience</option>
-                  <option value="conversational">Conversational — warm, natural, collegial tone</option>
-                  <option value="executive">Executive — BLUF, outcome-focused, so-what first</option>
-                  <option value="casual">Casual — relaxed, informal, no-formality needed</option>
-                  <option value="coaching">Coaching — encouraging, growth-oriented, forward-looking</option>
-                  <option value="diplomatic">Diplomatic — tactful, balances honesty with relationship care</option>
-                  <option value="concise">Concise — shortest possible, essentials only</option>
-                  <option value="_custom">Custom</option>
-                </select>
-                <input type="text" id="comm-peer-custom" class="field-input mt-2 hidden" placeholder="Describe your communication style" />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="comm-direct">Direct reports</label>
-                <select id="comm-direct" class="field-input" onchange="handleCommStyleChange('direct')">
-                  <option value="">Use default</option>
-                  <option value="professional">Professional — polished, clear, appropriate for any audience</option>
-                  <option value="conversational">Conversational — warm, natural, collegial tone</option>
-                  <option value="executive">Executive — BLUF, outcome-focused, so-what first</option>
-                  <option value="casual">Casual — relaxed, informal, no-formality needed</option>
-                  <option value="coaching">Coaching — encouraging, growth-oriented, forward-looking</option>
-                  <option value="diplomatic">Diplomatic — tactful, balances honesty with relationship care</option>
-                  <option value="concise">Concise — shortest possible, essentials only</option>
-                  <option value="_custom">Custom</option>
-                </select>
-                <input type="text" id="comm-direct-custom" class="field-input mt-2 hidden" placeholder="Describe your communication style" />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="comm-cross-team">Cross-team</label>
-                <select id="comm-cross-team" class="field-input" onchange="handleCommStyleChange('cross-team')">
-                  <option value="">Use default</option>
-                  <option value="professional">Professional — polished, clear, appropriate for any audience</option>
-                  <option value="conversational">Conversational — warm, natural, collegial tone</option>
-                  <option value="executive">Executive — BLUF, outcome-focused, so-what first</option>
-                  <option value="casual">Casual — relaxed, informal, no-formality needed</option>
-                  <option value="coaching">Coaching — encouraging, growth-oriented, forward-looking</option>
-                  <option value="diplomatic">Diplomatic — tactful, balances honesty with relationship care</option>
-                  <option value="concise">Concise — shortest possible, essentials only</option>
-                  <option value="_custom">Custom</option>
-                </select>
-                <input type="text" id="comm-cross-team-custom" class="field-input mt-2 hidden" placeholder="Describe your communication style" />
-              </div>
-            </div>
-
-            <div class="form-section">
               <h2 class="section-title">Email preferences</h2>
 
               <div class="field-group">
                 <label class="field-label" for="comm-sign-off">Sign-off</label>
                 <input type="text" id="comm-sign-off" class="field-input" placeholder="e.g. Thanks, Best, Cheers" />
-              </div>
-
-              <div class="field-group">
-                <label class="field-label" for="comm-email-greeting">Greeting style</label>
-                <select id="comm-email-greeting" class="field-input">
-                  <option value="">Select greeting</option>
-                  <option value="first-name">First name</option>
-                  <option value="formal">Formal</option>
-                  <option value="none">None</option>
-                </select>
               </div>
 
             </div>
@@ -541,7 +373,7 @@
 
           <div id="projects-list" class="flex flex-col gap-2 mb-4"></div>
 
-          <div class="info-box mb-4">Got a goals doc, project brief, or business review? Upload it in <a href="#" onclick="event.preventDefault(); switchTab('files')" class="underline">Files</a> and run <code>/myna:setup</code> — Myna will extract projects automatically.</div>
+          <div class="info-box mb-4">Have a doc that lists your projects? Upload it in <a href="#" onclick="event.preventDefault(); switchTab('files')" class="underline">Files</a>.</div>
 
           <button type="button" class="add-item-btn" onclick="addProject()">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -559,7 +391,7 @@
 
           <div id="people-list" class="flex flex-col gap-2 mb-4"></div>
 
-          <div class="info-box mb-4">Got a team directory, org chart, or any doc that lists your colleagues? Upload it in <a href="#" onclick="event.preventDefault(); switchTab('files')" class="underline">Files</a> and run <code>/myna:setup</code> — Myna will extract people automatically.</div>
+          <div class="info-box mb-4">Have a doc that lists your colleagues? Upload it in <a href="#" onclick="event.preventDefault(); switchTab('files')" class="underline">Files</a>.</div>
 
           <button type="button" class="add-item-btn" onclick="addPerson()">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -586,7 +418,7 @@
 
           <!-- Helper info box -->
           <div class="info-box mt-4 mb-6">
-            Upload any docs that describe your work — team directories, org charts, goals docs, project briefs, business reviews, meeting notes. Run <code>/myna:setup</code> in a Claude chat to extract people and projects automatically.
+            Drop docs here — team rosters, org charts, project briefs, goals docs, meeting notes. After you close the UI, Myna will ask if you want to extract people and projects from them.
           </div>
 
           <!-- Uploaded files (populated after upload) -->
@@ -625,27 +457,23 @@
       <div id="defaults-content" class="hidden py-3">
         <dl class="defaults-list">
           <div class="defaults-row">
-            <dt class="defaults-label">Timestamp format</dt>
-            <dd class="defaults-value">YYYY-MM-DD</dd>
-          </div>
-          <div class="defaults-row">
-            <dt class="defaults-label">Prompt logging</dt>
-            <dd class="defaults-value">true</dd>
-          </div>
-          <div class="defaults-row">
-            <dt class="defaults-label">AI model</dt>
-            <dd class="defaults-value">claude-code</dd>
-          </div>
-          <div class="defaults-row">
-            <dt class="defaults-label">Calendar prefix</dt>
+            <dt class="defaults-label">Calendar event prefix</dt>
             <dd class="defaults-value">[Myna]</dd>
           </div>
           <div class="defaults-row">
             <dt class="defaults-label">Calendar event types</dt>
             <dd class="defaults-value">Focus / Task / Reminder</dd>
           </div>
+          <div class="defaults-row">
+            <dt class="defaults-label">Timestamp format</dt>
+            <dd class="defaults-value">YYYY-MM-DD</dd>
+          </div>
+          <div class="defaults-row">
+            <dt class="defaults-label">Inbox triage folders</dt>
+            <dd class="defaults-value">Reply / FYI / Follow-Up / Schedule</dd>
+          </div>
         </dl>
-        <p class="text-slate-400 text-xs italic mt-3">These are internal defaults. Edit <code class="font-mono not-italic">workspace.yaml</code> directly to change them.</p>
+        <p class="text-slate-400 text-xs italic mt-3">These values are hardcoded in Myna and cannot be changed via the UI.</p>
       </div>
     </div>
   </div>

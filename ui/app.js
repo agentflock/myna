@@ -133,13 +133,12 @@ async function loadConfig() {
 function populateForms() {
   if (!window.config) return;
   populateIdentity();
-  populateCalendar();
-  populateIntegrations();
+  populateEmail();
   populateCommunication();
   populateProjects();
   populatePeople();
   // Attach help listeners for all static tabs now that DOM is ready
-  ['identity', 'calendar', 'communication', 'integrations'].forEach(tab => attachHelpListeners(tab));
+  ['identity', 'communication', 'email'].forEach(tab => attachHelpListeners(tab));
   // Re-render help panel in case the active tab has no listeners yet
   renderHelpPanel(activeTab);
   attachHelpListeners(activeTab);
@@ -171,10 +170,6 @@ function populateIdentity() {
   // Work hours — parse HH:MM 24-hour into hour/minute/AM-PM dropdowns
   setTimePicker('work-start', wh.start || '09:00');
   setTimePicker('work-end',   wh.end   || '17:00');
-  // Map stored days to the nearest dropdown option (14 / 30 / 90)
-  const cycleDays = ws.feedback_cycle_days != null ? ws.feedback_cycle_days : 30;
-  const cycleOption = cycleDays <= 20 ? '14' : cycleDays <= 60 ? '30' : '90';
-  setValue('feedback-cycle', cycleOption);
   setValue('journal-archive',  journal.archive_after_days != null ? journal.archive_after_days : '');
 
   // Timezone — check if it's in the known list, else use "other".
@@ -210,74 +205,16 @@ function populateIdentity() {
 
 }
 
-function populateCalendar() {
-  const ws = window.config.workspace || {};
-  setValue('calendar-prefix', ws.calendar_event_prefix || '[Myna]');
-}
-
-function populateIntegrations() {
-  const ws      = window.config.workspace || {};
+function populateEmail() {
   const triage  = (window.config.projects || {}).triage || {};
   setValue('triage-inbox-source',        triage.inbox_source         || 'INBOX');
   setValue('triage-draft-replies-folder',triage.draft_replies_folder || 'DraftReplies');
-  setValue('email-processed-folder',     (ws.email || {}).processed_folder || '');
-  updateDraftRepliesVisibility();
-}
-
-function updateDraftRepliesVisibility() {
-  const emailMcp = document.getElementById('mcp-email');
-  const section  = document.getElementById('draft-replies-section');
-  if (!emailMcp || !section) return;
-  section.style.display = emailMcp.value.trim() ? '' : 'none';
 }
 
 function populateCommunication() {
-  const cs    = window.config['communication-style'] || {};
-  const ws    = window.config.workspace || {};
-  const tier  = cs.presets_per_tier || {};
-  const ep    = cs.email_preferences || {};
-  const email = ws.email || {};
-
-  setCommStyleValue('comm-default-preset', cs.default_preset    || 'professional');
-  setCommStyleValue('comm-upward',         tier.upward           || 'executive');
-  setCommStyleValue('comm-peer',           tier.peer             || 'professional');
-  setCommStyleValue('comm-direct',         tier.direct           || 'conversational');
-  setCommStyleValue('comm-cross-team',     tier['cross-team']    || 'professional');
+  const cs   = window.config['communication-style'] || {};
 
   setValue('comm-sign-off',           cs.sign_off       || '');
-  setValue('comm-email-greeting',     ep.greeting_style || '');
-}
-
-/**
- * Populate a communication style select + its companion custom input.
- * If the stored value matches a known option it sets it directly.
- * If it doesn't match (legacy or freeform value), it selects "_custom"
- * and puts the raw value into the companion text input.
- */
-function setCommStyleValue(selectId, value) {
-  const sel    = document.getElementById(selectId);
-  const custom = document.getElementById(selectId + '-custom');
-  if (!sel) return;
-
-  const knownValues = ['', 'professional', 'conversational', 'executive', 'casual', 'coaching', 'diplomatic', 'concise', '_custom'];
-
-  if (!value) {
-    sel.value = '';
-    if (custom) { custom.classList.add('hidden'); custom.value = ''; }
-    return;
-  }
-
-  if (knownValues.includes(value)) {
-    sel.value = value;
-    if (custom) { custom.classList.add('hidden'); custom.value = ''; }
-  } else {
-    // Unknown/legacy/custom value — show custom input
-    sel.value = '_custom';
-    if (custom) {
-      custom.value = value;
-      custom.classList.remove('hidden');
-    }
-  }
 }
 
 // ── Overview rendering ─────────────────────────────────────────────────────
@@ -286,8 +223,7 @@ function renderOverview() {
   if (!window.config) return;
 
   renderIdentityCard();
-  renderCalendarCard();
-  renderIntegrationsCard();
+  renderEmailCard();
   renderCommunicationCard();
   renderProjectsCard();
   renderPeopleCard();
@@ -312,36 +248,19 @@ function renderIdentityCard() {
   }
 }
 
-function renderCalendarCard() {
-  const ws = window.config.workspace || {};
-  const body  = document.getElementById('overview-calendar-body');
-  const badge = document.getElementById('badge-calendar');
-  const prefix = ws.calendar_event_prefix;
-
-  setBadge(badge, 'configured', 'Configured');
-
-  body.innerHTML = [
-    kv('Prefix', prefix || '[Myna]'),
-    kv('Labels', 'Focus · Task · Reminder'),
-  ].join('');
-}
-
-function renderIntegrationsCard() {
-  const body = document.getElementById('overview-integrations-body');
-  const badge = document.getElementById('badge-integrations');
+function renderEmailCard() {
+  const body = document.getElementById('overview-email-body');
+  const badge = document.getElementById('badge-email');
 
   const triage = (window.config.projects || {}).triage || {};
-  const ws = window.config.workspace || {};
   const hasInboxSource = !!(triage.inbox_source);
-  const hasProcessedFolder = !!(ws.email && ws.email.processed_folder);
-  const isConfigured = hasInboxSource || hasProcessedFolder;
+  const isConfigured = hasInboxSource;
 
   setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? 'Configured' : 'None');
 
   if (isConfigured) {
     const lines = [];
     if (hasInboxSource) lines.push(kv('Inbox source', triage.inbox_source));
-    if (hasProcessedFolder) lines.push(kv('Processed folder', ws.email.processed_folder));
     body.innerHTML = lines.join('');
   } else {
     body.innerHTML = '<span class="text-slate-400 text-sm">Not configured</span>';
@@ -353,11 +272,11 @@ function renderCommunicationCard() {
   const body  = document.getElementById('overview-communication-body');
   const badge = document.getElementById('badge-communication');
 
-  const isConfigured = !!cs.default_preset;
+  const isConfigured = !!cs.sign_off;
   setBadge(badge, isConfigured ? 'configured' : 'empty', isConfigured ? 'Configured' : 'Not set');
 
-  if (cs.default_preset) {
-    body.innerHTML = kv('Default', capitalize(cs.default_preset));
+  if (cs.sign_off) {
+    body.innerHTML = kv('Sign-off', cs.sign_off);
   } else {
     body.innerHTML = '<span class="text-slate-400 text-sm">Not configured</span>';
   }
@@ -397,8 +316,7 @@ function renderPeopleCard() {
 
 function getTabData(tabName) {
   if (tabName === 'identity')      return getIdentityData();
-  if (tabName === 'calendar')      return getCalendarData();
-  if (tabName === 'integrations')  return getIntegrationsData();
+  if (tabName === 'email')         return getEmailData();
   if (tabName === 'communication') return getCommunicationData();
   if (tabName === 'projects')      return { projects: collectProjectsData() };
   if (tabName === 'people')        return { people: collectPeopleData() };
@@ -406,8 +324,19 @@ function getTabData(tabName) {
 }
 
 function getIdentityData() {
-  // Start from existing config to preserve unrelated workspace fields
+  // Start from existing config to preserve unrelated workspace fields.
+  // Strip dead fields (vault, timestamp_format, calendar_event_prefix,
+  // mcp_servers) so they're dropped on next save.
   const existing = deepClone(window.config && window.config.workspace || {});
+  const {
+    vault: _vault,
+    timestamp_format: _ts,
+    calendar_event_prefix: _cep,
+    calendar_event_types: _cet,
+    mcp_servers: _mcp,
+    email: _email,
+    ...rest
+  } = existing;
 
   const tzSelect = document.getElementById('user-timezone');
   let tz = tzSelect.value;
@@ -422,7 +351,7 @@ function getIdentityData() {
   }
 
   return {
-    ...existing,
+    ...rest,
     user: {
       ...(existing.user || {}),
       name:  document.getElementById('user-name').value.trim(),
@@ -434,35 +363,16 @@ function getIdentityData() {
       start: getTimePicker('work-start'),
       end:   getTimePicker('work-end'),
     },
-    feedback_cycle_days: parseInt(document.getElementById('feedback-cycle').value, 10) || 30,
     // journal.archive_after_days removed per D056; preserve any existing journal config
     journal: existing.journal || {},
-    email: existing.email || {},
   };
 }
 
-function getCalendarData() {
-  const existing = deepClone(window.config && window.config.workspace || {});
-  const updated = {
-    ...existing,
-    calendar_event_prefix: document.getElementById('calendar-prefix').value.trim() || '[Myna]',
-  };
-  delete updated.calendar_event_types;
-  return updated;
-}
-
-function getIntegrationsData() {
-  // Returns workspace data (email.processed_folder).
-  // projects.triage fields are saved separately via saveIntegrationsTriageData().
-  const existing = deepClone(window.config && window.config.workspace || {});
-  const processedFolder = document.getElementById('email-processed-folder').value.trim();
-  return {
-    ...existing,
-    email: {
-      ...(existing.email || {}),
-      processed_folder: processedFolder,
-    },
-  };
+function getEmailData() {
+  // The email tab only writes to projects.yaml (triage section).
+  // Saving is handled via getTriageData() in saveTab().
+  // This function returns null to skip the workspace PUT.
+  return null;
 }
 
 function getTriageData() {
@@ -481,49 +391,31 @@ function getTriageData() {
 }
 
 function getCommunicationData() {
-  // Start from the loaded config so that fields not shown in the UI
-  // (difficult_message_approach, email_preferences.max_length, etc.)
-  // are preserved on save.
   const existing = window.config['communication-style'] || {};
-  const existingEp = existing.email_preferences || {};
+
+  // Build the output without dead fields (difficult_message_approach,
+  // messaging_preferences, email_preferences, default_preset,
+  // presets_per_tier). Rebuilding from scratch drops any stale keys.
+  const {
+    difficult_message_approach: _dma,
+    messaging_preferences: _mp,
+    email_preferences: _ep,
+    default_preset: _dp,
+    presets_per_tier: _ppt,
+    ...rest
+  } = existing;
 
   return {
-    ...existing,
-    default_preset: getCommStyleValue('comm-default-preset'),
-    presets_per_tier: {
-      upward:       getCommStyleValue('comm-upward')      || null,
-      peer:         getCommStyleValue('comm-peer')        || null,
-      direct:       getCommStyleValue('comm-direct')      || null,
-      'cross-team': getCommStyleValue('comm-cross-team')  || null,
-    },
+    ...rest,
     sign_off: document.getElementById('comm-sign-off').value.trim(),
-    email_preferences: {
-      ...existingEp,
-      greeting_style: document.getElementById('comm-email-greeting').value,
-    },
   };
-}
-
-/**
- * Read a communication style select: if "_custom" is chosen, return the
- * companion text input's value instead.
- */
-function getCommStyleValue(selectId) {
-  const sel = document.getElementById(selectId);
-  if (!sel) return '';
-  if (sel.value === '_custom') {
-    const custom = document.getElementById(selectId + '-custom');
-    return custom ? custom.value.trim() : '';
-  }
-  return sel.value;
 }
 
 // ── Save handler ───────────────────────────────────────────────────────────
 
 const CONFIG_NAME_MAP = {
   identity:      'workspace',
-  calendar:      'workspace',
-  integrations:  'workspace',
+  email:         'projects',
   communication: 'communication-style',
   projects:      'projects',
   people:        'people',
@@ -533,11 +425,29 @@ async function saveTab(tabName) {
   const configName = CONFIG_NAME_MAP[tabName];
   if (!configName) return;
 
-  const data = getTabData(tabName);
-  if (!data) return;
-
   setSaveStatus('saving');
   try {
+    // Email tab saves only triage fields to projects.yaml
+    if (tabName === 'email') {
+      const triageData = getTriageData();
+      const triageRes = await fetch('/api/config/projects', {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(triageData),
+      });
+      if (!triageRes.ok) {
+        const msg = await triageRes.text().catch(() => 'Server error');
+        throw new Error(msg || 'HTTP ' + triageRes.status);
+      }
+      window.config.projects = { ...(window.config.projects || {}), triage: triageData.triage };
+      renderOverview();
+      setSaveStatus('saved');
+      return;
+    }
+
+    const data = getTabData(tabName);
+    if (!data) return;
+
     const res = await fetch('/api/config/' + configName, {
       method:  'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -568,49 +478,11 @@ async function saveTab(tabName) {
       window.config[configName] = data;
     }
 
-    // Integrations tab also saves triage fields to projects.yaml
-    if (tabName === 'integrations') {
-      const triageData = getTriageData();
-      const triageRes = await fetch('/api/config/projects', {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(triageData),
-      });
-      if (!triageRes.ok) {
-        const msg = await triageRes.text().catch(() => 'Server error');
-        throw new Error(msg || 'HTTP ' + triageRes.status);
-      }
-      window.config.projects = { ...(window.config.projects || {}), triage: triageData.triage };
-    }
-
     renderOverview();
     setSaveStatus('saved');
   } catch (err) {
     console.error('Save failed:', err);
     setSaveStatus('error');
-  }
-}
-
-// ── Communication style change handler ────────────────────────────────────
-
-/**
- * Show or hide the free-text custom input for a communication style select.
- * fieldKey is 'default', 'upward', 'peer', 'direct', or 'cross-team'.
- */
-function handleCommStyleChange(fieldKey) {
-  const selectId = fieldKey === 'default' ? 'comm-default-preset' : 'comm-' + fieldKey;
-  const customId = selectId + '-custom';
-  const sel    = document.getElementById(selectId);
-  const custom = document.getElementById(customId);
-  if (!sel || !custom) return;
-  if (sel.value === '_custom') {
-    custom.classList.remove('hidden');
-    custom.focus();
-    // Don't save yet — wait for blur on the custom text input
-  } else {
-    custom.classList.add('hidden');
-    custom.value = '';
-    saveTab('communication');
   }
 }
 
@@ -727,11 +599,6 @@ function formatRole(role) {
     'vp-of-product':             'VP of Product',
   };
   return map[role] || role;
-}
-
-function formatMcpKey(key) {
-  const map = { email: 'Email', calendar: 'Calendar', slack: 'Messaging' };
-  return map[key] || capitalize(key);
 }
 
 function formatSlug(slug) {
@@ -1455,10 +1322,6 @@ function buildPersonCard(person, idx) {
           <input type="text" class="field-input person-team" value="${escHtmlAttr(person.team || '')}" placeholder="e.g. Platform" onblur="saveTab('people')" />
         </div>
         <div class="field-group">
-          <label class="field-label">Feedback cycle (days)</label>
-          <input type="number" class="field-input person-feedback-cycle" value="${escHtmlAttr(person.feedback_cycle_days != null ? String(person.feedback_cycle_days) : '')}" placeholder="30" min="1" onblur="saveTab('people')" />
-        </div>
-        <div class="field-group">
           <label class="field-label">Birthday (MM-DD)</label>
           <input type="text" class="field-input person-birthday" value="${escHtmlAttr(person.birthday || '')}" placeholder="03-15" onblur="saveTab('people')" />
         </div>
@@ -1557,7 +1420,7 @@ function deletePerson(idx) {
 }
 
 function addPerson() {
-  peopleData.push({ display_name: '', full_name: '', aliases: [], email: '', slack_handle: '', relationship_tier: '', role: '', team: '', feedback_cycle_days: null, birthday: '', work_anniversary: '' });
+  peopleData.push({ display_name: '', full_name: '', aliases: [], email: '', slack_handle: '', relationship_tier: '', role: '', team: '', birthday: '', work_anniversary: '' });
   renderPeopleList();
   const list = document.getElementById('people-list');
   const newCard = list.lastElementChild;
@@ -1576,8 +1439,6 @@ function collectPeopleData() {
     const base = peopleData[idx] || {};
     const tiMap = (tagInputs.people[idx] || {});
 
-    const feedbackVal = card.querySelector('.person-feedback-cycle').value.trim();
-
     return {
       ...base,
       display_name:       card.querySelector('.person-display-name').value.trim(),
@@ -1588,7 +1449,6 @@ function collectPeopleData() {
       relationship_tier:  card.querySelector('.person-tier').value,
       role:               card.querySelector('.person-role').value.trim(),
       team:               card.querySelector('.person-team').value.trim(),
-      feedback_cycle_days:feedbackVal ? parseInt(feedbackVal, 10) : null,
       birthday:           card.querySelector('.person-birthday').value.trim(),
       work_anniversary:   card.querySelector('.person-anniversary').value.trim(),
     };
@@ -1765,7 +1625,7 @@ function toggleDefaults() {
  */
 const HELP_CONTENT = {
   identity: {
-    intro: 'Your personal profile and working preferences. Myna uses these to personalise daily notes, schedule suggestions, and the cadence of feedback reminders.',
+    intro: 'Your personal profile and working preferences. Myna uses these to personalise daily notes and schedule suggestions.',
     fields: [
       { id: 'user-name',        label: 'Name',               desc: 'Your full name, used in draft greetings and the header of your daily note.' },
       { id: 'user-email',       label: 'Email',              desc: 'Your primary email address. Used to identify emails you sent or received when processing your inbox.' },
@@ -1773,19 +1633,12 @@ const HELP_CONTENT = {
       { id: 'user-timezone',    label: 'Timezone',           desc: 'Your local timezone. Used when converting meeting times, scheduling focus blocks, and anchoring daily note dates.' },
       { id: 'work-start-hour',  label: 'Work hours start',   desc: 'The start of your working day. Myna avoids scheduling focus blocks or reminders outside this window.' },
       { id: 'work-end-hour',    label: 'Work hours end',     desc: 'The end of your working day. Calendar events and reminders are kept within start-to-end unless you override them.' },
-      { id: 'feedback-cycle',   label: 'Feedback cycle',     desc: 'How often you aim to give written feedback to each direct report. Myna flags anyone overdue when this interval passes without a logged feedback entry. Options: every 2 weeks, monthly, or quarterly.' },
     ],
   },
   communication: {
-    intro: 'Writing style settings that shape every draft Myna produces — emails, messages, and status updates. A good default plus per-tier overrides covers nearly all situations.',
+    intro: 'Writing style settings that shape every draft Myna produces — emails, messages, and status updates. Myna applies built-in tier-aware shaping (BLUF for upward, conversational for peer, etc.).',
     fields: [
-      { id: 'comm-default-preset',   label: 'Default preset',        desc: 'The baseline tone for all drafts unless overridden. Choose the style that fits most of your everyday communications.' },
-      { id: 'comm-upward',           label: 'Upward (manager, leadership)', desc: 'Override tone when drafting messages to your manager or senior leadership. Leave blank to use the default.' },
-      { id: 'comm-peer',             label: 'Peer',                  desc: 'Override tone for peer-level colleagues. Useful if you are more formal with your manager but looser with teammates.' },
-      { id: 'comm-direct',           label: 'Direct reports',        desc: 'Override tone for messages to your direct reports. Many managers prefer a warmer or more direct style here.' },
-      { id: 'comm-cross-team',       label: 'Cross-team',            desc: 'Override tone for colleagues outside your immediate team — stakeholders, partner teams, or cross-functional peers.' },
       { id: 'comm-sign-off',         label: 'Sign-off',              desc: 'The closing phrase appended to email drafts, e.g. "Thanks" or "Best regards". Leave blank to skip a sign-off.' },
-      { id: 'comm-email-greeting',   label: 'Greeting style',        desc: 'How email drafts open — first name only ("Hi Sarah"), formal ("Dear Ms. Chen"), or no greeting at all.' },
     ],
   },
   people: {
@@ -1798,7 +1651,6 @@ const HELP_CONTENT = {
       { id: 'person-tier',            label: 'Relationship tier',     desc: 'How you relate to this person. The tier controls communication style overrides and determines which team-health checks apply.' },
       { id: 'person-role',            label: 'Role',                  desc: 'Their job title. Shown in briefings so you have context before a meeting or message.' },
       { id: 'person-team',            label: 'Team',                  desc: 'The team or department they belong to. Helps Myna group people and provide team-level summaries.' },
-      { id: 'person-feedback-cycle',  label: 'Feedback cycle (days)', desc: 'How often you aim to give this person written feedback. Overrides the global default set in Identity.' },
       { id: 'person-birthday',        label: 'Birthday (MM-DD)',      desc: 'Their birthday in MM-DD format. Myna surfaces this in your daily note so you can send a note on the day.' },
       { id: 'person-anniversary',     label: 'Work anniversary',      desc: 'Their work start date. Myna mentions upcoming anniversaries in the daily note as a prompt to recognise milestones.' },
       { id: 'person-aliases',         label: 'Aliases',               desc: 'Alternative names or nicknames for this person. Myna uses these to recognise them in emails and messages even when a different name is used.' },
@@ -1816,21 +1668,11 @@ const HELP_CONTENT = {
       { id: 'proj-key-people',   label: 'Key people',      desc: 'The main stakeholders or contributors for this project. Myna includes their recent activity and open items in project briefings.' },
     ],
   },
-  calendar: {
-    intro: 'Controls how Myna labels the calendar events it creates. The prefix is prepended to every event title so you can distinguish Myna-created events at a glance.',
+  email: {
+    intro: 'Configure how Myna triages your inbox. Set the source folder Myna scans for new mail and the folder where you forward threads to get draft replies.',
     fields: [
-      { id: 'calendar-prefix',       label: 'Event prefix',      desc: 'A tag prepended to every calendar event Myna creates, e.g. "[Myna]". Lets you visually distinguish Myna-created events from manual entries at a glance.' },
-    ],
-  },
-  integrations: {
-    intro: 'MCP server connections that give Myna read access to your email, calendar, and messaging tools. All data stays local — Myna never sends or posts anything.',
-    fields: [
-      { id: 'mcp-email',    label: 'Email MCP server',          desc: 'The name of the MCP server registered with Claude Code that provides access to your email account. Run "claude mcp list" in a terminal to see available servers.' },
-      { id: 'mcp-calendar', label: 'Calendar MCP server',       desc: 'The MCP server that connects to your calendar. Used for meeting prep, focus-block creation, and reading upcoming events.' },
-      { id: 'mcp-slack',    label: 'Messaging MCP server',      desc: 'The MCP server for Slack or another messaging platform. Used to process messages and draft replies. Leave blank if you paste messages manually.' },
       { id: 'triage-inbox-source',         label: 'Inbox source folder',       desc: 'The email folder Myna scans for new mail to triage. Defaults to INBOX.' },
       { id: 'triage-draft-replies-folder', label: 'Draft replies folder',      desc: 'Email folder where you forward threads with reply notes. Myna reads this folder to create draft replies.' },
-      { id: 'email-processed-folder',      label: 'Processed email folder',    desc: 'Folder where Myna moves emails after triage to prevent reprocessing.' },
     ],
   },
   overview: {
@@ -1838,7 +1680,7 @@ const HELP_CONTENT = {
     fields: [],
   },
   files: {
-    intro: 'Upload documents that describe your work context — project docs, team pages, Confluence exports, org charts. Run /myna:setup import in a Claude chat to process them into vault files.',
+    intro: 'Drop docs here — team rosters, org charts, project briefs, goals docs, meeting notes. After you close the UI, Myna will ask if you want to extract people and projects from them.',
     fields: [],
   },
 };
@@ -1964,7 +1806,6 @@ function resolveHelpId(el, tabName, fieldIds) {
     'person-tier':           'person-tier',
     'person-role':           'person-role',
     'person-team':           'person-team',
-    'person-feedback-cycle': 'person-feedback-cycle',
     'person-birthday':       'person-birthday',
     'person-anniversary':    'person-anniversary',
   };
@@ -2044,17 +1885,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ── Integrations: text inputs → save on blur ──────────────────────────────
-  ['mcp-email', 'mcp-calendar', 'mcp-slack',
-   'triage-inbox-source', 'triage-draft-replies-folder', 'email-processed-folder'].forEach(id => {
+  // ── Email: text inputs → save on blur ──────────────────────────────────────
+  ['triage-inbox-source', 'triage-draft-replies-folder'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('blur', () => saveTab('integrations'));
-  });
-
-  // ── Communication: unwired dropdowns → save on change ─────────────────────
-  ['comm-email-greeting'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('change', () => saveTab('communication'));
+    if (el) el.addEventListener('blur', () => saveTab('email'));
   });
 
   // Sign-off text input → save on blur
@@ -2062,17 +1896,5 @@ document.addEventListener('DOMContentLoaded', () => {
   if (signOffInput) {
     signOffInput.addEventListener('blur', () => saveTab('communication'));
   }
-
-  // Auto-save on blur for communication style custom inputs (Design Decision #7)
-  ['comm-default-preset', 'comm-upward', 'comm-peer', 'comm-direct', 'comm-cross-team'].forEach(selectId => {
-    const customInput = document.getElementById(selectId + '-custom');
-    if (customInput) {
-      customInput.addEventListener('blur', () => {
-        if (document.getElementById(selectId).value === '_custom') {
-          saveTab('communication');
-        }
-      });
-    }
-  });
 
 });

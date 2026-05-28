@@ -654,7 +654,6 @@ people:
     relationship_tier: direct
     role: Senior Engineer
     team: Platform
-    feedback_cycle_days: 21  # override
 
   - display_name: Alex
     full_name: Alex Kumar
@@ -682,19 +681,13 @@ Most meetings need no entry — the agent infers type from calendar data (D022).
 
 ### communication-style.yaml
 
-Writing style preferences. Populated by the communication style interview or by choosing presets.
+Writing style preferences. Populated by `/myna:setup` or the config UI.
 
 ```yaml
-default_preset: professional
-presets_per_tier:
-  upward: executive
-  peer: conversational
-  direct: coaching
-  cross-team: diplomatic
 sign_off: Best
 ```
 
-Built-in presets: professional, conversational, executive, casual, coaching, diplomatic, concise. Users can mix presets per audience tier.
+All drafting skills (draft, draft-replies, rewrite) apply built-in tier-aware shaping — BLUF and formal structure for upward/cross-team, conversational for peer, direct for direct reports. No preset selection required.
 
 ### tags.yaml
 

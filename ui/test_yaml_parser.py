@@ -38,32 +38,10 @@ user:
   email: "alex@company.com"
   role: senior-engineer
 
-vault:
-  path: "/Users/alex/Documents/MyVault"
-
 timezone: America/Los_Angeles
 work_hours:
   start: "09:00"
   end: "17:00"
-
-email:
-  processed_folder: per-project
-
-triage:
-  inbox_source: "INBOX"
-  folders:
-    - name: Reply
-      description: "Needs a response from me"
-    - name: FYI
-      description: "Informational, no action needed"
-    - name: Follow-Up
-      description: "Waiting on someone else"
-    - name: Schedule
-      description: "Needs a meeting or calendar action"
-  draft_replies_folder: DraftReplies
-
-feedback_cycle_days: 30
-calendar_event_prefix: "[Myna]"
 """
 
 PROJECTS_YAML = """\
@@ -110,7 +88,6 @@ people:
     relationship_tier: direct
     role: Senior Engineer
     team: Platform
-    feedback_cycle_days: 21
     birthday: "03-15"
     work_anniversary: "2023-06-01"
 
@@ -137,19 +114,7 @@ people:
 """
 
 COMMUNICATION_STYLE_YAML = """\
-default_preset: professional
-
-presets_per_tier:
-  upward: executive
-  peer: assertive
-  direct: empathetic
-  cross-team: formal
-
 sign_off: "Best"
-
-email_preferences:
-  max_length: medium
-  greeting_style: first-name
 """
 
 MEETINGS_YAML = """\
@@ -410,9 +375,9 @@ class TestEdgeCases(unittest.TestCase):
         self.assertEqual(data["aliases"], [])
 
     def test_numeric_value(self):
-        data = self._parse_string("feedback_cycle_days: 30\n")
-        self.assertEqual(data["feedback_cycle_days"], 30)
-        self.assertIsInstance(data["feedback_cycle_days"], int)
+        data = self._parse_string("archive_after_days: 30\n")
+        self.assertEqual(data["archive_after_days"], 30)
+        self.assertIsInstance(data["archive_after_days"], int)
 
     def test_quoted_string_with_hash_not_treated_as_comment(self):
         data = self._parse_string('prefix: "[Myna]"\n')
@@ -502,31 +467,6 @@ class TestEdgeCases(unittest.TestCase):
 
 class TestFixtureValues(unittest.TestCase):
 
-    def test_workspace_vault_path(self):
-        path = _write_tmp(WORKSPACE_YAML)
-        try:
-            data = load(path)
-            self.assertEqual(data["vault"]["path"], "/Users/alex/Documents/MyVault")
-        finally:
-            os.unlink(path)
-
-    def test_workspace_feedback_cycle_days(self):
-        path = _write_tmp(WORKSPACE_YAML)
-        try:
-            data = load(path)
-            self.assertEqual(data["feedback_cycle_days"], 30)
-            self.assertIsInstance(data["feedback_cycle_days"], int)
-        finally:
-            os.unlink(path)
-
-    def test_workspace_calendar_event_prefix(self):
-        path = _write_tmp(WORKSPACE_YAML)
-        try:
-            data = load(path)
-            self.assertEqual(data["calendar_event_prefix"], "[Myna]")
-        finally:
-            os.unlink(path)
-
     def test_projects_first_aliases(self):
         path = _write_tmp(PROJECTS_YAML)
         try:
@@ -562,36 +502,11 @@ class TestFixtureValues(unittest.TestCase):
         finally:
             os.unlink(path)
 
-    def test_people_first_has_feedback_cycle_override(self):
-        path = _write_tmp(PEOPLE_YAML)
-        try:
-            data = load(path)
-            self.assertEqual(data["people"][0]["feedback_cycle_days"], 21)
-            self.assertIsInstance(data["people"][0]["feedback_cycle_days"], int)
-        finally:
-            os.unlink(path)
-
-    def test_communication_style_default_preset(self):
-        path = _write_tmp(COMMUNICATION_STYLE_YAML)
-        try:
-            data = load(path)
-            self.assertEqual(data["default_preset"], "professional")
-        finally:
-            os.unlink(path)
-
     def test_communication_style_sign_off(self):
         path = _write_tmp(COMMUNICATION_STYLE_YAML)
         try:
             data = load(path)
             self.assertEqual(data["sign_off"], "Best")
-        finally:
-            os.unlink(path)
-
-    def test_communication_style_email_max_length(self):
-        path = _write_tmp(COMMUNICATION_STYLE_YAML)
-        try:
-            data = load(path)
-            self.assertEqual(data["email_preferences"]["max_length"], "medium")
         finally:
             os.unlink(path)
 

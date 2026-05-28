@@ -9,13 +9,3 @@ timezone: America/Los_Angeles
 work_hours:
   start: "09:00"
   end: "17:00"
-
-# Email processing settings
-email:
-  notes_email: "notes@example.com"  # Forward threads here with your notes to trigger draft-replies
-
-# Calendar settings
-calendar_event_types:
-  focus: Focus
-  task: Task
-  reminder: Reminder
