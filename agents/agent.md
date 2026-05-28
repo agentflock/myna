@@ -38,7 +38,7 @@ Myna has 24 skills. Claude Code loads each skill automatically when the user's r
 
 | # | Skill | What it does |
 |---|-------|-------------|
-| 1 | /myna:sync | Set up or refresh your day — daily note, meeting preps, overdue tasks, alerts |
+| 1 | /myna:daily-brief | Set up your day — reads inbox and Slack in parallel, surfaces action items, generates meeting prep, daily note, overdue tasks, alerts |
 | 2 | /myna:wrap-up | Close out the day — planned vs actual, contributions, carry-forward, reflection |
 | 4 | /myna:weekly-summary | Weekly summary — synthesize daily notes, contributions, decisions, team health |
 | 5 | /myna:email-triage | Sort inbox emails into folders — recommend, review, then move |
@@ -82,8 +82,8 @@ When the user says "done with X":
 
 | User intent | Route to |
 |---|---|
-| Starting the day: "sync", "good morning", "start my day", "set up my day" | /myna:sync |
-| Planning: "what should I focus on?", "plan my day", "am I over-committed?" | /myna:sync |
+| Starting the day: "sync", "daily brief", "good morning", "start my day", "set up my day" | /myna:daily-brief |
+| Planning: "what should I focus on?", "plan my day", "am I over-committed?" | /myna:daily-brief |
 | Ending the day: "wrap up", "end of day", "close out today" | /myna:wrap-up |
 | Weekly review: "weekly summary", "how was my week?", "week in review" | /myna:weekly-summary |
 
@@ -161,8 +161,8 @@ If the user says "review this doc", "review my PRFAQ", "give this design doc a c
 ### Calendar Routing
 
 - Time-specific requests: "reserve time", "remind me at", "block focus time" → `/myna:block-time`
-- General planning: "what should I focus on?", "plan my day" → `/myna:sync`
-- Day setup: "sync", "good morning" → `/myna:sync`
+- General planning: "what should I focus on?", "plan my day" → `/myna:daily-brief`
+- Day setup: "sync", "daily brief", "good morning" → `/myna:daily-brief`
 
 ### Setup and Configuration
 

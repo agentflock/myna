@@ -19,6 +19,15 @@ Each entry:
 
 ---
 
+### D068 — Canonical daily note Sync block gains ### Emails and ### Slack subsections
+
+**Date:** 2026-05-27
+**Context:** Extending D061. The daily-brief skill (renamed from sync) now spawns parallel subagents to read email and Slack during morning setup. The results need a canonical home in the daily note — within the existing `## Sync — {HH:MM}` block — so the user sees inbox action items alongside calendar and task data without navigating to a separate view.
+**Decision:** The canonical `## Sync — {HH:MM}` block defined in D061 gains two new optional subsections: `### Emails — {N} unread` and `### Slack — {N} unread`. Both appear after `### Today's Meetings` and before `### Tasks Due Today`. Each section uses a two-tier format: **Action Required** (direct questions, approvals, task assignments, deadlines) and **FYI** (worth knowing, no action needed), plus a count of not-surfaced items (newsletters, bot alerts). Sections are omitted entirely when the corresponding MCP is unavailable or the unread count is zero. Urgent action items from email and Slack also surface as bullets in `### Briefing` for quick-scan. The section header `## Sync — {HH:MM}` is unchanged — it is the daily note section name, not the skill name.
+**Alternatives rejected:** Separate daily note top-level sections for email and Slack (outside the Sync block) — breaks the canonical structure defined in D061 and creates a cluttered daily note with too many top-level sections. A separate `/myna:email-brief` skill — adds user friction (two morning commands instead of one); the whole point is zero-friction morning setup. Appending email/Slack to the Briefing bullets only (no dedicated section) — Briefing is intentionally a quick-scan; the dedicated subsections provide the drill-down that Briefing can't.
+
+---
+
 ### D067 — Dispatcher pattern for multi-runtime install and update
 
 **Date:** 2026-05-26

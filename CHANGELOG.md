@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- `daily-brief` now reads email and Slack during morning setup — spawns parallel subagents to fetch and classify inbox items into Action Required, FYI, and not-surfaced tiers. Results appear in new `### Emails` and `### Slack` subsections within the daily note's Sync block, with urgent items surfaced in `### Briefing` as well. Requires email and Slack MCPs; degrades gracefully if unavailable.
 - `review-doc` skill — multi-persona doc review with Chief-of-Staff context layer; supports PRFAQ, design doc/RFC, HLD, LLD, one-pager, and generic doc types. Results saved to `Reviews/`.
 - Reviewer subagent primitives — 11 input-agnostic persona subagents at `agents/myna-reviewer-*.md` (PE, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor). Available for cross-skill orchestration via the Task tool.
 - `Reviews/` and `Reviews/sources/` vault folders — created by the install script. `Reviews/` holds doc review reports; `Reviews/sources/` preserves verbatim source text for paste-type reviews.
@@ -22,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- `sync` skill renamed to `daily-brief` (`/myna:daily-brief`). Routing triggers updated; "daily brief" added as a new trigger phrase. Skill behavior is unchanged for vault-scan, calendar, and task data.
 - [Changed] process-meeting normalizes grammar and expands shorthand in tasks and decisions; preserves close-to-verbatim wording for observations and personal notes
 - Weekly summary output now opens with a narrative summary lead-in synthesizing the week's headline before the breakdown sections. Cleaned up several stale UI and doc references to removed features (prompt logging, delegation/dependency task types, worked examples).
 - Removed prompt_logging config — redundant with Claude Code conversation history and unreliable as a steering-skill instruction
