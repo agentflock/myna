@@ -13,7 +13,7 @@ Today's meetings are shown in your daily note.
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND due = date(today)
+WHERE !completed AND due = date(today) AND (type = "task" OR type = "reply-needed")
 SORT priority DESC
 ```
 
@@ -21,13 +21,22 @@ SORT priority DESC
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND due < date(today)
+WHERE !completed AND due < date(today) AND (type = "task" OR type = "reply-needed")
 SORT due ASC
 ```
 
 ### Active Blockers
 
 > Blocker callouts are written as `> [!warning] Blocker` in project timelines. Review Projects/ files for active blockers.
+
+## Reminders
+
+```dataview
+TASK
+FROM "myna/_system/data/reminders"
+WHERE !completed AND type = "reminder" AND due <= date(today)
+SORT due ASC
+```
 
 ## Review Queue
 

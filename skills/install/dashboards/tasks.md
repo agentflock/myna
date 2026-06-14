@@ -9,7 +9,7 @@ dashboard: tasks
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND due = date(today)
+WHERE !completed AND due = date(today) AND (type = "task" OR type = "reply-needed")
 SORT priority DESC
 ```
 
@@ -17,7 +17,7 @@ SORT priority DESC
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND due < date(today)
+WHERE !completed AND due < date(today) AND (type = "task" OR type = "reply-needed")
 SORT due ASC
 ```
 
@@ -25,7 +25,7 @@ SORT due ASC
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND due > date(today) AND due <= date(today) + dur(7 days)
+WHERE !completed AND due > date(today) AND due <= date(today) + dur(7 days) AND (type = "task" OR type = "reply-needed")
 SORT due ASC
 ```
 
@@ -36,7 +36,7 @@ Tasks with no assigned person (`person::` field missing). Each group shows the s
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND !person
+WHERE !completed AND !person AND (type = "task" OR type = "reply-needed")
 GROUP BY file.link
 SORT file.path ASC
 ```

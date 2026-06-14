@@ -9,7 +9,7 @@ dashboard: overdue
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND due < date(today)
+WHERE !completed AND due < date(today) AND (type = "task" OR type = "reply-needed")
 SORT due ASC
 ```
 
