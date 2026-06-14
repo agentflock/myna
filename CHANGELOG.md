@@ -21,6 +21,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Learn skill (`/myna:learn`) and emergent memory system. Memory routing now defers to Claude's native memory — say "remember this" and Claude handles it directly without a vault skill.
 
+### Fixed
+
+- Fixed Config UI edits not taking effect until session restart — config now reloads automatically after setup and on "reload config"
+
 ### Changed
 
 - `sync` skill renamed to `daily-brief` (`/myna:daily-brief`). Routing triggers updated; "daily brief" added as a new trigger phrase. Skill behavior is unchanged for vault-scan, calendar, and task data.

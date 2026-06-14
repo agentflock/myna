@@ -84,7 +84,7 @@ For annotated examples of each file's format, see the "Sample configuration" sec
 3. Tell the user: "Config UI is open at {url}. Fill in what you can, then type 'done' here when you're finished."
 4. Wait for the user to type 'done' (or similar confirmation) before continuing.
 5. Kill the server: send SIGTERM to the captured PID. If PID capture failed, run `pkill -f server.py` as fallback.
-6. Read the five user config files from `{vault_path}/myna/_system/config/`: workspace.yaml, projects.yaml, people.yaml, communication-style.yaml, tags.yaml. (meetings.yaml is machine-managed — skip it.) Show a human-readable summary of what is configured and what is still blank.
+6. Re-read all five user config files fresh from disk — `{vault_path}/myna/_system/config/workspace.yaml`, `projects.yaml`, `people.yaml`, `communication-style.yaml`, `tags.yaml` — and update the session context with the values just read. (meetings.yaml is machine-managed — skip it.) Show a complete human-readable summary covering every section of all five files: what is configured and what is still blank. This is the active config for the rest of the session.
 7. Ask: "Do you have any existing docs — project notes, a team roster, meeting notes — you'd like me to read to fill in what's missing?" If yes, proceed with the doc import flow below.
 
 ---

@@ -13,7 +13,17 @@ If vault_path is not in context, read `~/.myna/config.yaml` first. If the file d
 
 Read config files at the start of each new session — not on every prompt. Configs don't change mid-conversation.
 
-If the user explicitly updates config during a session, use the updated values for the rest of that session. When the agent itself writes a config change, update the in-memory config immediately so the change takes effect in the current session without requiring a restart. Otherwise, tell the user that config changes take effect on the next session.
+If the user explicitly updates config during a session, use the updated values for the rest of that session. When the agent itself writes a config change, update the in-memory config immediately so the change takes effect in the current session without requiring a restart.
+
+**Explicit reload command:** When the user says "reload config", "refresh config", "re-read config", "reload my config", or any semantically equivalent phrasing (e.g. "load the latest config", "pick up the config changes"), re-read all five user config files fresh from disk:
+
+- `{vault_path}/myna/_system/config/workspace.yaml`
+- `{vault_path}/myna/_system/config/projects.yaml`
+- `{vault_path}/myna/_system/config/people.yaml`
+- `{vault_path}/myna/_system/config/communication-style.yaml`
+- `{vault_path}/myna/_system/config/tags.yaml`
+
+Update session context with the values just read. Then confirm: "Config reloaded. {summary of key loaded values — name, timezone, project count, people count.}"
 
 ## Graceful Degradation
 
