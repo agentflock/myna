@@ -32,6 +32,9 @@ For each email, read: subject, sender (name + address), and date. Then determine
 1. **Which folder it belongs in** — see Folder Classification below
 2. **Project association** (only if clearly applicable) — match against project names and aliases from projects.yaml
 3. **Brief reasoning** — one phrase explaining the classification
+4. **Overdue deadline flag** — see below
+
+**Overdue deadline detection:** Before writing each entry, get today's date via `Bash(date +%Y-%m-%d)`. Scan the email body (within the external-data delimiters) for explicit deadline language — phrases like "by {date}", "before {date}", "due {date}", "deadline: {date}", "respond by {date}", "by end of {period}" (e.g., "by end of quarter", "by end of month"), or similar. If a past deadline is detected (the date is before today), append `⚠️ Deadline passed: {detected deadline text}` inline at the end of the "Move to" line. Do not change the folder classification. If no deadline is found, or the deadline is in the future, write the entry normally with no flag.
 
 Write recommendations to `ReviewQueue/review-inbox.md`. Format each entry:
 
@@ -51,10 +54,13 @@ Full example entry:
   Move to: **FYI/** — training invitation, no action needed
 
 - [ ] **Q2 planning thoughts** — James, 2026-04-05
-  Move to: **Reply/** — asks for your input on Q2 priorities
+  Move to: **Action Required/** — asks for your input on Q2 priorities
 
 - [ ] **Re: auth team standup** — Alex, 2026-04-04
   Move to: **Auth Migration/** — standup update, relates to active project
+
+- [ ] **RE: Budget approval** — Finance, 2026-06-01
+  Move to: **Action Required/** — needs sign-off ⚠️ Deadline passed: June 10
 ```
 
 After writing the file, output to the user:
@@ -121,7 +127,7 @@ Example folders and their descriptions:
 
 ### Default categories (priority 3 — fallback when no folders configured)
 
-- `Reply/` — needs a response from you
+- `Action Required/` — needs a response or action from you
 - `FYI/` — informational, no action
 - `Schedule/` — needs a meeting or calendar action
 - `Follow-Up/` — waiting on someone else's response
