@@ -24,7 +24,7 @@ You are a senior Myna contributor who just finished a design discussion. Your jo
 
 **The mental model:** you are briefing a team of engineers, not writing a recipe. Each task subagent gets a clear problem statement, context, and definition of done — then figures out the implementation itself. The prompt captures *what* and *why*, not *how*.
 
-**Built-in quality loop:** every task subagent reviews its own work before reporting back — spawning a dedicated review subagent, fixing Critical and Important issues, and iterating up to 3 rounds. The prompt you write must include this loop. Quality is enforced autonomously, not left to the human reviewer.
+**Built-in quality loop:** every task subagent reviews its own work before reporting back — committing, running review up to 3 rounds, and fixing Critical and Important issues between rounds. This loop is not hand-written into each task: every T-N subagent prompt **must** end by invoking `/myna-dev-task-protocol`, which owns the commit→review→fix→report sequence. Do not inline the review steps — delegate to the protocol so the logic stays in one place. Quality is enforced autonomously, not left to the human reviewer.
 
 The output is a markdown file at `tmp/[name]/[prefix]-prompt.md`.
 
@@ -138,7 +138,7 @@ If none of these are affected, skip the doc task — don't add a placeholder.
 - **Low risk:** doc updates, config changes, new files → lighter review.
 
 ### Review Persona
-Match reviewer lens to the work. Each task gets a dedicated review subagent invoked via `/myna-dev-review --task`. Persona examples: "Principal Engineer checking correctness", "Product Manager checking UX flow", "SRE checking shell safety". Bake the relevant persona into the task's `--criteria` or the Context block so the reviewer has the right lens.
+Match reviewer lens to the work. The review loop runs through `/myna-dev-task-protocol` (which calls `myna-dev-review` internally) — never invoke `/myna-dev-review --task` directly from a T-N prompt. Persona examples: "Principal Engineer checking correctness", "Product Manager checking UX flow", "SRE checking shell safety". Bake the relevant persona into the task's `--criteria` (passed to the protocol) or the Context block so the reviewer has the right lens.
 
 ### Model Selection
 Default to Sonnet. Use Opus only for ambiguous requirements or complex existing code.
@@ -371,6 +371,8 @@ Summary:  tmp/[feature]/[prefix]-summary.md
 **No open fields — exact values or explicit source.** Any field a subagent could "fill in with something appropriate" is a hallucination invitation. Two categories to watch: (1) **Counts in acceptance criteria** — verify the exact number by reading the actual files before writing it (`ls agents/dashboards/ | wc -l`), never estimate. (2) **Metadata and embedded content** — if a task writes a manifest, config, or file that embeds exact strings (author, repo URL, keywords, JSON config, heredoc content), either specify the exact value in the prompt or write "copy verbatim from `[source file]`, do not reconstruct from memory." "Replicate from X" is not strong enough — say "verbatim."
 
 **Quality over speed.** Session length is not a concern. Every task gets full attention — a review subagent, a fix cycle, a clean commit. The goal is zero human rework after the session completes.
+
+**Every T-N task ends with `/myna-dev-task-protocol` — no exceptions in the common case.** The protocol owns commit→review→fix→report. Do not hand-write the review rounds, the CLEAN/ISSUES-FOUND branching, or direct `/myna-dev-review --task` calls into a task prompt — that duplicates the protocol and drifts from it. The *only* time a task may skip the protocol is when its work needs a fundamentally different reviewer than `myna-dev-review` (e.g. prose-conversion quality, where `myna-dev-review`'s dimensions don't apply); in that case write the custom review loop explicitly and note in the prompt *why* the protocol doesn't fit. Absent that justification, the protocol invocation is mandatory.
 
 **Three roles, clean separation.** Orchestrator sequences and merges — never implements. Task subagent (T-N) implements, reviews, commits — never touches other tasks. Review subagent reads and reports — never fixes. Keep each role doing only its job.
 

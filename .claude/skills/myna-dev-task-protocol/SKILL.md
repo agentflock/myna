@@ -13,7 +13,7 @@ allowed-tools:
   - Skill
 ---
 
-# Myna Implement Task
+# Myna Task Protocol — Commit, Review, Fix
 
 This skill is the shared protocol for T-N subagents in Myna development sessions. It is never invoked directly by a user — only by task subagents spawned by `myna-dev-build-prompt` or `myna-dev-execute-tasks`.
 
