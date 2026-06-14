@@ -26,7 +26,7 @@ Obsidian Vault     Company MCP Servers
 
 When you type a prompt, the Myna agent reads it and determines which skill to invoke. Skills are loaded on demand — at startup, only their names and one-line descriptions are in context. When a skill is triggered, its full instructions are loaded and executed. Cross-cutting rules (safety, output style, vault conventions, memory) live in 6 steering skills that are always preloaded.
 
-Myna has 24 feature skills covering every domain of your workflow, and 6 steering skills that enforce consistent behavior across all of them. Every skill is a plain markdown file — there is no compiled code, no binary, no framework.
+Myna has 25 feature skills covering every domain of your workflow, and 6 steering skills that enforce consistent behavior across all of them. Every skill is a plain markdown file — there is no compiled code, no binary, no framework.
 
 ---
 
@@ -50,6 +50,7 @@ After install, Myna creates the following folder structure inside your vault's `
 | `ReviewQueue/` | Items requiring your judgment before Myna acts |
 | `Dashboards/` | Dataview-powered dashboards |
 | `_system/config/` | Your 6 config files (YAML) |
+| `_system/data/` | Machine-written data files: `links.md` (link index) and `reminders.md` (vault reminders) |
 | `_system/templates/` | Templates for new notes |
 | `_system/logs/` | Audit log, processed channel timestamps |
 | `_system/sources/` | Source message references for deduplication |
@@ -59,7 +60,7 @@ After install, Myna creates the following folder structure inside your vault's `
 
 ## 4. Skills Reference
 
-### Feature Skills (24)
+### Feature Skills (25)
 
 | Skill | Description |
 |-------|-------------|
@@ -83,7 +84,8 @@ After install, Myna creates the following folder structure inside your vault's `
 | **/myna:rewrite** | Fix, adjust, or restructure existing text. Three modes: fix (grammar), tone (restyle for audience), rewrite (full restructure). |
 | **/myna:capture** | Route input to vault destinations — quick notes, observations, recognition, tasks (single or recurring), project/person updates. |
 | **/myna:links** | Save and find links — saves to the entity file and central index. |
-| **/myna:block-time** | Create personal calendar time blocks and reminders. Finds free slots, proposes options, user confirms. |
+| **/myna:block-time** | Create personal calendar time blocks. Finds free slots, proposes options, user confirms. |
+| **/myna:reminder** | Set a vault-native reminder for a future day. Writes to the vault immediately — no calendar required. Optional calendar push when a clock time is given. Reminders surface in the daily brief. |
 | **/myna:self-track** | Log contributions and generate self-review documents — brag docs, self-reviews, promo packets. Your contributions only. |
 | **/myna:park** | Save working context for zero-loss resumption in a new session. Resume by name or list all parked items. |
 | **/myna:process-review-queue** | Process review queue items across review-work, review-people, and review-self queues — interactively or from pre-checked items. |

@@ -5,7 +5,7 @@
 
 <!-- TODO: Add GIF demo — sync → prep → capture in ~25 seconds -->
 
-AI Chief of Staff for tech professionals — your projects, your team, your meetings, your email. 30 skills and growing. Runs in [Claude Code](https://claude.ai/code).
+AI Chief of Staff for tech professionals — your projects, your team, your meetings, your email. 31 skills and growing. Runs in [Claude Code](https://claude.ai/code).
 
 ---
 
@@ -121,7 +121,7 @@ First time? Try `sync` to set up your day, or `what can you do?` to see all skil
 **After install you get:**
 
 - Organized folder structure with 10 pre-built dashboards (best viewed in Obsidian)
-- 30 skills covering email, meetings, projects, people, and daily workflow
+- 31 skills covering email, meetings, projects, people, and daily workflow
 - Config files ready for your projects and people
 
 Your data, configs, and custom rules are never touched by updates.
@@ -144,11 +144,12 @@ Your data, configs, and custom rules are never touched by updates.
 > *"reply to these forwarded emails: [paste]"* — separates your instructions from the forwarded thread, drafts reply
 
 ### Meetings & Calendar
-`prep meeting` · `process meeting` · `block time`
+`prep meeting` · `process meeting` · `block time` · `remind me`
 
 > *"prep for my remaining meetings today"* — skips already-prepped, fills in the rest
 > *"done with 1:1 with Marcus"* — tasks, decisions, observations extracted in one step
 > *"reserve 2 hours Monday for the coverage plan"* — personal time blocks only, never creates events with attendees
+> *"remind me on Friday to review the deploy checklist"* — vault reminder written immediately; optional calendar push if a time is given; surfaces in daily brief
 
 ### Projects & Tasks
 `brief project` · `blockers` · `unreplied threads`
@@ -187,7 +188,7 @@ Your data, configs, and custom rules are never touched by updates.
 
 ## How It Works
 
-Myna is not an application. There is no server, no API, no frontend. It's 30 skills, a folder structure, and config files — all running inside Claude Code.
+Myna is not an application. There is no server, no API, no frontend. It's 31 skills, a folder structure, and config files — all running inside Claude Code.
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -229,6 +230,7 @@ myna/
 ├── Team/             # Team-level files
 └── _system/          # Config, logs, dashboards, templates
     ├── config/       # Your projects, people, preferences
+    ├── data/         # Machine-written data: links index, reminders
     └── dashboards/   # Dataview dashboards (best viewed in Obsidian)
 ```
 
@@ -248,7 +250,7 @@ See [Customization Guide](docs/guide/customization.md) for details.
 
 ## Built Entirely by Claude Code
 
-Myna was designed, built, reviewed, and fixed entirely by Claude Code — from feature specs through architecture, implementation, and polish. One person defined the vision and settled decisions. Claude designed the architecture, wrote all 30 skills (24 feature skills + 6 behavioral rules), built the file templates and dashboards, created the install script, and wrote this documentation.
+Myna was designed, built, reviewed, and fixed entirely by Claude Code — from feature specs through architecture, implementation, and polish. One person defined the vision and settled decisions. Claude designed the architecture, wrote all 31 skills (25 feature skills + 6 behavioral rules), built the file templates and dashboards, created the install script, and wrote this documentation.
 
 Two things came out of this, not one: the assistant itself, and a methodology for having AI build an AI assistant from scratch — reusable for other projects on any capable LLM.
 
