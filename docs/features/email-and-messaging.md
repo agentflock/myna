@@ -74,8 +74,9 @@ One-line summary: "Triage my inbox" reads inbox emails, classifies each into a f
 - **Step 3 — Process:** "process triage" → agent reads the file, moves approved emails into their classified folders using the email MCP, clears processed items from the file. Rejected/deleted items are gone. Skipped items stay for next time.
 - **Folder classification — two modes:**
   - **User-defined folders:** if the user has configured triage folders in the registry with descriptions (e.g., `FYI/` = "informational, no action", `Reply/` = "needs a response from me", `Follow-Up/` = "waiting on someone else"), the agent classifies into those folders
-  - **Default categories:** if no folders are configured, the agent uses built-in categories: needs reply, FYI/no action, needs scheduling, follow-up/waiting, can archive
+  - **Default categories:** if no folders are configured, the agent uses built-in categories: Action Required, FYI, Schedule, Follow-Up, Archive. These are also the pre-populated defaults in the Config UI triage folder table — users can rename or replace them.
   - Either way, Myna moves approved emails into the classified folder using the email MCP
+- **Overdue flag:** during Step 1, if an email contains an explicit deadline (e.g., "by June 15", "before end of quarter") that has already passed, the agent adds a ⚠️ flag to that entry in review-inbox.md with the detected deadline text (e.g., `⚠️ Deadline passed: June 15`). The email still moves to its classified folder — overdue is urgency metadata, not a category. The flag is shown so the user can verify the detected deadline before approving the move.
 - Can switch to one-by-one review mode if preferred
 
 ### Thread Summary
