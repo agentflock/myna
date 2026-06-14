@@ -137,11 +137,11 @@ Collect the following data and return it as structured JSON. Do not write any fi
 
 1. CALENDAR: Read today's (or tomorrow's) calendar events via the calendar MCP. For each event: { title, start_time, end_time, attendee_count, meeting_file_path_if_exists }. If calendar MCP is unavailable, return { calendar_available: false }.
 
-2. DUE_TODAY: Grep `{vault_path}/myna/Projects/` for `- \[ \]` with `📅 {target_date}`. Group by project file. Also grep outside `Projects/` for tasks with `📅 {target_date}`. Return: [{ project, task_text, source_file }].
+2. DUE_TODAY: Grep `{vault_path}/myna/Projects/` for `- \[ \]` with `📅 {target_date}`. Exclude lines containing `[type:: reminder]`. Group by project file. Also grep outside `Projects/` for tasks with `📅 {target_date}` (again, excluding `[type:: reminder]` lines). Return: [{ project, task_text, source_file }].
 
-3. OVERDUE_SIGNAL: Grep `{vault_path}/myna/Projects/` for `- \[ \]` with `📅` before target date. Return: { total_count, top_3: [{ task_text, project, date }] }.
+3. OVERDUE_SIGNAL: Grep `{vault_path}/myna/Projects/` for `- \[ \]` with `📅` before target date. Exclude lines containing `[type:: reminder]`. Return: { total_count, top_3: [{ task_text, project, date }] }.
 
-4. OVERDUE_OTHERS: Grep `{vault_path}/myna/` for `- \[ \]` lines containing `[person::]` with `📅` before today, where person != "{user_name}". Return: { total_count, items: [{ task_text, person, date }] }.
+4. OVERDUE_OTHERS: Grep `{vault_path}/myna/` for `- \[ \]` lines containing `[person::]` with `📅` before today, where person != "{user_name}". Exclude lines containing `[type:: reminder]`. Return: { total_count, items: [{ task_text, person, date }] }.
 
 5. BLOCKERS: Grep `{vault_path}/myna/Projects/` for `> [!warning] Blocker`. For each match, read ~5 surrounding lines. Skip if `resolved:: true` or `status:: resolved` appears in the block. Return: [{ project, blocker_text }].
 
@@ -246,7 +246,21 @@ Step 4: Return structured result:
 
 ### After All 3 Subagents Return
 
-Collect results from Subagents A, B, and C. Proceed to Step 6.
+Collect results from Subagents A, B, and C. Proceed to Step 5b.
+
+---
+
+## Step 5b: Surface Reminders
+
+Read `{vault_path}/_system/data/reminders.md`. For each unchecked item (`- [ ]`) whose `📅` date is on or before `{target_date}` (catch-all — a reminder from a skipped day still fires today):
+
+1. Extract the reminder text and the `[time:: {HH:MM}]` value if present.
+2. Collect them into a `reminders` list: `[{ text, time_if_set }]`.
+3. For each surfaced reminder, mark it delivered by changing `- [ ]` to `- [x]` in `_system/data/reminders.md` (use Edit). Reminders are fire-once — do NOT carry them forward to tomorrow or any future date.
+
+If `_system/data/reminders.md` does not exist or has no matching open items, `reminders` is an empty list. Proceed silently — do not write a `### Reminders` section if there are no reminders to surface.
+
+**Reminder exclusion:** items with `[type:: reminder]` must never appear in DUE_TODAY, OVERDUE_SIGNAL, or OVERDUE_OTHERS surfaces. That exclusion was applied in the Subagent A prompt above; do not second-guess or re-include them here.
 
 ---
 
@@ -285,6 +299,13 @@ date: {YYYY-MM-DD}
 - Review queue if non-zero ("{N} items in review queue")
 - **{N} emails need action** — {action_type} from {sender}, {action_type} from {sender} (omit if email unavailable or 0 action items)
 - **{N} Slack messages need action** — mentioned by {sender} in #{channel}, ... (omit if Slack unavailable or 0 action items)
+
+### Reminders
+
+{For each open reminder with due <= today from Step 5b, one bullet per reminder:}
+- {reminder text}{, HH:MM if time was set}
+
+{Omit this section entirely if there are no reminders to surface.}
 
 ### Today's Meetings
 

@@ -22,6 +22,12 @@ date: {{date}}
 - {milestones within 7 days}
 - {review queue count if non-zero}
 
+### Reminders
+
+> Open reminders firing today or earlier (catch-all). Marked done on surfacing — fire-once.
+
+- {reminder text} {(HH:MM) if time set}
+
 ### Today's Meetings
 
 - [ ] {HH:MM} [[{meeting-file}]] — {meeting title} {prep-status}
