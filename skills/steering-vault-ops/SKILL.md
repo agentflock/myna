@@ -33,7 +33,7 @@ Query open and completed tasks across the vault using Grep:
 | Open tasks | `- \[ \]` |
 | Completed tasks | `- \[x\]` |
 | Filter by project | `\[project:: \[\[{name}\]\]\]` |
-| Filter by type | `\[type:: {type}\]` — values: `task`, `reply-needed` |
+| Filter by type | `\[type:: {type}\]` — values: `task`, `reply-needed`, `reminder` |
 | Filter by person | `\[person:: \[\[{name}\]\]\]` |
 | Due date (for overdue detection) | `📅 {YYYY-MM-DD}` — compare matched date against today |
 | Pending review | `\[review-status:: pending\]` |
@@ -115,7 +115,7 @@ If the template doesn't exist, create a minimal file with the required YAML fron
 | Config | `{vault}/myna/_system/config/{name}.yaml` |
 | Source | `{vault}/myna/_system/sources/{entity}.md` |
 | Dashboard | `{vault}/myna/Dashboards/dashboard.md` |
-| Link index | `{vault}/myna/_system/links.md` |
+| Link index | `{vault}/myna/_system/data/links.md` |
 | Team | `{vault}/myna/Team/{slug}.md` |
 
 **Naming conventions:**

@@ -134,7 +134,7 @@ For tasks, `📅` is the **due date**, not the source date. Include the source d
 
 **Task fields as inline properties:**
 - `[project:: [[{name}]]]` — which project (wiki-link to project file)
-- `[type:: {task | reply-needed}]` — task type
+- `[type:: {task | reply-needed | reminder}]` — task type
 - `[person:: [[{name}]]]` — owner or who you're waiting on (wiki-link to person file)
 - `[review-status:: {pending | reviewed}]` — set to pending when fields are inferred
 - `[effort:: {estimate}]` — effort estimate
