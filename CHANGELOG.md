@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Kiro by transforming frontmatter and scaffolding the vault. Refactors `install/claude.sh`
   to share vault setup logic via `install/lib.sh`.
 
+### Changed
+
+- `daily-brief` now renders Today's Meetings as a table with a dedicated, linked Prep column (meeting-file wikilink) instead of inline checkbox bullets, and surfaces the day's largest free block as a Briefing line when meetings fragment the day.
+
 ### Removed
 
 - Learn skill (`/myna:learn`) and emergent memory system. Memory routing now defers to Claude's native memory — say "remember this" and Claude handles it directly without a vault skill.

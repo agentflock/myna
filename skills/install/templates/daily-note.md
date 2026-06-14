@@ -30,7 +30,9 @@ date: {{date}}
 
 ### Today's Meetings
 
-- [ ] {HH:MM} [[{meeting-file}]] — {meeting title} {prep-status}
+| Time | Meeting | Prep |
+|------|---------|------|
+| {HH:MM}–{HH:MM} | {meeting title} | [[{meeting-file}]] |
 
 ### Tasks Due Today
 

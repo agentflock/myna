@@ -331,8 +331,9 @@ SORT due ASC
 
 ### Today's Meetings
 
-- [ ] {HH:MM} [[{meeting-file}]] — {meeting name}
-- [ ] {HH:MM} [[{meeting-file}]] — {meeting name}
+| Time | Meeting | Prep |
+|------|---------|------|
+| {HH:MM}–{HH:MM} | {meeting name} | [[{meeting-file}]] |
 
 ## End of Day — {HH:MM}
 

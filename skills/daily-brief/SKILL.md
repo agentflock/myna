@@ -295,6 +295,7 @@ date: {YYYY-MM-DD}
 - Unresolved blockers
 - Prep warnings for today's meetings (e.g., "Design review at 2 PM — no prep file yet")
 - Capacity flag if task effort exceeds focus time ("Over capacity by {N} hrs")
+- Largest free block today, derived from the gaps between calendar events within work hours ("Largest open block: 2:00–4:00 PM (2 hrs)"). Include only when meetings fragment the day and focus time is scarce — omit on open days.
 - Milestones within 7 days (birthdays or work anniversaries — omit if none)
 - Review queue if non-zero ("{N} items in review queue")
 - **{N} emails need action** — {action_type} from {sender}, {action_type} from {sender} (omit if email unavailable or 0 action items)
@@ -309,10 +310,13 @@ date: {YYYY-MM-DD}
 
 ### Today's Meetings
 
-{For each calendar event today, one bullet linking to the prep file with prep status:}
-- [ ] {HH:MM} [[{meeting-file}]] — {meeting title} {prep-status}
+{Render today's meetings as a table — one row per calendar event, sorted by start time.}
 
-{prep-status is one of: "(prep ready)", "(no prep yet)", or "(basic prep from sync)"}
+| Time | Meeting | Prep |
+|------|---------|------|
+| {HH:MM}–{HH:MM} | {meeting title} | [[{meeting-file}]] |
+
+{Prep cell is just the wikilink to the meeting file so it opens in Obsidian. Don't stamp a per-row prep status — after sync every meeting already has at least basic prep, so a status word would read the same on nearly every row. Meetings that genuinely need prep attention are flagged in `### Briefing` instead. Step 7 creates a file for every event, so the cell normally always has a link; in the rare case a meeting has no file, leave the Prep cell empty.}
 
 ### Emails — {N} unread
 
@@ -374,7 +378,7 @@ Omit `### Slack` section entirely if:
 
 ### Today's Meetings
 
-- [ ] {HH:MM} [[{meeting-file}]] — {meeting title} {prep-status}
+{Same table format as the full snapshot (Time | Meeting | Prep). Regenerate only if calendar events changed since the last snapshot; if unchanged, write "(no change since {HH:MM})".}
 
 ### Emails — {N} unread
 
@@ -443,7 +447,7 @@ For each calendar event today:
 
    Full deep prep (pending feedback, coaching suggestions, career topics, personal notes) is available on demand via /myna:prep-meeting. Add a note at the top of the Prep section: "Basic prep from daily-brief. Say 'prep for [meeting]' for full prep."
 
-Meeting file is wiki-linked in the daily note's Today's Meetings section.
+Meeting file is wiki-linked in the Prep column of the Today's Meetings table.
 
 ---
 
