@@ -168,7 +168,24 @@ For each that applies: name the file, draft the exact entry or edit, show it, an
 
 Do *not* touch either for bug fixes that restore already-specified behavior, refactors, internal mechanics, or doc/dev-tooling changes. If neither is affected, say so plainly — e.g. "No feature or foundations update needed — this is a [bug fix / refactor / internal change]." Then continue.
 
-Once both specs are settled (or confirmed not needed): **Ready for implementation? Say "generate prompt"** and I'll package this into an autonomous execution prompt.
+Once both specs are settled (or confirmed not needed), move to hand-off.
+
+### Step 6: Hand off
+
+Offer two routes — recommend one based on scope, but let the user choose:
+
+- **`generate prompt`** — packages this into a self-contained execution prompt via `/myna-dev-build-prompt`, built now as its own unit. *Recommended when* the feature benefits from parallel execution, or you want it built immediately.
+- **`add to queue`** — appends this design to the dev task queue (`tmp/tasks.md`) via `/myna-dev-task-add`, to batch with other features and build later in one `/myna-dev-execute-tasks` pass. *Recommended when* this is one of several changes you want to accumulate and build together.
+
+Per-task quality is identical either way — both run the same implement → review → fix loop (`/myna-dev-task-protocol`). The choice is about *when and how* it's built, not how well. Present it as:
+
+```
+Ready for implementation. Two options:
+- **generate prompt** — build this now as its own execution prompt
+- **add to queue** — queue it to batch with other features into one run
+
+Which one?
+```
 
 ---
 
@@ -179,11 +196,14 @@ Once both specs are settled (or confirmed not needed): **Ready for implementatio
 - **Don't keep going after the design is settled.** When decisions are made, summarize and stop. Don't probe for edge cases that won't affect implementation.
 - **Don't re-debate settled decisions** from `docs/design/product-decisions.md` or `docs/design/architecture-decisions.md` unless the user explicitly asks.
 - **Don't present implementation options for invalid ideas.** If a proposal conflicts with a settled decision, vision principle, or architecture constraint, surface the conflict clearly before any options. Ask if they want to revisit or explore an alternative — don't silently adapt the idea into something valid and present that instead.
-- **Don't build the solution.** This skill designs; `myna-dev-build-prompt` packages; a fresh session builds. Stay in design mode.
+- **Don't build the solution.** This skill designs; `myna-dev-build-prompt` or `myna-dev-task-add` packages; a fresh session (or the queue runner) builds. Stay in design mode.
 - **Don't skip reading the code.** Your recommendations must be grounded in what actually exists, not what you assume exists. Read the relevant files before presenting options.
 
 ---
 
-## Trigger: "generate prompt"
+## Triggers: hand off
 
-At any point in the session, if the user says "generate prompt" (or equivalent: "package this", "write the execution prompt", "crystallize this"), invoke `/myna-dev-build-prompt` with the design summary as context. Do not wait for an explicit Step 4 Converge first — if the user triggers it mid-session, that's their signal the design is settled enough.
+At any point in the session the user can route the settled design to either builder. Don't wait for an explicit Step 4 Converge — if they trigger mid-session, that's their signal the design is settled enough.
+
+- **`generate prompt`** (or "package this", "write the execution prompt", "crystallize this") → invoke `/myna-dev-build-prompt` with the design summary as context.
+- **`add to queue`** (or "queue this", "queue it up", "add to the queue") → decompose the settled design into one or more logical task units (group by unit of work, the same way a build prompt would — including a companion doc task if the change updates records like architecture/decisions/README), then invoke `/myna-dev-task-add` with the full set as context. `task-add` drafts every entry in the canonical queue format, shows them for one approval, and appends them.

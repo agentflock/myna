@@ -390,24 +390,38 @@ Summary:  tmp/[feature]/[prefix]-summary.md
 
 ---
 
-## Phase 4: Review (1 cycle only)
+## Phase 4: Review and Fix
 
-Spawn a review subagent. One cycle — the prompt is a document, not implementation.
+Two complementary lenses, run in order — together they cover both *intent* (did the prompt capture what we designed?) and *autonomy* (can a stranger execute it?). Each alone leaves a blind spot.
 
-The reviewer checks:
-1. **Autonomy** — will it run without asking the user anything?
-2. **Completeness** — every task and doc update present?
-3. **Accuracy** — file paths correct? Files exist?
-4. **Dependencies** — parallel phases truly independent?
-5. **Review criteria** — specific enough to catch real issues?
+### 4a. Same-context review (up to 2 passes)
 
-**Review discipline:** Only flag real problems. Don't manufacture findings. Clean review is valid.
+You wrote this prompt with the full design conversation in your head — use that vantage, because only you can check it. Re-read the prompt against the design and fix:
+- **Intent fidelity** — every settled decision and design detail is reflected; nothing from the conversation was dropped or distorted.
+- **Completeness** — every task and doc update present; the execution plan covers the whole design.
+- Any obvious autonomy gaps you can already see.
+
+Fix what you find, then re-read — up to 2 passes, stopping early once a pass finds nothing.
+
+### 4b. Independent review (subagent, up to 2 rounds)
+
+Now test what a stranger sees — that's exactly the position the executing session is in. Each round, spawn a fresh review subagent that receives **only the prompt file**, no conversation context. Fix valid findings yourself, then re-spawn for the next round. Loop up to 2 rounds, stopping early once a round is clean.
+
+The bar: a fresh session must execute this prompt end to end, and every subagent it spawns must have everything it needs, with **no chance to ask anyone a question**. The reviewer checks:
+1. **Per-task autonomy** — for *each* T-N subagent prompt: could a fresh subagent that reads only this prompt (plus the files it names) implement the task without guessing? Flag missing context, undefined references, or open fields it would have to invent.
+2. **Orchestrator autonomy** — will the orchestrator run end to end without asking the user anything? Branch/worktree/merge steps unambiguous?
+3. **Accuracy** — file paths exist and are correct; counts and embedded values verified, not estimated.
+4. **Dependencies** — parallel tasks truly file-disjoint; sequential ordering correct.
+5. **Verifiable criteria** — each task's Done-when / `--criteria` is specific and checkable, not "it works".
+6. **Other issues and improvements** — anything else that would cause rework, ambiguity, or a weaker result: unclear problem statements, missing "don't touch" guards, wrong review persona, redundant tasks.
+
+**Review discipline:** Only flag real problems. Don't manufacture findings to fill rounds — a clean round ends the loop early. Fix valid findings between rounds; carry nothing unresolved into the summary without flagging it.
 
 ---
 
-## Phase 5: Fix and Summarize
+## Phase 5: Summarize
 
-Fix valid issues. Then present:
+After the review loop converges, present:
 
 ```
 ## Execution Summary
