@@ -159,15 +159,13 @@ Myna refuses to send. Reminds you it drafts only. Offers to turn it into a draft
 
 ## 1:30 PM — Cross-team email to clean up
 
-There's a vendor email in DraftReplies with Sam's instruction note attached.
+There's a vendor email Sam replied to with a drafting instruction, CCed to the instructions address.
 
 ```
-process these draft reply requests (treat them as if they came from the DraftReplies folder):
-
-{paste the VectorVendor Sales email from tests/fixtures/mock-data/mock-emails.md — Folder: DraftReplies, including Sam's bracketed note and the forwarded message below it}
+process my instructions
 ```
 
-Myna separates your instruction ("decline politely, reopen Q4") from the forwarded context, writes a diplomatic decline, and drops a review TODO in today's daily note.
+Myna reads the instructions folder, verifies the sender, separates your instruction ("decline politely, reopen Q4") from the forwarded thread context, writes a diplomatic decline draft in `Drafts/`, and logs the instruction to the audit trail.
 
 ---
 
@@ -205,7 +203,7 @@ process these slack messages:
 {paste #atlas-team thread starting Alex Thompson 2026-04-08 09:15 (with 3 replies) + Marcus Walker 2026-04-08 10:05 in #phoenix-eng from tests/fixtures/mock-data/mock-slack.md}
 ```
 
-LRU cascade finding → Atlas timeline. Marcus escalation question → a reply-needed task. Channel timestamps updated so Myna knows where it left off.
+LRU cascade finding → Atlas timeline. Marcus escalation question → a reply-needed task. Channel timestamps in `_system/state/slack-sync.yaml` updated so Myna knows where it left off.
 
 ---
 

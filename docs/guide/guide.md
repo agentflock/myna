@@ -51,7 +51,8 @@ After install, Myna creates the following folder structure inside your vault's `
 | `Dashboards/` | 10 Dataview-powered dashboards |
 | `_system/config/` | Your 5 config files (YAML) |
 | `_system/templates/` | Templates for new notes |
-| `_system/logs/` | Audit log, processed channel timestamps |
+| `_system/logs/` | Audit log, instruction execution audit |
+| `_system/state/` | Runtime state: email and Slack dedup timestamps |
 | `_system/sources/` | Source message references for deduplication |
 | `_system/parked/` | Parked context saved by myna-park |
 
@@ -67,8 +68,8 @@ After install, Myna creates the following folder structure inside your vault's `
 | **myna-wrap-up** | Close out your day — compares planned vs actual, logs contributions, moves unfinished items to tomorrow. |
 | **myna-weekly-summary** | Summarize your week — synthesizes daily notes, contributions, decisions, and task completions. Includes team health snapshot for managers. |
 | **myna-email-triage** | Sort inbox emails into folders. Three-step flow: read inbox, write recommendations, then process triage to move emails. |
-| **myna-process-messages** | Extract structured data from email, Slack, or pasted documents and route to the vault. Populates tasks, timelines, person files, and review queues. |
-| **myna-draft-replies** | Process the DraftReplies email folder — reads forwarded emails with your drafting instructions, creates reply drafts in the vault. |
+| **myna-process-updates** | Extract structured data from email, Slack, or pasted documents and route to the vault. Populates tasks, timelines, person files, and review queues. |
+| **myna-process-instructions** | Execute natural language instructions sent via email (CC to instructions address) or a dedicated Slack channel. Uses Myna skills or LLM capabilities; additive writes only. |
 | **myna-prep-meeting** | Generate or update meeting prep for one meeting or all remaining meetings today. Includes carry-forward items and coaching notes. |
 | **myna-process-meeting** | Process a completed meeting — closes checked prep items, extracts tasks/decisions/observations, routes each to the vault. |
 | **myna-brief-person** | Deep-dive briefing on one person — role, shared projects, open items, pending feedback, 1:1 history, personal notes. |
@@ -115,6 +116,7 @@ The primary config file. Required — Myna reads it at every session start.
 | `user.name` | Your full name |
 | `user.email` | Your work email (used to identify your messages) |
 | `user.role` | `engineering-manager`, `tech-lead`, `senior-engineer`, or `pm` |
+| `email.instructions` | Address where instruction emails arrive (default: `{local}+myna@{domain}`) |
 | `timezone` | IANA timezone, e.g. `America/Los_Angeles` |
 | `work_hours.start` / `.end` | Your workday bounds, e.g. `09:00` / `17:00` |
 
@@ -131,7 +133,9 @@ One entry per active project. Myna uses this to route emails, Slack messages, an
 | `slack_channels` | Slack channels mapped to this project |
 | `description` | One-line description |
 | `key_people` | People involved (matched against people.yaml) |
-| `triage.*` | Inbox source, triage folders with descriptions, DraftReplies folder |
+| `triage.*` | Inbox source and triage folders with descriptions |
+| `instructions.email_folder` | Email folder where instruction emails arrive (default: `Myna/`) |
+| `instructions.slack_channel` | Slack channel for instructions (default: `myna`) |
 
 ### people.yaml
 

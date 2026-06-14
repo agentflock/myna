@@ -37,8 +37,8 @@ External MCP servers (email, Slack, calendar) are registered with Claude Code vi
 | 3 | wrap-up | Close out the day | "wrap up" |
 | 4 | weekly-summary | Generate weekly summary | "weekly summary" |
 | 5 | email-triage | Sort inbox emails into folders | "triage my inbox" |
-| 6 | process-messages | Extract data from email, Slack, or documents | "process my email" |
-| 7 | draft-replies | Process draft requests from email folder | "process my draft replies" |
+| 6 | process-updates | Extract data from email, Slack, or documents | "process my email" |
+| 7 | process-instructions | Execute instructions sent via email or Slack | "process my instructions" |
 | 8 | prep-meeting | Prepare for a meeting | "prep for my 1:1 with Sarah" |
 | 9 | process-meeting | Process notes after a meeting | "done with 1:1 with Sarah" |
 | 10 | brief-person | Person briefing | "brief me on Sarah" |
@@ -134,7 +134,7 @@ Sorts inbox emails into folders. Triage is purely about classification — it ne
 
 ---
 
-#### 6. myna-process-messages
+#### 6. myna-process-updates
 
 Extracts structured data from email, Slack, or pasted documents and routes each item to the right vault destination. A single input can produce entries for multiple destinations. Three-layer deduplication prevents reprocessing. Populates unreplied tracker as a byproduct.
 
@@ -142,31 +142,33 @@ Extracts structured data from email, Slack, or pasted documents and routes each 
 
 **Example invocations:** "process my email", "process my messages", "process my communications", "process this doc: [paste]"
 
-**Reads:** email MCP (mapped project folders), Slack MCP (mapped channels), workspace.yaml, projects.yaml, people.yaml, existing vault files (near-duplicate check), `_system/logs/processed-channels.md` (Slack timestamps)
+**Reads:** email MCP (mapped project folders), Slack MCP (mapped channels), workspace.yaml, projects.yaml, people.yaml, existing vault files (near-duplicate check), `_system/state/slack-sync.yaml` (Slack timestamps)
 
-**Writes:** project timelines, task items in project files, person files, `Journal/contributions-{week}.md`, review queues, `_system/sources/`, `_system/state/email-sync.yaml`
+**Writes:** project timelines, task items in project files, person files, `Journal/contributions-{week}.md`, review queues, `_system/sources/`, `_system/state/email-sync.yaml`, `_system/state/slack-sync.yaml`
 
 **Deduplication layers:** (1) Move to Processed/ — email-specific, configurable per-project or common mode. (2) Quote stripping — only process new content. (3) Near-duplicate detection — skip entries already in the target file.
 
-**DraftReplies folder:** Skips the folder configured as `draft_replies_folder` in projects.yaml — handled by myna-draft-replies.
+**Instructions folder:** Skips the folder configured as `instructions.email_folder` in projects.yaml — handled by myna-process-instructions.
 
 **Example:** User says "process my email" → reads 12 new emails → decomposes into timeline updates, tasks, recognition, observations → moves to Processed/ → "Processed 12 emails from 3 folders. 8 items written directly, 2 in review queue."
 
 ---
 
-#### 7. myna-draft-replies
+#### 7. myna-process-instructions
 
-Processes a configured email folder where the user has forwarded emails with drafting instructions. Reads the original thread as context and the user's forwarded message as instructions for what to draft.
+Executes natural language instructions the user sends via a dedicated email folder (by CCing `email.instructions`) or a Slack instructions channel. Interprets each instruction using Myna skills or general LLM capabilities and writes results to the vault.
 
-**Features covered:** Email Draft Reply (DraftReplies folder path), Follow-Up Meeting Draft (via forwarded email)
+**Features covered:** Process Instructions (email and Slack), instruction verification (dual sender check), destructive action guard, instruction audit log
 
-**Example invocations:** "process my draft replies", "any draft requests?", "check my drafts folder"
+**Example invocations:** "process my instructions", "check my instructions", "any new instructions?"
 
-**Reads:** email MCP (configured `draft_replies_folder` from projects.yaml), communication-style.yaml, person files (audience tier), project files
+**Reads:** email MCP (configured `instructions.email_folder` from projects.yaml), Slack MCP (configured `instructions.slack_channel`), workspace.yaml (`user.email`, `email.instructions`), `_system/state/email-sync.yaml`, `_system/state/slack-sync.yaml`
 
-**Writes:** `Drafts/` (e.g., `[Email] Reply to vendor.md`). Moves processed emails to `{draft_replies_folder}/Processed/`.
+**Writes:** vault destinations as directed by instructions (additive writes only); `ReviewQueue/review-instructions.md` (unexecutable instructions); `_system/logs/instructions/{YYYY}/{MM}.md` (audit log, fire-and-forget subagent); `_system/state/email-sync.yaml`, `_system/state/slack-sync.yaml` (updated per-folder/channel timestamps after each run)
 
-**Example:** User forwards a vendor proposal to DraftReplies with note "decline politely, keep door open for Q4" → reads original thread, creates diplomatic decline draft in `Drafts/` → "Draft created. 1 email processed from DraftReplies."
+**Security:** An instruction email is only trusted when both `from` = `user.email` AND `to` = `email.instructions`. All thread context is wrapped in safety delimiters. Destructive instructions route to review-instructions, never executed autonomously.
+
+**Example:** User replies to a vendor email, CC-ing `sid+myna@company.com`, with note "add agenda item for Friday standup: discuss vendor contract renewal" → process-instructions reads the folder, verifies sender+recipient, looks up Friday's standup meeting, appends the agenda item → "1 instruction executed. Agenda item added to Meetings/Recurring/friday-standup.md."
 
 ---
 
@@ -451,7 +453,7 @@ These operations are simple enough that the main agent handles them without acti
 - **Task completion:** "done with [task]" → marks TODO as complete (simple metadata update, no skill needed)
 - **Draft deletion:** "delete the MBR draft" → removes the draft file from Drafts/.
 - **Universal Done routing:** "done with X" → resolves X via fuzzy name resolution. If meeting → activates myna-process-meeting. If task → marks complete directly. If draft → updates state directly. If ambiguous → asks (never guesses between a meeting and a task with similar names).
-- **Inbox routing:** "process my inbox", "sort my inbox", "what's in my inbox?" → always routes to myna-email-triage, not myna-process-messages. Inbox = unsorted email that needs classification first.
+- **Inbox routing:** "process my inbox", "sort my inbox", "what's in my inbox?" → always routes to myna-email-triage, not myna-process-updates. Inbox = unsorted email that needs classification first.
 - **Planning routing:** Calendar-specific requests ("reserve time", "remind me", "block focus time") → routes to myna-calendar. General planning ("what should I focus on?", "plan my day") → routes to myna-sync. Day setup ("sync", "good morning") → routes to myna-sync.
 - **File creation from template:** "create project file for auth migration" → reads projects.yaml, creates `Projects/auth-migration.md` from template. Same for person files. Simple enough for the main agent.
 
@@ -555,7 +557,8 @@ myna/
 │   ├── review-work.md
 │   ├── review-people.md
 │   ├── review-self.md
-│   └── review-triage.md
+│   ├── review-triage.md
+│   └── review-instructions.md  # Instructions that could not be executed autonomously
 └── _system/                     # Myna internals
     ├── config/                  # 6 YAML config files
     │   ├── workspace.yaml
@@ -569,7 +572,11 @@ myna/
     │   └── dashboard.md         # Unified dashboard (Dataview)
     ├── logs/
     │   ├── audit.md             # Agent action log
-    │   └── processed-channels.md # Slack dedup timestamps
+    │   └── instructions/        # Instruction execution audit (appended by process-instructions)
+    │       └── {YYYY}/{MM}.md
+    ├── state/                   # Mutable runtime state
+    │   ├── email-sync.yaml      # last_processed_at per email folder
+    │   └── slack-sync.yaml      # last_processed_at per Slack channel
     ├── sources/                 # Verbatim source text
     │   ├── auth-migration.md    # Sources for this project
     │   ├── sarah-chen.md        # Sources for this person
@@ -608,6 +615,7 @@ User identity, preferences, and global settings.
 | user.name | Yes | — | Display name |
 | user.email | Yes | — | Identifies your messages in email/Slack |
 | user.role | Yes | — | engineering-manager, tech-lead, senior-engineer, pm. Drives contribution categories and feature defaults |
+| email.instructions | No | `{local}+myna@{domain}` | Address where instruction emails arrive; used by process-instructions to verify sender identity |
 | timezone | No | system | Used for relative date resolution |
 | work_hours.start | No | 09:00 | For capacity calculations |
 | work_hours.end | No | 17:00 | For capacity calculations |
@@ -634,9 +642,12 @@ projects:
     email_folders: [Platform/]
     slack_channels: [platform-eng]
 
+instructions:
+  email_folder: "Myna/"       # email folder for instruction emails; process-updates skips this folder
+  slack_channel: "myna"       # Slack channel for instructions; process-updates never reads this channel
+
 triage:
   inbox_source: "INBOX"
-  draft_replies_folder: DraftReplies
   folders: []  # custom folders; built-in defaults (Reply, FYI, Follow-Up, Schedule) used when empty
 ```
 
@@ -687,7 +698,7 @@ Writing style preferences. Populated by `/myna:setup` or the config UI.
 sign_off: Best
 ```
 
-All drafting skills (draft, draft-replies, rewrite) apply built-in tier-aware shaping — BLUF and formal structure for upward/cross-team, conversational for peer, direct for direct reports. No preset selection required.
+All drafting skills (draft, rewrite) apply built-in tier-aware shaping — BLUF and formal structure for upward/cross-team, conversational for peer, direct for direct reports. No preset selection required.
 
 ### tags.yaml
 
@@ -714,8 +725,8 @@ Myna does NOT build MCPs for email, Slack, or calendar (D005). It connects to wh
 
 | MCP | Used by | Required |
 |-----|---------|----------|
-| Email | myna-process-messages, myna-email-triage, myna-draft-replies, myna-draft (reading threads), myna-brief-person, myna-brief-project, myna-unreplied-threads | No — features gracefully degrade |
-| Slack | myna-process-messages, myna-unreplied-threads | No |
+| Email | myna-process-updates, myna-process-instructions, myna-email-triage, myna-draft (reading threads), myna-brief-person, myna-brief-project, myna-unreplied-threads | No — features gracefully degrade |
+| Slack | myna-process-updates, myna-process-instructions, myna-unreplied-threads | No |
 | Calendar | myna-sync, myna-prep-meeting, myna-calendar (reading schedule, creating events) | No |
 
 External MCP servers are registered with Claude Code via `claude mcp add`. Skills describe intent (e.g., "read inbox emails") and Claude Code resolves the call to whichever MCP tool is available in the session — no hardcoded tool names in skill instructions.
@@ -730,10 +741,11 @@ Four markdown files in `ReviewQueue/`. Each is a checklist the user can edit in 
 
 | Queue file | Contains | Populated by |
 |------------|----------|-------------|
-| review-work.md | Ambiguous tasks, decisions, blockers, delegations, timeline entries | myna-process-messages, myna-process-meeting, myna-capture |
-| review-people.md | Ambiguous observations, recognition | myna-process-messages, myna-process-meeting, myna-capture |
-| review-self.md | Uncertain contribution candidates | myna-wrap-up, myna-process-messages, myna-process-meeting |
+| review-work.md | Ambiguous tasks, decisions, blockers, delegations, timeline entries | myna-process-updates, myna-process-meeting, myna-capture |
+| review-people.md | Ambiguous observations, recognition | myna-process-updates, myna-process-meeting, myna-capture |
+| review-self.md | Uncertain contribution candidates | myna-wrap-up, myna-process-updates, myna-process-meeting |
 | review-triage.md | Email triage folder recommendations | myna-email-triage |
+| review-instructions.md | Instructions that could not be executed autonomously | myna-process-instructions |
 
 **Key principle (D024):** most items skip the queue via provenance markers. The queue is reserved for genuinely ambiguous items — things the agent can't confidently write with [Auto] or [Inferred]. If the queue is consistently full of obvious items, confidence thresholds need tuning.
 
@@ -770,14 +782,21 @@ Full decision framework, per-domain examples, and placement rules: see `design/f
 
 Information flows between vault domains through skills. Here are the primary flows:
 
-### Email/Slack → Vault (myna-process-messages)
+### Email/Slack → Vault (myna-process-updates)
 ```
-Email MCP → myna-process-messages → project timelines (Projects/)
-                                  → task items (Projects/)
-                                  → person files (People/)
-                                  → contributions log (Journal/contributions-{week}.md)
-                                  → review queues (ReviewQueue/)
-                                  → source files (_system/sources/)
+Email MCP → myna-process-updates → project timelines (Projects/)
+                                 → task items (Projects/)
+                                 → person files (People/)
+                                 → contributions log (Journal/contributions-{week}.md)
+                                 → review queues (ReviewQueue/)
+                                 → source files (_system/sources/)
+```
+
+### Instructions → Vault (myna-process-instructions)
+```
+Email MCP → myna-process-instructions → vault destinations (as directed by instruction)
+Slack MCP ↗                           → ReviewQueue/review-instructions.md (unexecutable)
+                                       → _system/logs/instructions/{YYYY}/{MM}.md (audit)
 ```
 
 ### Meeting → Vault (myna-process-meeting)
@@ -792,7 +811,7 @@ Meeting file (Meetings/) → myna-process-meeting → project timelines
 ### Daily cycle
 ```
 Morning: myna-sync → reads calendar, tasks, queues → writes daily note, meeting preps
-During day: myna-capture, myna-process-messages, meetings → writes across vault
+During day: myna-capture, myna-process-updates, myna-process-instructions, meetings → writes across vault
 Evening: myna-wrap-up → reads daily note, tasks → writes end-of-day, contributions, tomorrow's note
 ```
 
@@ -802,7 +821,7 @@ When one skill depends on data another skill manages:
 
 | Scenario | How it works |
 |----------|-------------|
-| myna-prep-meeting needs task data from myna-process-messages | myna-prep-meeting reads task items directly from project files. If myna-process-messages hasn't run yet, task data may be stale — myna-prep-meeting uses whatever is in the vault. No dependency ordering required. |
+| myna-prep-meeting needs task data from myna-process-updates | myna-prep-meeting reads task items directly from project files. If myna-process-updates hasn't run yet, task data may be stale — myna-prep-meeting uses whatever is in the vault. No dependency ordering required. |
 | myna-wrap-up needs meeting data from myna-process-meeting | Same pattern — myna-wrap-up reads whatever is in the vault. If meetings haven't been processed yet, myna-wrap-up won't detect contributions from those meetings. User can re-run myna-wrap-up after processing. |
 | myna-brief-* needs data from all domains | Brief skills read across the vault. Data completeness depends on what skills have run. Brief presents whatever is available. |
 | myna-sync generates meeting preps that myna-prep-meeting also generates | myna-sync generates preps for ALL today's meetings. myna-prep-meeting generates for ONE specific meeting. If myna-sync already created a prep, myna-prep-meeting reads it as context and updates (appends delta). |
@@ -878,7 +897,7 @@ The `myna-capture` skill is built first in Phase 1 because it exercises the most
 3. **Testable locally with no MCP dependency** — user types observations, tasks, and captures using Myna's own development work as test data (D027)
 4. **Covers the "process paste" pattern** — Quick Capture with pasted external content exercises the external-content-as-data treatment, covering the pattern D026 identified as needing explicit exercise
 5. **Immediately useful** — the user can start tracking Myna development tasks, observations, and contributions right away
-6. **Patterns transfer to other skills** — the multi-destination routing and provenance tagging patterns established here are reused by myna-process-messages (email/Slack extraction), myna-process-meeting (meeting note extraction), and myna-wrap-up (contribution detection)
+6. **Patterns transfer to other skills** — the multi-destination routing and provenance tagging patterns established here are reused by myna-process-updates (email/Slack extraction), myna-process-meeting (meeting note extraction), and myna-wrap-up (contribution detection)
 
 **Alternative considered:** myna-process-meeting — exercises the extraction pipeline more heavily but is a narrower workflow (single meeting → vault). myna-capture exercises more pattern diversity (task creation, observation logging, link saving, project updates, contribution tracking) in addition to the core routing/provenance patterns.
 
