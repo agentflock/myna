@@ -223,8 +223,8 @@ projects: []
 # Controls how "triage my inbox" classifies emails.
 # ---
 triage:
-  inbox_source: ""
-  draft_replies_folder: ""
+  inbox_source: "INBOX"
+  draft_replies_folder: "DraftReplies"
   folders: []'
 
   _myna_create_if_missing "$MYNA_ROOT/_system/config/people.yaml" \

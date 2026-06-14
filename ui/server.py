@@ -44,14 +44,14 @@ CONFIG_DEFAULTS = {
     "workspace": {
         "user": {"name": "", "email": "", "role": ""},
         "timezone": "",
-        "work_hours": {"start": "09:00", "end": "17:00"},
+        "work_hours": {"start": "", "end": ""},
     },
     "projects": {
         "projects": [],
         "triage": {
-            "inbox_source": "INBOX",
+            "inbox_source": "",
             "folders": [],
-            "draft_replies_folder": "DraftReplies",
+            "draft_replies_folder": "",
         },
     },
     "people": {"people": []},
