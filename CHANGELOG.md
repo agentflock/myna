@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- Added: process-instructions skill — send instructions to Myna via email or Slack and they're executed automatically
 - `daily-brief` now reads email and Slack during morning setup — spawns parallel subagents to fetch and classify inbox items into Action Required, FYI, and not-surfaced tiers. Results appear in new `### Emails` and `### Slack` subsections within the daily note's Sync block, with urgent items surfaced in `### Briefing` as well. Requires email and Slack MCPs; degrades gracefully if unavailable.
 - `review-doc` skill — multi-persona doc review with Chief-of-Staff context layer; supports PRFAQ, design doc/RFC, HLD, LLD, one-pager, and generic doc types. Results saved to `Reviews/`.
 - Reviewer subagent primitives — 11 input-agnostic persona subagents at `agents/myna-reviewer-*.md` (PE, Sr SDE, SRE, Security, QA, Product Leader, PM, Customer Skeptic, Skeptic, Decision-Maker, Writer/Editor). Available for cross-skill orchestration via the Task tool.
