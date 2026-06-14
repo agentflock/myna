@@ -25,8 +25,8 @@ One-line summary: Save and retrieve links to external resources (docs, dashboard
 
 - **Save:** "save link: [url] for [project/meeting/person]" → saves to:
   1. The relevant file's `## Links` section (project file, person file, or meeting file)
-  2. The central link index at `_system/links.md`
-- **Save without explicit entity:** "save link: [url]" → the agent first checks the prompt for context clues. If the user provided any context ("save link: auth team wiki [url]", "save this dashboard [url] — we use it for incident reviews"), the agent infers the destination using fuzzy name resolution against the registry. If a match is found, it links to that entity without asking. If no match or no context, it saves to `_system/links.md` only — useful for general references like company wikis, HR portals, tooling dashboards, or anything not tied to a specific entity.
+  2. The central link index at `_system/data/links.md`
+- **Save without explicit entity:** "save link: [url]" → the agent first checks the prompt for context clues. If the user provided any context ("save link: auth team wiki [url]", "save this dashboard [url] — we use it for incident reviews"), the agent infers the destination using fuzzy name resolution against the registry. If a match is found, it links to that entity without asking. If no match or no context, it saves to `_system/data/links.md` only — useful for general references like company wikis, HR portals, tooling dashboards, or anything not tied to a specific entity.
 - **Find:** "find link: MBR Jan" → searches across all link entries, returns matches
   - Supports versioned keywords: "find link: MBR Jan v2" → exact match
 - Supports: URLs, local file paths, mixed entries, multiple links per entity

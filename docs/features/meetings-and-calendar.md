@@ -106,15 +106,15 @@ One-line summary: Plan your day with time blocks and optionally create personal 
 - Calendar event prefix includes type: `[Myna:Focus]`, `[Myna:Task]`, `[Myna:Reminder]` — so you can tell at a glance what the block is for. Prefix and type labels configurable in workspace config.
 - For AI models without hook support, layers 1 + 3 still protect (instruction + confirmation)
 
-### Calendar Reminders
+### Reminders
 
-One-line summary: Create time-sensitive calendar reminders that push notifications via your calendar app.
+One-line summary: "Remind me on [day]" or "remind me at [time]" about [X] — a vault-native reminder that surfaces in the daily brief, with an optional calendar notification.
 
-- Two types:
-  - **Task reminder:** "Remind me about the design review at 2pm" → creates calendar event linked to the task
-  - **Standalone reminder:** "Remind me to call Alice at 3pm" → creates calendar event, no Obsidian task
-- All calendar events use typed prefix: `[Myna:Task]`, `[Myna:Reminder]` — consistent with time block planning. Three-layer protection (D003), no attendees.
-- Dashboard-level reminders (tasks with due dates shown in daily note) are handled by daily-workflow, not here
+- **Vault-first, always:** every reminder is written immediately to `_system/data/reminders.md` as a `[type:: reminder]` checkbox with a fire date (`📅`). This works with no calendar MCP — the reliable channel.
+- **Optional calendar push:** if a clock time is given, the time is stored (`[time::]`) AND a personal calendar event `[Myna:Reminder]` is created (no attendees, D003 three-layer protection). If the calendar MCP is available but no time was given, ask for a time after writing the vault reminder — never block the write on the answer.
+- **Surfacing:** the daily brief shows open reminders firing today or earlier (catch-all so a skipped day never drops one), with the time if set, and checks them off on delivery (fire-once, no carry-forward). See daily-workflow.
+- The user never picks a channel — a time simply adds a notification on top of the vault reminder.
+- Owned by the `reminder` skill; `block-time` handles only focus/time blocks.
 
 ### Follow-Up Meeting Draft
 

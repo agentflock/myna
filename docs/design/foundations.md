@@ -56,7 +56,9 @@ myna/
     ├── state/                        # Mutable runtime state (not logs)
     │   └── email-sync.yaml           # last_processed_at timestamp for email dedup fallback
     ├── sources/                      # Verbatim source text, one file per entity
-    ├── links.md                      # Central link index
+    ├── data/                         # Structured data files (indexes, not logs/state)
+    │   ├── links.md                  # Central link index
+    │   └── reminders.md              # Reminder items (type:: reminder)
     ├── parked/                       # Parked context snapshots
     └── setup-pending.md              # Skipped setup steps
 ```
@@ -291,12 +293,18 @@ date: {YYYY-MM-DD}
 - {approaching deadlines}
 - {blockers}
 
+### Reminders
+
+> Open reminders firing today or earlier (catch-all). Marked done on surfacing — fire-once.
+
+- {reminder text} {(HH:MM) if time set}
+
 ### Open Tasks
 
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND (due <= date(today) OR !due)
+WHERE !completed AND (due <= date(today) OR !due) AND (type = "task" OR type = "reply-needed")
 SORT priority DESC
 LIMIT 20
 ```
@@ -306,7 +314,7 @@ LIMIT 20
 ```dataview
 TASK
 FROM "myna"
-WHERE !completed AND person
+WHERE !completed AND person AND (type = "task" OR type = "reply-needed")
 SORT due ASC
 ```
 
@@ -583,7 +591,7 @@ On each run, the myna-process-messages skill reads messages after the stored tim
 
 ### 2.14 Central Link Index
 
-`_system/links.md`
+`_system/data/links.md`
 
 ```markdown
 ## Links
@@ -608,7 +616,25 @@ A Dataview-powered file with live queries. Always up-to-date without manual refr
 - People Overview (upcoming 1:1s, feedback gaps)
 - Team Health (for managers — summarized from Team/ files)
 - Current Drafts (list of files in Drafts/ folder)
+- Reminders (firing today or upcoming, from `_system/data/reminders.md`)
 - Recent Activity (latest vault writes)
+
+### 2.16 Reminders
+
+`_system/data/reminders.md`
+
+Standalone, date-targeted reminders. A reminder is a typed checkbox — the same item model as tasks, distinguished by `[type:: reminder]` so it stays out of task queries (which whitelist `task`/`reply-needed`) and gets its own surface.
+
+```markdown
+## Reminders
+
+- [ ] {what} 📅 {YYYY-MM-DD} [type:: reminder] [time:: {HH:MM}] [project:: [[{name}]]] [User] (remind, {YYYY-MM-DD})
+```
+
+- `📅 {date}` — the day the reminder fires (Dataview `due`).
+- `[time:: {HH:MM}]` — optional; present only when the user gave a clock time. Shown in the daily brief; also drives the optional calendar push (see the Reminders feature).
+- `[project::]`/`[person::]` — optional entity link.
+- `- [x]` marks the reminder delivered (checked off by the daily brief when surfaced). Reminders are fire-once; they are never carried forward.
 
 ---
 
