@@ -209,6 +209,48 @@ function populateEmail() {
   const triage  = (window.config.projects || {}).triage || {};
   setValue('triage-inbox-source',        triage.inbox_source         || 'INBOX');
   setValue('triage-draft-replies-folder',triage.draft_replies_folder || 'DraftReplies');
+
+  // Populate triage folders table from config; no JS-side defaults injected.
+  const tbody = document.getElementById('triage-folders-tbody');
+  tbody.innerHTML = '';
+  const folders = Array.isArray(triage.folders) ? triage.folders : [];
+  folders.forEach(f => appendTriageFolderRow(f.name || '', f.description || ''));
+}
+
+function appendTriageFolderRow(name, description) {
+  const tbody = document.getElementById('triage-folders-tbody');
+  const tr = document.createElement('tr');
+  tr.className = 'triage-folder-row';
+  tr.innerHTML = `
+    <td class="pr-2 pb-2">
+      <input type="text" class="field-input font-mono triage-folder-name" placeholder="FolderName" value="${escapeAttr(name)}" />
+    </td>
+    <td class="pr-2 pb-2">
+      <input type="text" class="field-input triage-folder-desc" placeholder="What goes here" value="${escapeAttr(description)}" />
+    </td>
+    <td class="pb-2 text-right">
+      <button type="button" class="entity-delete-btn" onclick="removeTriageFolderRow(this)" title="Remove">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function escapeAttr(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function addTriageFolder() {
+  appendTriageFolderRow('', '');
+  const tbody = document.getElementById('triage-folders-tbody');
+  const newRow = tbody.lastElementChild;
+  if (newRow) newRow.querySelector('.triage-folder-name').focus();
+}
+
+function removeTriageFolderRow(btn) {
+  const row = btn.closest('.triage-folder-row');
+  if (row) row.remove();
 }
 
 function populateCommunication() {
@@ -379,13 +421,25 @@ function getTriageData() {
   // Returns the projects.triage section for the integrations tab.
   const existingProjects = deepClone(window.config && window.config.projects || {});
   const existingTriage   = existingProjects.triage || {};
+
+  // Collect folder rows from the table; filter out rows with empty name.
+  const folderRows = Array.from(
+    document.querySelectorAll('#triage-folders-tbody .triage-folder-row')
+  );
+  const folders = folderRows
+    .map(row => ({
+      name:        row.querySelector('.triage-folder-name').value.trim(),
+      description: row.querySelector('.triage-folder-desc').value.trim(),
+    }))
+    .filter(f => f.name !== '');
+
   return {
     ...existingProjects,
     triage: {
       ...existingTriage,
       inbox_source:         document.getElementById('triage-inbox-source').value.trim()         || 'INBOX',
       draft_replies_folder: document.getElementById('triage-draft-replies-folder').value.trim() || 'DraftReplies',
-      folders:              existingTriage.folders || [],
+      folders,
     },
   };
 }

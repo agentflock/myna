@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- [Added] Config UI Email tab now includes a Triage Folders table — configure which folders inbox emails are sorted into
 - Added: vault-native day-level reminders via /myna:reminder — "remind me on [day] about [X]" surfaces in the daily brief, with an optional calendar notification
 - Added: process-instructions skill — send instructions to Myna via email or Slack and they're executed automatically
 - `daily-brief` now reads email and Slack during morning setup — spawns parallel subagents to fetch and classify inbox items into Action Required, FYI, and not-surfaced tiers. Results appear in new `### Emails` and `### Slack` subsections within the daily note's Sync block, with urgent items surfaced in `### Briefing` as well. Requires email and Slack MCPs; degrades gracefully if unavailable.

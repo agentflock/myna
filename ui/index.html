@@ -339,6 +339,27 @@
 
             </div>
 
+            <div class="form-section">
+              <h2 class="section-title">Triage folders</h2>
+              <p class="field-hint mb-3">Folders inbox emails are sorted into. Each folder needs a name and a description so Myna knows when to use it.</p>
+
+              <table class="w-full text-sm mb-3" id="triage-folders-table">
+                <thead>
+                  <tr>
+                    <th class="text-left font-medium text-slate-500 pb-2 pr-2 w-1/3">Name</th>
+                    <th class="text-left font-medium text-slate-500 pb-2 pr-2">Description</th>
+                    <th class="pb-2 w-8"></th>
+                  </tr>
+                </thead>
+                <tbody id="triage-folders-tbody"></tbody>
+              </table>
+
+              <button type="button" class="add-item-btn" onclick="addTriageFolder()">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add folder
+              </button>
+            </div>
+
           </form>
         </div>
       </div>
@@ -467,10 +488,6 @@
           <div class="defaults-row">
             <dt class="defaults-label">Timestamp format</dt>
             <dd class="defaults-value">YYYY-MM-DD</dd>
-          </div>
-          <div class="defaults-row">
-            <dt class="defaults-label">Inbox triage folders</dt>
-            <dd class="defaults-value">Reply / FYI / Follow-Up / Schedule</dd>
           </div>
         </dl>
         <p class="text-slate-400 text-xs italic mt-3">These values are hardcoded in Myna and cannot be changed via the UI.</p>
