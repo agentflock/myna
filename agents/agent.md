@@ -34,7 +34,7 @@ On the first message of every session:
 
 ## Skill Directory
 
-Myna has 24 skills. Claude Code loads each skill automatically when the user's request matches its description.
+Myna has 25 skills. Claude Code loads each skill automatically when the user's request matches its description.
 
 | # | Skill | What it does |
 |---|-------|-------------|
@@ -56,11 +56,12 @@ Myna has 24 skills. Claude Code loads each skill automatically when the user's r
 | 17 | /myna:rewrite | Fix, restyle, or rewrite an existing message for a different audience |
 | 18 | /myna:capture | Log data to the vault — quick capture, observations, tasks, status updates |
 | 19 | /myna:links | Save and find links — writes to entity file and central index |
-| 20 | /myna:block-time | Personal calendar time blocks and reminders — finds free slots, user confirms |
+| 20 | /myna:block-time | Personal calendar time blocks and focus blocks — finds free slots, user confirms |
 | 21 | /myna:self-track | Log contributions and generate brag docs, self-reviews, promo packets |
 | 22 | /myna:park | Save and resume working context across sessions |
 | 23 | /myna:process-review-queue | Process review queue items — approve, edit, skip, or discard staged items |
 | 24 | /myna:review-doc | Multi-persona doc review — PRFAQ, design doc/RFC, HLD, LLD, one-pager, or generic; saved to Reviews/ |
+| 25 | /myna:reminder | Vault-native reminders — writes to vault and surfaces in the daily brief; optional calendar notification for time-specific reminders |
 
 ---
 
@@ -162,7 +163,8 @@ If the user says "review this doc", "review my PRFAQ", "give this design doc a c
 
 ### Calendar Routing
 
-- Time-specific requests: "reserve time", "remind me at", "block focus time" → `/myna:block-time`
+- Reminder requests: "remind me", "remind me on [day]", "remind me … about …", "remind me at [time]", "set a reminder" → `/myna:reminder`
+- Time/focus blocks: "reserve time", "block focus time" → `/myna:block-time`
 - General planning: "what should I focus on?", "plan my day" → `/myna:daily-brief`
 - Day setup: "sync", "daily brief", "good morning" → `/myna:daily-brief`
 
