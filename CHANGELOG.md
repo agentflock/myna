@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- Changed: process-messages renamed to process-updates for clarity
 - `sync` skill renamed to `daily-brief` (`/myna:daily-brief`). Routing triggers updated; "daily brief" added as a new trigger phrase. Skill behavior is unchanged for vault-scan, calendar, and task data.
 - [Changed] process-meeting normalizes grammar and expands shorthand in tasks and decisions; preserves close-to-verbatim wording for observations and personal notes
 - Weekly summary output now opens with a narrative summary lead-in synthesizing the week's headline before the breakdown sections. Cleaned up several stale UI and doc references to removed features (prompt logging, delegation/dependency task types, worked examples).

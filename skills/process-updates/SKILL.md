@@ -1,12 +1,12 @@
 ---
-name: process-messages
+name: process-updates
 disable-model-invocation: true
-description: Extract and structure data from email, Slack, or pasted documents and route to the vault. Processes project-mapped folders/channels. Never touches inbox or DraftReplies. Populates tasks, timelines, person files, review queues.
+description: Extract and structure data from email, Slack, or pasted documents and route to the vault. Processes project-mapped folders/channels. Never touches inbox or instructions folder. Populates tasks, timelines, person files, review queues.
 user-invocable: true
 argument-hint: '"process my email", "process my messages", "process this doc: [paste]"'
 ---
 
-# myna-process-messages
+# myna-process-updates
 
 If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:setup` and stop.
 
@@ -24,15 +24,15 @@ Read `_system/config/workspace.yaml`.
 
 ### Email
 
-Read emails from folders mapped to projects in projects.yaml (`email_folders` per project). **Never read the inbox** — that's `/myna:email-triage`. **Never read the `draft_replies_folder`** — that's `/myna:draft-replies`.
+Read emails from folders mapped to projects in projects.yaml (`email_folders` per project). **Never read the inbox** — that's `/myna:email-triage`. **Never read the instructions folder** — that's `/myna:process-instructions`.
 
-Skip the folder named in `triage.draft_replies_folder` (default: `DraftReplies`) entirely.
+Skip the folder named in `instructions.email_folder` (default: `Myna/`) entirely.
 
 For each project, process emails in the configured `email_folders`. Each folder maps to exactly one project — use that mapping for routing. No ambiguity.
 
 ### Slack
 
-Read messages from channels mapped to projects in projects.yaml (`slack_channels` per project). Process only messages after the last-processed timestamp stored in `_system/logs/processed-channels.md` for each channel.
+Read messages from channels mapped to projects in projects.yaml (`slack_channels` per project). Process only messages after the last-processed timestamp stored in `_system/state/slack-sync.yaml` for each channel.
 
 DMs and unmapped channels: if the user pastes a message from a DM or unmapped channel, route using context clues and any project mention. Keyword routing tags are supported: `TODO`, `LOG`, `BLOCKER`, `DECISION`, `RECOGNITION`. Messages without a keyword tag go through normal extraction.
 
@@ -52,11 +52,11 @@ Apply all three layers before writing any entry:
 Read `_system/state/email-sync.yaml` for `last_processed_at` per folder — if set, only fetch emails received after that timestamp. After each email is successfully processed, update `last_processed_at` for that folder to the email's received timestamp. Mid-run failures resume from the last successfully processed email, not the start of the batch.
 
 **Layer 1 — Slack: Timestamp tracking**
-Process only messages after the last-processed timestamp stored in `_system/logs/processed-channels.md` for each channel. After each message is successfully processed, update that channel's entry to the message's timestamp. Mid-run failures resume from the last successfully processed message, not the start of the batch. If the file doesn't exist (first run), create it with the format below before writing the first timestamp.
+Process only messages after the last-processed timestamp stored in `_system/state/slack-sync.yaml` for each channel. After each message is successfully processed, update that channel's entry to the message's timestamp. Mid-run failures resume from the last successfully processed message, not the start of the batch. If the file doesn't exist (first run), create it with the format below before writing the first timestamp.
 
 Format (YAML under `channels:` key):
 ```yaml
-# Auto-updated by /myna:process-messages skill. Do not edit manually.
+# Auto-updated by /myna:process-updates skill. Do not edit manually.
 # Format: channel-name: timestamp of last successfully processed message
 channels:
   auth-team: "2026-04-05T14:30:00Z"
@@ -213,7 +213,7 @@ These surface in the daily note's open-task view. When a subsequent processing r
 - **MCP unavailable (email or Slack):** If the MCP connection fails, skip that source type, note it in the output summary ("Email MCP unavailable — skipped"), and continue with other sources. Do not abort the whole run.
 - **No mapped projects:** If projects.yaml has no `email_folders` or `slack_channels`, skip that source type with a note: "No folders/channels mapped — nothing to process." Suggest running `/myna:setup` to set up mappings.
 - **All items near-duplicates:** Normal outcome. Report the skip count in the output summary. Do not re-process.
-- **DraftReplies folder not in config:** Default to skipping a folder named `DraftReplies`. No config required.
+- **Instructions folder not in config:** Default to skipping the folder named in `instructions.email_folder` (default: `Myna/`). No config required.
 - **Empty folders/channels:** Normal outcome. Report zero items processed.
 
 ---
