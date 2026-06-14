@@ -1,16 +1,16 @@
 ---
 name: block-time
 disable-model-invocation: true
-description: Create personal calendar time blocks and reminders. Finds free slots, proposes options, user confirms before any calendar write — no attendees, ever. Does not handle meeting prep or scheduling with others.
+description: Create personal calendar time blocks — focus time, task blocks, deep work. Finds free slots, proposes options, confirms before any write — no attendees, ever. For reminders, use /myna:reminder. Does not handle meeting prep or scheduling others.
 user-invocable: true
-argument-hint: "reserve [duration] [when] for [what] | remind me [what] at [time]"
+argument-hint: "reserve [duration] [when] for [what] | block [duration] on [day] for [purpose] | find me a slot for [task]"
 ---
 
 If vault_path is not in context, read `~/.myna/config.yaml` first. If the file does not exist, tell the user to run `/myna:setup` and stop.
 
 # block-time
 
-Creates personal calendar events — time blocks and reminders. Every calendar write is personal-only — no attendees, ever.
+Creates personal calendar time blocks — focus time, task slots, deep work. Every calendar write is personal-only — no attendees, ever. For reminders, use /myna:reminder.
 
 ---
 
@@ -47,7 +47,7 @@ No attendees.
 Create this event? (yes / pick a different slot / cancel)
 ```
 
-Event type labels and the base prefix are hardcoded: `[Myna]`, `[Myna:Focus]`, `[Myna:Reminder]`.
+Event type labels and the base prefix are hardcoded: `[Myna]`, `[Myna:Focus]`.
 
 **Step 4: Create the event**
 
@@ -64,46 +64,11 @@ If creation succeeds, confirm: "✅ Time block created: {title}, {day} {start}�
 
 ---
 
-## Calendar Reminders
-
-**Triggers:** "remind me about the design review at 2pm", "remind me to call Alice at 3pm", "set a reminder for the deployment window at 11 AM"
-
-### Two Reminder Types
-
-**Task reminder:** "Remind me about [task] at [time]" — the reminder is linked to an existing task or event. Title includes the task name.
-
-**Standalone reminder:** "Remind me to [action] at [time]" — no linked vault task. Just a calendar notification.
-
-### How It Works
-
-**Step 1: Parse the request**
-
-Extract: what to be reminded about, when (time today or specific datetime), and whether it links to a vault task.
-
-If "at 2pm" is ambiguous (today or tomorrow?), assume today if the time hasn't passed, otherwise tomorrow. Confirm in the output.
-
-**Step 2: Confirm details**
-
-```
-⏰ Proposed reminder:
-Title: [Myna:Reminder] {what}
-When: {day}, {time} ({duration}: 15 min)
-No attendees.
-
-Create this reminder? (yes / cancel)
-```
-
-Reminders default to 15-minute duration (enough for the calendar app to send a notification). Duration is not configurable in this skill.
-
-**Step 3: Create the event**
-
-Same three-layer protection as time blocks. No attendees. On success: "✅ Reminder set: {what} at {time}."
-
----
-
 ## Edge Cases
 
-**Calendar MCP unavailable:** For time blocks and reminders, inform the user and stop. "Calendar MCP is unavailable — can't check free slots or create events. Try again when it's connected."
+**Calendar MCP unavailable:** Inform the user and stop. "Calendar MCP is unavailable — can't check free slots or create events. Try again when it's connected."
+
+**Reminder request:** This skill does not handle reminders. Say: "For reminders, use /myna:reminder." Do not attempt to process reminder requests here.
 
 **No free slots of requested duration:** "No {duration}-hour slots available on {day}. Closest options: {slot-A} ({shorter-duration}), or {next-available-day} for a full {duration}-hour block."
 
