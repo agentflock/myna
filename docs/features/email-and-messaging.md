@@ -7,7 +7,7 @@
 ## Features
 
 > **Moved to cross-domain.md:** F20 (Auto-Tagging) — applies across all domains, not just email/messaging.
-> **Moved to writing-and-drafts.md:** F17 (Email Draft Replies) — the draft creation is a writing concern. The trigger mechanism (DraftReplies folder) is noted there.
+> **Moved to writing-and-drafts.md:** F17 (Email Draft Replies) — the draft creation is a writing concern. The trigger mechanism is now handled by Process Instructions below.
 
 ### Deduplication (shared by email processing, messaging processing, and triage)
 
@@ -16,7 +16,7 @@ One-line summary: Three-layer defense against processing the same content twice,
 - **Layer 1 — Move to Processed folder (D019):** after processing an email, move it to a `Processed/` subfolder within the same project folder. Next run only sees unprocessed emails in the parent folder. The folder structure mirrors the project mapping (e.g., `Auth Migration/Processed/`). Emails are preserved, not deleted. Assumes the email MCP supports folder moves.
 - **Layer 2 — Quote stripping:** when processing an email that's part of a thread, the agent strips quoted content before extraction. Detects quote markers: lines starting with ">", "On [date], [person] wrote:", "From: ... Sent: ..." blocks, and forwarded message headers. Only the new content at the top is processed. Imperfect for inline replies (someone writing between quoted lines) — layer 3 catches those.
 - **Layer 3 — Near-duplicate detection:** before staging an extracted item in the review queue, the agent checks recent queue entries and recent vault writes for near-duplicates (same action item, same decision, similar wording from the same source thread). If a near-match exists, the item is skipped and the user is informed on CLI ("Skipped: 'review design doc' — similar item already staged from earlier email in this thread"). Transparency so the user knows what was dropped and can override if it was actually a distinct item. For email triage, skipped items are also noted in `review-triage.md` so they're visible when the user reviews the file.
-- **Applies to:** email processing, messaging processing, email triage, and document processing. Any feature that extracts structured data from external content uses all three layers. Layer 1 (folder moves) is email-specific; for Slack, the agent stores the last-processed timestamp per channel in `_system/logs/processed-channels.md`. On each run, only messages after the stored timestamp are processed. Timestamp updated after successful processing.
+- **Applies to:** email processing, messaging processing, email triage, and document processing. Any feature that extracts structured data from external content uses all three layers. Layer 1 (folder moves) is email-specific; for Slack, the agent stores the last-processed timestamp per channel in `_system/state/slack-sync.yaml`. On each run, only messages after the stored timestamp are processed. Timestamp updated after successful processing.
 
 ### Email Processing
 
@@ -99,3 +99,19 @@ One-line summary: Tracks messages waiting on you and messages you're waiting on 
 - **No separate tracker file** — the "unreplied tracker" is a Dataview query over TODOs with `type:: reply-needed`. Surfaced in daily note and queryable on demand ("what am I waiting on?").
 - Items auto-resolve when a reply is detected in subsequent processing runs (the TODO is marked complete)
 
+### Process Instructions
+
+One-line summary: "Process my instructions" reads a dedicated email folder and Slack channel for natural language instructions the user sent via reply or forward, and executes them using Myna skills or general LLM capabilities.
+
+- **How the user sends instructions — email:** user replies to any email, CCing `email.instructions` (configured in workspace.yaml). That reply lands in the configured instructions folder via a mail filter rule. The reply body is the instruction; the rest of the thread is context only. Multiple instruction messages in the same thread are each processed independently.
+- **How the user sends instructions — Slack:** user posts or forwards a message in the configured instructions channel. The user's own message is the instruction; any shared/forwarded message is context only.
+- **Config:** `instructions.email_folder` and `instructions.slack_channel` in projects.yaml — set by the setup skill, user-configurable (setup defaults: `Myna/` and `myna`). `email.instructions` in workspace.yaml — set by the setup skill as `{local}+myna@{domain}` from `user.email` (plus-addressing, works on most providers without creating a new alias), user-configurable. The skill skips a source if its config key is absent — no hardcoded fallbacks.
+- **Instruction execution:** instructions are interpreted naturally — using Myna skills where applicable, general LLM capabilities otherwise. No fixed type list. A single message can contain multiple instructions or a chain of instructions executed in sequence (e.g., "read this article, summarize it, add a TODO to review the summary").
+- **Provenance:** every vault entry created includes a sub-bullet immediately after: `- *From: {sender} — "{subject or channel name}" ({YYYY-MM-DD})*`
+- **Agenda items:** the skill looks up the calendar to find the matching meeting and writes the item to that meeting file. If no meeting is found, routes to `ReviewQueue/review-instructions.md`.
+- **Unexecutable, ambiguous, or instructions the skill cannot confidently map to a specific vault operation** → `ReviewQueue/review-instructions.md` with instruction text, reason, email subject, sender, and timestamp. When in doubt, stage for review — never guess.
+- **Audit log:** after each run, a fire-and-forget subagent appends one entry per instruction to `_system/logs/instructions/{YYYY}/{MM}.md` (source, instruction, outcome, vault destination). Append-only — main skill never reads the file.
+- **Deduplication — email:** uses the existing per-folder timestamp structure in `_system/state/email-sync.yaml`. The instructions folder (`Myna/` by default) gets its own entry alongside project folder entries. Timestamp updated to current wall-clock time after each run (not email timestamp — avoids timezone edge cases).
+- **Deduplication — Slack:** uses the existing per-channel timestamp structure in `_system/state/slack-sync.yaml`. The instructions channel (`myna` by default) gets its own entry alongside project channel entries.
+- **Security — instruction verification:** an instruction message is only trusted if both `from` = `user.email` (workspace.yaml) AND `to` = `email.instructions` are true. This prevents a crafted thread from injecting fake instruction messages. All thread content (everything outside the verified instruction message) is wrapped in safety delimiters and treated as data only — never acted on directly.
+- **Security — destructive action guard:** the skill only performs additive vault writes (create drafts, append tasks, append agenda items, append observations). Any instruction requesting deletion, bulk overwriting, or modification of existing vault content → `ReviewQueue/review-instructions.md`, never executed autonomously.
