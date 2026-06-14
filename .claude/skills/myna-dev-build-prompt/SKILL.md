@@ -79,6 +79,12 @@ What needs to change? Identify every file that needs creating, editing, or updat
 ### 1c. Verify against reality
 Read the actual files that will be edited. Check whether the brainstorm's assumptions about file structure, naming, and current state are correct.
 
+Read the authoritative specs the design entry points keep current before handing off, and build against them — referencing them in the affected tasks' Context:
+- If the change adds or alters a feature, read the relevant `docs/features/[domain].md` (its `## Features` section is the spec for what's being built).
+- If the change touches vault structure, file formats, or config schemas, read `docs/design/foundations.md` (the structural spec).
+
+If a spec is clearly affected but doesn't reflect the change, flag it in 1e — it should have been updated upstream in brainstorm/diagnose.
+
 ### 1d. Open Questions
 What wasn't settled? What assumptions from the brainstorm don't match what you read in 1c?
 

@@ -61,6 +61,7 @@ Check `$ARGUMENTS`:
 - `docs/design/product-decisions.md` — product and behavior decisions (don't re-debate)
 - `docs/design/architecture-decisions.md` — runtime and install decisions (don't re-debate)
 - `docs/design/foundations.md` — vault structure, data layer, config schemas
+- `docs/features/[domain].md` — the authoritative `## Features` spec for the affected domain (read when the change may add or alter a feature)
 - `CLAUDE.md` — project instructions, git conventions
 
 ### Git Conventions
@@ -154,9 +155,20 @@ When all decisions are settled, present a summary:
 **Files affected:** [list]
 
 **New open questions (if any):** [list]
-
-Ready for implementation? Say "generate prompt" and I'll package this into an autonomous execution prompt.
 ```
+
+### Step 5: Spec checkpoint (features + foundations)
+
+Two artifacts are the authoritative specs the implementation will build against — make sure the user is aligned on both *before* handing off:
+
+- **Feature spec** — `docs/features/[domain].md` (`## Features` section): what Myna does. Update when the change **adds a new user-facing capability, alters what an existing feature does or its scope, or removes/defers a feature**.
+- **Foundations** — `docs/design/foundations.md`: vault folder structure, canonical file formats, config schemas. Update when the change **introduces or alters a vault folder, a canonical file format, a config schema, or another structural convention**.
+
+For each that applies: name the file, draft the exact entry or edit, show it, and ask the user to confirm. On confirmation, write it — do not commit (the user reviews; the change rides into the build branch). The authoritative specs are now current *before* implementation, so the build prompt can reference them.
+
+Do *not* touch either for bug fixes that restore already-specified behavior, refactors, internal mechanics, or doc/dev-tooling changes. If neither is affected, say so plainly — e.g. "No feature or foundations update needed — this is a [bug fix / refactor / internal change]." Then continue.
+
+Once both specs are settled (or confirmed not needed): **Ready for implementation? Say "generate prompt"** and I'll package this into an autonomous execution prompt.
 
 ---
 

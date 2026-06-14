@@ -172,7 +172,20 @@ If the diagnosis reveals the problem is in a different place than described (e.g
 
 ---
 
-## Step 5 — Queue Offer
+## Step 5 — Spec checkpoint (features + foundations)
+
+Once the user has chosen an option, decide whether it changes either authoritative spec the implementation will build against:
+
+- **Feature spec** — `docs/features/[domain].md` (`## Features` section): what Myna does. Update when the chosen change **adds a new user-facing capability, alters what an existing feature does or its scope, or removes/defers a feature**.
+- **Foundations** — `docs/design/foundations.md`: vault folder structure, canonical file formats, config schemas. Update when the change **introduces or alters a vault folder, a canonical file format, a config schema, or another structural convention**.
+
+For each that applies: name the file, draft the exact entry or edit, show it, and ask the user to confirm. On confirmation, write it — do not commit (the user reviews; the change rides into the build branch). The authoritative specs are now current *before* implementation, so a build prompt can reference them.
+
+Do *not* touch either for bug fixes that restore already-specified behavior, refactors, internal mechanics, or doc/dev-tooling changes. If neither is affected, say so plainly — e.g. "No feature or foundations update needed — this is a [bug fix / refactor / internal change]." Then continue.
+
+---
+
+## Step 6 — Queue Offer
 
 After presenting options, if the problem is worth fixing:
 
