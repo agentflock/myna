@@ -147,7 +147,9 @@ Collect the following data and return it as structured JSON. Do not write any fi
 
 6. MILESTONES: Read people.yaml and all People files. Find birthdays (`birthday: MM-DD`) or work anniversaries (`work_anniversary: YYYY-MM-DD`) within the next 7 days. Return: [{ person, type, date }]. If none, return [].
 
-7. REVIEW_QUEUE: Read `{vault_path}/myna/ReviewQueue/review-work.md`, `review-people.md`, `review-self.md`, `review-inbox.md`. Count unchecked items (`- \[ \]`) in each. Return: { work, people, self, inbox, total }.
+7. REVIEW_QUEUE: Read `{vault_path}/myna/ReviewQueue/review-work.md`, `review-people.md`, `review-self.md`, `review-inbox.md`, `review-instructions.md`. Count unchecked items (`- \[ \]`) in each. Return: { work, people, self, inbox, instructions, total }.
+
+The `total` in review_queue is the sum of work + people + self + inbox + instructions.
 
 Return all results as a single JSON object with keys: calendar, due_today, overdue_signal, overdue_others, blockers, milestones, review_queue.
 ```
