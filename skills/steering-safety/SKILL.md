@@ -19,7 +19,7 @@ All Myna writes target paths under the configured `myna/` subfolder. Never write
 
 **Allowed external write exceptions:**
 1. Personal calendar events with the three-layer protection below (never attendees).
-2. Moving emails among the user's own email folders for approved triage/dedup (e.g., `/myna:email-triage`, `/myna:process-messages`). Never sending or changing recipients.
+2. Moving emails among the user's own email folders for approved triage/dedup (e.g., `/myna:email-triage`, `/myna:process-updates`). Never sending or changing recipients.
 
 **Allowed non-vault Myna paths:** `~/.myna/config.yaml` (setup/config reads) and `~/.myna/overrides/` (user customization). Only `/myna:setup` and system bootstrap may read/write these paths.
 

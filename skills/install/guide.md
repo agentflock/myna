@@ -68,7 +68,7 @@ After install, Myna creates the following folder structure inside your vault's `
 | **/myna:wrap-up** | Close out your day — compares planned vs actual, logs contributions, moves unfinished items to tomorrow. |
 | **/myna:weekly-summary** | Summarize your week — synthesizes daily notes, contributions, decisions, and task completions. Includes team health snapshot for managers. |
 | **/myna:email-triage** | Sort inbox emails into folders. Three-step flow: read inbox, write recommendations, then process triage to move emails. |
-| **/myna:process-messages** | Extract structured data from email, Slack, or pasted documents and route to the vault. Populates tasks, timelines, person files, and review queues. |
+| **/myna:process-updates** | Extract structured data from email, Slack, or pasted documents and route to the vault. Populates tasks, timelines, person files, and review queues. |
 | **/myna:draft-replies** | Process the DraftReplies email folder — reads forwarded emails with your drafting instructions, creates reply drafts in the vault. |
 | **/myna:prep-meeting** | Generate or update meeting prep for one meeting or all remaining meetings today. Includes carry-forward items and coaching notes. |
 | **/myna:process-meeting** | Process a completed meeting — closes checked prep items, extracts tasks/decisions/observations, routes each to the vault. |

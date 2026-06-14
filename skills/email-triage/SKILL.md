@@ -10,7 +10,7 @@ If vault_path is not in context, read `~/.myna/config.yaml` first. If the file d
 
 # email-triage
 
-Sort inbox emails into folders. This skill is **purely about classification** — it recommends where each email belongs, nothing more. It never extracts tasks, decisions, observations, or any other data into the vault. That's `/myna:process-messages`'s job.
+Sort inbox emails into folders. This skill is **purely about classification** — it recommends where each email belongs, nothing more. It never extracts tasks, decisions, observations, or any other data into the vault. That's `/myna:process-updates`'s job.
 
 ---
 
@@ -167,6 +167,6 @@ This ensures the user can see what was skipped and override if it was actually a
 - Does not create or update any project files, person files, or timeline entries
 - Does not send emails or create drafts
 - Does not touch the `DraftReplies` folder (that's `/myna:draft-replies`)
-- Does not process emails in project-mapped folders (that's `/myna:process-messages`)
+- Does not process emails in project-mapped folders (that's `/myna:process-updates`)
 
-After triage, the user runs `/myna:process-messages` to extract vault data from the sorted emails.
+After triage, the user runs `/myna:process-updates` to extract vault data from the sorted emails.
