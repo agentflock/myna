@@ -42,8 +42,8 @@ Myna has 24 skills. Claude Code loads each skill automatically when the user's r
 | 2 | /myna:wrap-up | Close out the day — planned vs actual, contributions, carry-forward, reflection |
 | 4 | /myna:weekly-summary | Weekly summary — synthesize daily notes, contributions, decisions, team health |
 | 5 | /myna:email-triage | Sort inbox emails into folders — recommend, review, then move |
-| 6 | /myna:process-messages | Extract data from email, Slack, or documents and route to the vault |
-| 7 | /myna:draft-replies | Process the DraftReplies email folder — create reply drafts from forwarded emails |
+| 6 | /myna:process-updates | Extract data from project-mapped email and Slack into the vault — tasks, decisions, blockers, observations, timeline updates |
+| 7 | /myna:process-instructions | Process instructions sent via email or Slack — executes any instruction the user forwards to their configured instructions folder or channel |
 | 8 | /myna:prep-meeting | Prepare for a meeting — agenda, carry-forward, coaching for sensitive items |
 | 9 | /myna:process-meeting | Process notes after a meeting — extract tasks, decisions, observations |
 | 10 | /myna:brief-person | Everything Myna knows about a person — role, projects, items, 1:1 history |
@@ -89,17 +89,19 @@ When the user says "done with X":
 
 ### Inbox Routing
 
-"Process my inbox", "sort my inbox", "what's in my inbox?" → always `/myna:email-triage` (classification first), never `/myna:process-messages`.
+"Process my inbox", "sort my inbox", "what's in my inbox?" → always `/myna:email-triage` (classification first), never `/myna:process-updates`.
 
-"Process my email", "process my messages" → `/myna:process-messages` (extraction from already-sorted folders).
+"Process my email", "process my messages", "process my updates" → `/myna:process-updates` (extraction from already-sorted project-mapped folders).
 
-"Process my draft replies", "any draft requests?" → `/myna:draft-replies`.
+"Process my instructions", "check my instructions", "any new instructions?" → `/myna:process-instructions`.
+
+"Process everything", "process my updates and instructions", "sync everything" → run `/myna:process-updates` then `/myna:process-instructions` in sequence. These are distinct workflows — run both and report results from each.
 
 ### Email and Message Processing
 
 - Triage (classify and sort) → `/myna:email-triage`
-- Extract data from sorted email/Slack → `/myna:process-messages`
-- Process DraftReplies folder → `/myna:draft-replies`
+- Extract data from sorted email/Slack → `/myna:process-updates`
+- Process instructions forwarded by the user → `/myna:process-instructions`
 
 These are distinct workflows. Never combine them unless the user explicitly asks for a sequence.
 
@@ -136,9 +138,9 @@ If the user asks about a single project's blockers, use `/myna:brief-project` (i
 
 - "Capture: [anything]", "observation about Sarah: ...", "add task: ..." → `/myna:capture` (user enters data directly; routes it to the right vault destination)
 - "Save link: [url]", "save this link" → `/myna:links`
-- "Process my email", "process Slack messages" → `/myna:process-messages` (extracts structured data from emails/messages already in the vault)
+- "Process my email", "process Slack messages", "process my updates" → `/myna:process-updates` (extracts structured data from project-mapped emails/messages already in the vault)
 
-`/myna:capture` is for user-dictated input. `/myna:process-messages` is for parsing external content. Never substitute one for the other.
+`/myna:capture` is for user-dictated input. `/myna:process-updates` is for parsing external content. Never substitute one for the other.
 
 ### Working Context
 
@@ -174,7 +176,7 @@ When a request could reasonably map to multiple skills, present the options and 
 
 > I can help with that a couple of ways:
 > - **/myna:brief-project** — project status summary
-> - **/myna:process-messages** — extract new data from project emails
+> - **/myna:process-updates** — extract new data from project emails
 >
 > Which did you mean?
 
