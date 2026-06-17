@@ -63,7 +63,7 @@ If "plan tomorrow" is run again after the user has already edited the note: trea
 
 If no weekly note exists for the ISO week containing the target date:
 
-1. **Archive previous weekly note:** Glob `Journal/*.md` for files matching `\d{4}-W\d{2}.md`. If any file is found and it is not the weekly note being created, move it to `Journal/Archive/Weekly/` using Bash `mv`.
+1. **Archive previous weekly note:** Glob `Journal/*.md` for files matching `\d{4}-W\d{2}.md`. If any file is found and it is not the weekly note being created, move it to `Journal/Archive/Weekly/` using Bash `mv`. This `mv` is a required action — run it and record whether it succeeded or there was nothing to move. You will report this outcome in Step 8.
 
 2. **Create the new weekly note** at `Journal/{YYYY-W\d\d}.md` (e.g. `2026-W18.md`) using this template:
 
@@ -107,7 +107,7 @@ Populate Week Capacity by reading this week's calendar events (duration + count 
 
 ## Step 4: Archive Previous Daily Note
 
-**Normal sync (today):** Before creating or refreshing today's daily note, glob `Journal/*.md` for files matching `\d{4}-\d{2}-\d{2}.md` (daily pattern). Any file found whose name does not match today's date is the previous daily note — move it to `Journal/Archive/Daily/` using Bash `mv`. There should be at most one such file (the previous day's note). Report if moved; if none found, continue silently.
+**Normal sync (today):** Before creating or refreshing today's daily note, glob `Journal/*.md` for files matching the date-only daily pattern `\d{4}-\d{2}-\d{2}.md`. **Only files whose full filename matches this pattern exactly are eligible for archiving** — this explicitly excludes `contributions-{YYYY-MM-DD}.md` files, which accumulate in `Journal/` root and are never archived. Any eligible file found whose name does not match today's date is the previous daily note — move it to `Journal/Archive/Daily/` using Bash `mv`. There should be at most one such file (the previous day's note). This `mv` is a required action — run it and record the result (what file was moved, or that nothing matched). You will report this outcome in Step 8 whether or not a file was moved.
 
 **Plan tomorrow:** Do NOT archive today's daily note. Today's note remains the active record for the current day. Archive happens only on the normal sync run for the new target date. Only archive any prior daily note that is not today's date and not tomorrow's date.
 
@@ -460,12 +460,16 @@ Daily brief complete ({HH:MM}). {N} meetings today ({M} hrs), {O} tasks due toda
 {If email read:} {N} emails — {A} need action, {F} FYI, {S} not surfaced.
 {If Slack read:} {N} Slack messages — {A} need action, {F} FYI, {S} not surfaced.
 Daily note: obsidian://open?vault={vault}&file={path} | {disk-path}
-{If first sync of week:} "Weekly note created for {YYYY-Www}. Previous week note archived."
-{If daily note was archived:} "Previous daily note archived."
+Daily archive: Archived {YYYY-MM-DD}.md → Journal/Archive/Daily/   {-- or: "Daily archive: nothing to archive (no previous daily note found)."}
+{If first sync of week:} Weekly note created for {YYYY-Www}. Weekly archive: Archived {YYYY-WNN}.md → Journal/Archive/Weekly/   {-- or: "Weekly archive: nothing to archive (no previous weekly note found)."}
 {If calendar unavailable:} "Calendar unavailable — meetings section skipped."
 {If email unavailable:} "Email unavailable — inbox not read."
 {If Slack unavailable:} "Slack unavailable — messages not read."
 ```
+
+The "Daily archive" line is always printed on every normal sync run — it is not optional. Print the actual filename that was moved, or state that nothing needed archiving. Never silently omit this line.
+
+The "Weekly archive" line is printed whenever a new weekly note is created (first sync of the week) — it is not optional in that case. Print the actual filename that was moved, or state that nothing needed archiving.
 
 Then print the Briefing bullets as a quick-scan list.
 
