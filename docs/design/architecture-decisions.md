@@ -19,6 +19,15 @@ Each entry:
 
 ---
 
+### D070 — Daily note `### Tasks Due Today` is a live Dataview TASK block, not copied text
+
+**Date:** 2026-06-17
+**Context:** The daily-brief skill renders `### Tasks Due Today` by copying task text out of project files into the daily note. Because these are copies, checking off or editing a task in the daily note does not propagate to the canonical task in the project file — a behavior new users find broken, since the universal checkbox mental model is "tick it once, it's done everywhere." D061 had removed the daily note's Dataview task block to fix an unrelated drift bug (reader skills depending on a synthesized `### Immediate Attention` section). That objection does not apply to a live query block: a Dataview `TASK` query stores no data and is not a second source of truth — it is a live view of the project files, which remain authoritative. Obsidian's Dataview/Tasks plugins (the assumed interface per D026) write checkbox state back to the source file natively when a task is toggled in a rendered query.
+**Decision:** `### Tasks Due Today` in the `## Sync — {HH:MM}` block is a live Dataview `TASK` query block (filtered to tasks due today, grouped by project), not copied task text. Toggling a task's checkbox in the rendered block writes the completion back to the canonical task in its project file — no reconciliation step, no lag. Project files remain the single source of truth; the daily note renders a live view. This reverses, for the task section only, D061's removal of the Dataview task block. D061's core rule is unchanged and still binding: reader skills (wrap-up, plan, weekly-summary) must query source files directly and must never treat a synthesized daily-note section as a task-data source. The Briefing's one-line task summary still uses the vault-scan data. Accepted trade-off: in an archived daily note the live block re-evaluates against current sources rather than showing that day's historical state — acceptable because the day's frozen retrospective already lives in the static `## End of Day` section that wrap-up writes.
+**Alternatives rejected:** Keep copies and add a reconciliation pass (read `- [x]` items from the daily note at wrap-up, match by block ID, mark source complete) — works and stays maximally conservative, but adds a block-ID join key plus a sync skill to maintain, and the checkoff only reflects at end-of-day instead of instantly; worse UX for no architectural gain over a live view. Block-reference links per task (`[[project#^id]]`) for click-through-to-exact-task — solves navigation but not sync, and is moot once the section is a live block. Tasks-plugin query instead of Dataview — Dataview `TASK` is already the convention for `## Open Tasks` in project files; reusing it keeps one query language.
+
+---
+
 ### D068 — Canonical daily note Sync block gains ### Emails and ### Slack subsections
 
 **Date:** 2026-05-27
