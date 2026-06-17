@@ -81,7 +81,7 @@ For MCP-dependent tests, the prompt references a mock data file — paste the na
 - Does NOT mutate Morning Focus section
 
 **Files to check:**
-- `Journal/DailyNote-2026-04-11.md` (or today's date) — new file with sync snapshot, frontmatter `date:`, `#daily` tag, Sync section, Open Tasks Dataview query
+- `Journal/DailyNote-2026-04-11.md` (or today's date) — new file with sync snapshot, frontmatter `date:`, `#daily` tag, Daily Brief section, Open Tasks Dataview query
 - No edits to April 10 daily note
 
 **Result:** [ ]
@@ -95,11 +95,11 @@ For MCP-dependent tests, the prompt references a mock data file — paste the na
 
 **Pass criteria:**
 - Output notes it's a re-run and lists "what changed since last sync" (likely 0 changes if run immediately after SYNC-01)
-- A second `## Sync — HH:MM` snapshot prepended below Morning Focus in today's daily note
+- A second `## Daily Brief — HH:MM` snapshot prepended below Morning Focus in today's daily note
 - Previous snapshot is untouched (no edits to SYNC-01's snapshot)
 
 **Files to check:**
-- `Journal/DailyNote-2026-04-11.md` — two Sync snapshots, Morning Focus preserved
+- `Journal/DailyNote-2026-04-11.md` — two Daily Brief snapshots, Morning Focus preserved
 
 **Result:** [ ]
 
