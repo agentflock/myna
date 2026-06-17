@@ -342,15 +342,13 @@ date: {YYYY-MM-DD}
 
 {One sentence AI-generated summary — surface signal, not just a count. E.g.: "Alpha launch has the most due today (4 tasks), and the blocker on payments is the highest-priority item." If nothing is due, write: "(nothing due today)".}
 
-{For each project that has tasks due today, render a sub-header and task list:}
-
-#### {Project Name}
-
-- [ ] {task title} 📅 {date} {priority if set}
-
-#### General
-
-{Tasks with no project association go here. If none, omit this sub-header.}
+```dataview
+TASK
+FROM "myna"
+WHERE !completed AND due = date("{YYYY-MM-DD}") AND (type = "task" OR type = "reply-needed")
+GROUP BY file.link
+SORT file.name ASC
+```
 
 ### Dashboards
 
