@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Kiro by transforming frontmatter and scaffolding the vault. Refactors `install/claude.sh`
   to share vault setup logic via `install/lib.sh`.
 
+### Fixed
+
+- [Fixed] Daily brief now reliably archives the previous daily and weekly notes and reports what it moved.
+
 ### Changed
 
 - [Changed] Email triage now flags emails with past deadlines (⚠️ Deadline passed) and uses "Action Required" instead of "Reply" as the default folder name
