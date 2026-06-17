@@ -283,58 +283,63 @@ date: {YYYY-MM-DD}
 
 ## Sync — {HH:MM}
 
-### Capacity Check
+### Briefing
 
-{available focus hours} focus time vs {task effort hours} task effort.
-{Over-capacity warning if applicable.}
-
-### Immediate Attention
-
-> Auto-generated, user-editable throughout the day.
-
-- {overdue tasks}
-- {tasks assigned to others that are overdue}
-- {approaching deadlines}
-- {blockers}
+- {3–7 AI-generated bullets: overdue tasks, blockers, capacity flag, meeting prep warnings, email/Slack action items, milestones, review queue}
 
 ### Reminders
 
-> Open reminders firing today or earlier (catch-all). Marked done on surfacing — fire-once.
+- {reminder text}{, HH:MM if time set}
 
-- {reminder text} {(HH:MM) if time set}
-
-### Open Tasks
-
-```dataview
-TASK
-FROM "myna"
-WHERE !completed AND (due <= date(today) OR !due) AND (type = "task" OR type = "reply-needed")
-SORT priority DESC
-LIMIT 20
-```
-
-### Assigned to Others
-
-```dataview
-TASK
-FROM "myna"
-WHERE !completed AND person AND (type = "task" OR type = "reply-needed")
-SORT due ASC
-```
-
-### Review Queue
-
-{count} items pending. [[review-work]] ({n}), [[review-people]] ({n}), [[review-self]] ({n}).
-
-### Milestones
-
-> Upcoming birthdays, anniversaries (if enabled).
+{Omitted entirely when there are no reminders to surface.}
 
 ### Today's Meetings
 
 | Time | Meeting | Prep |
 |------|---------|------|
 | {HH:MM}–{HH:MM} | {meeting name} | [[{meeting-file}]] |
+
+### Emails — {N} unread
+
+**Action Required ({count})**
+- {action_type}: {subject} — {sender}, {reason}
+
+**FYI ({count})**
+- {subject} — {sender}, {one-liner summary}
+
+*({N} emails not surfaced — newsletters, notifications, automated alerts)*
+
+{Omitted entirely when email MCP is unavailable or unread count is 0.}
+
+### Slack — {N} unread
+
+**Action Required ({count})**
+- {action_type}: #{channel} — {sender}, {reason}
+
+**FYI ({count})**
+- #{channel} — {sender}, {one-liner summary}
+
+*({N} messages not surfaced — bot alerts, automated notifications)*
+
+{Omitted entirely when Slack MCP is unavailable or unread count is 0.}
+
+### Tasks Due Today
+
+{One-sentence AI-generated summary of signal. "(nothing due today)" when no tasks are due.}
+
+```dataview
+TASK
+FROM "myna"
+WHERE !completed AND due = date("{YYYY-MM-DD}") AND (type = "task" OR type = "reply-needed")
+GROUP BY file.link
+SORT file.name ASC
+```
+
+{Live Dataview TASK query — filters to the note's literal target date; grouped by project file. Toggling a checkbox writes completion back to the source project file (D070). Reader skills (wrap-up, weekly-summary) query source files directly and never read this section.}
+
+### Dashboards
+
+[[dashboard]]
 
 ## End of Day — {HH:MM}
 
@@ -355,7 +360,7 @@ SORT due ASC
 - {unfinished items moved to next day's note}
 ```
 
-**Re-run behavior:** Each sync prepends a new snapshot with timestamp header. Previous snapshots stay untouched. The user sees the latest state first.
+**Re-run behavior:** Each sync prepends a new `## Sync — {HH:MM}` snapshot immediately after the `#daily` tag, before `## Morning Focus`. Previous snapshots stay untouched. Re-run snapshots include `### Briefing`, `### Today's Meetings`, and (if freshly read) `### Emails` and `### Slack` only — `### Tasks Due Today` and `### Dashboards` live in the first snapshot and are not repeated.
 
 ### 2.7 Weekly Note
 

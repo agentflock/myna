@@ -26,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
+- [Changed] Tasks in the daily brief are now live — check one off in the daily note and it's marked done in the project file automatically.
 - [Changed] Email triage now flags emails with past deadlines (⚠️ Deadline passed) and uses "Action Required" instead of "Reply" as the default folder name
 - `daily-brief` now renders Today's Meetings as a table with a dedicated, linked Prep column (meeting-file wikilink) instead of inline checkbox bullets, and surfaces the day's largest free block as a Briefing line when meetings fragment the day.
 
