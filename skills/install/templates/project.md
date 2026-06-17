@@ -1,5 +1,6 @@
 ---
 created: {{date}}
+aliases: ["{{project-display-name}}"]
 ---
 
 #project #{{project-tag}}
