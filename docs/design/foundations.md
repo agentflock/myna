@@ -279,7 +279,7 @@ date: {YYYY-MM-DD}
 
 ## Morning Focus
 
-> User-editable. Sync never overwrites this section.
+> Your intent for the day — what you most want to focus on or get done. You write this; sync never overwrites it.
 
 ## Sync — {HH:MM}
 

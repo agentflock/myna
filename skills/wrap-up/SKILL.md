@@ -51,7 +51,7 @@ If no tasks were due today and no Morning Focus was written, note it and skip th
 For each "not started" and "partially done" item:
 
 1. Determine tomorrow's date (next weekday).
-2. If tomorrow's daily note (`Journal/{tomorrow}.md`) doesn't exist, create it with frontmatter (`date: {YYYY-MM-DD}`), `#daily` tag, and a `## Morning Focus` section only.
+2. If tomorrow's daily note (`Journal/{tomorrow}.md`) doesn't exist, create it with frontmatter (`date: {YYYY-MM-DD}`), `#daily` tag, and a `## Morning Focus` section with the canonical placeholder blockquote directly under the heading: `> Your intent for the day — what you most want to focus on or get done. You write this; sync never overwrites it.`
 3. Append the carried items to tomorrow's note under the `## Morning Focus` section (inside a `### Carry-Forwards` subsection — add it if it doesn't exist). Each item gets a carry-forward annotation:
 
 ```markdown
