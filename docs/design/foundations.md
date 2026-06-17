@@ -92,6 +92,7 @@ myna/
 ```markdown
 ---
 created: {YYYY-MM-DD}
+aliases: ["{Project Display Name}"]
 ---
 
 #project #{project-tag}
