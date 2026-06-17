@@ -43,11 +43,13 @@ Get the current date, time, and day of week using the configured timezone — al
 
 ```bash
 TZ={timezone} date +"%Y-%m-%d"      # today's date
-TZ={timezone} date +"%H:%M"         # current time for Sync header
+TZ={timezone} date +"%H:%M"         # current time for Daily Brief header
 TZ={timezone} date +"%A"            # day of week (e.g. "Tuesday")
 ```
 
-Use these values everywhere in the skill — the Sync header timestamp, day-of-week greetings, and date calculations.
+Use these values everywhere in the skill — the Daily Brief header timestamp, day-of-week greetings, and date calculations.
+
+**Timestamp rule:** The `{HH:MM}` in `## Daily Brief — {HH:MM}` is the literal output of `TZ={timezone} date +"%H:%M"` captured during this run. Never use an assumed, rounded, or "morning" time — always use the actual wall-clock time from the Bash command above.
 
 **Normal sync:** today's date from the command above.
 **Plan tomorrow:** next weekday from today's date. If today is Friday, tomorrow = Monday.
@@ -285,7 +287,7 @@ date: {YYYY-MM-DD}
 
 > Your intent for the day — what you most want to focus on or get done. You write this; sync never overwrites it.
 
-## Sync — {HH:MM}
+## Daily Brief — {HH:MM}
 
 ### Briefing
 
@@ -366,7 +368,7 @@ Omit `### Slack` section entirely if:
 ### Re-run Snapshot Format (prepended at top)
 
 ```markdown
-## Sync — {HH:MM}
+## Daily Brief — {HH:MM}
 
 ### Briefing
 
