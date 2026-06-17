@@ -281,7 +281,7 @@ date: {YYYY-MM-DD}
 
 > Your intent for the day — what you most want to focus on or get done. You write this; sync never overwrites it.
 
-## Sync — {HH:MM}
+## Daily Brief — {HH:MM}
 
 ### Briefing
 
@@ -360,7 +360,7 @@ SORT file.name ASC
 - {unfinished items moved to next day's note}
 ```
 
-**Re-run behavior:** Each sync prepends a new `## Sync — {HH:MM}` snapshot immediately after the `#daily` tag, before `## Morning Focus`. Previous snapshots stay untouched. Re-run snapshots include `### Briefing`, `### Today's Meetings`, and (if freshly read) `### Emails` and `### Slack` only — `### Tasks Due Today` and `### Dashboards` live in the first snapshot and are not repeated.
+**Re-run behavior:** Each daily-brief run prepends a new `## Daily Brief — {HH:MM}` snapshot immediately after the `#daily` tag, before `## Morning Focus`. Previous snapshots stay untouched. Re-run snapshots include `### Briefing`, `### Today's Meetings`, and (if freshly read) `### Emails` and `### Slack` only — `### Tasks Due Today` and `### Dashboards` live in the first snapshot and are not repeated.
 
 ### 2.7 Weekly Note
 
