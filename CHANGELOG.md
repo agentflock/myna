@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- [Fixed] New project files now carry an aliases field so wiki-links by display name (e.g. `[[Auth Migration]]`) resolve correctly.
 - [Fixed] Daily brief now reliably archives the previous daily and weekly notes and reports what it moved.
 
 ### Changed
