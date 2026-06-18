@@ -236,18 +236,6 @@ myna/
 
 Myna runs on Claude Code, but all skills are plain text — readable by any capable LLM. The same instructions can be adapted for other AI tools.
 
-## Customization
-
-All customizations survive updates.
-
-| What | How |
-|---|---|
-| **Tweak a skill** | Create `~/.myna/overrides/skills/myna-{skill-name}.md`. Your overrides take precedence over the installed skill. |
-| **Add a skill** | Create `~/.claude/skills/myna-[yourprefix]-[name]/` (e.g., `myna-amazon-oncall`). Single-word `myna-[word]` is reserved for built-in skills. Add routing rules to `~/.myna/overrides/routing.md`. |
-| **Disable a skill** | Delete or rename its folder. |
-
-See [Customization Guide](docs/guide/customization.md) for details.
-
 ## Built Entirely by Claude Code
 
 Myna was designed, built, reviewed, and fixed entirely by Claude Code — from feature specs through architecture, implementation, and polish. One person defined the vision and settled decisions. Claude designed the architecture, wrote all 31 skills (25 feature skills + 6 behavioral rules), built the file templates and dashboards, created the install script, and wrote this documentation.
@@ -261,7 +249,6 @@ Two things came out of this, not one: the assistant itself, and a methodology fo
 | Document | Purpose |
 |----------|---------|
 | [User Guide](docs/guide/guide.md) | Full reference — skills, config, workflows |
-| [Customization](docs/guide/customization.md) | Tweaking skills, adding your own, routing rules |
 | [A Day With Myna](docs/guide/a-day-with-myna.md) | Realistic workday walkthrough |
 | [Architecture](docs/design/architecture.md) | Runtime model, skill inventory, folder structure |
 | [Obsidian Setup](docs/guide/obsidian-setup.md) | Plugin configuration and dashboards |
