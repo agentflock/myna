@@ -16,16 +16,16 @@ A day in the life of Sam, a Platform Engineering Manager, using Myna. Every bloc
 You just sat down. You don't remember what's on fire from yesterday and you have a 9am 1:1. You need the day in one glance.
 
 ```
-sync
+daily-brief
 ```
 
-You read the capacity line, see Phoenix is still blocked, notice Sarah Mitchell's OKR reply is overdue, and Sarah Carter's birthday is Thursday. Good — one picture.
+Today's meetings come back as a table with a linked prep column, so you can jump straight into any one. You read the capacity line, see Phoenix is still blocked, notice Sarah Mitchell's OKR reply is overdue, and Sarah Carter's birthday is Thursday surfaced as a vault reminder in the daily note. Good — one picture.
 
 ---
 
 ## 7:55 AM — "OK but what actually matters today"
 
-Sync gave you facts. You want judgment.
+The daily brief gave you facts. You want judgment.
 
 ```
 what should I focus on today?
@@ -77,6 +77,18 @@ Three things, three destinations, one sentence. Sarah gets a recognition entry, 
 
 ---
 
+## 9:55 AM — Don't let this slip
+
+The deploy checklist review can't happen until Friday, but you'll forget by then.
+
+```
+remind me on Friday to review the deploy checklist
+```
+
+Written straight to the vault, no calendar required. It'll surface in Friday's daily brief. (Give it a time — "at 9am" — and Myna offers an optional personal calendar push too.)
+
+---
+
 ## 10:00 AM — "Wait, what's the state of Bridge?"
 
 Emily emailed earlier asking for a Phase 1 timeline confirmation. You don't remember where that project stands.
@@ -123,7 +135,7 @@ triage these inbox emails:
 {paste all emails with `Folder: INBOX` from tests/fixtures/mock-data/mock-emails.md}
 ```
 
-Myna rewrites `ReviewQueue/review-triage.md` with a folder recommendation and one-line reasoning per email. You glance through, tick the ones you agree with.
+Myna rewrites `ReviewQueue/review-inbox.md` with a folder recommendation and one-line reasoning per email. Anything that needs your response lands in **Action Required/**, and anything past a stated deadline gets a `⚠️ Deadline passed` marker on its line. You glance through, tick the ones you agree with.
 
 ```
 process triage
@@ -159,13 +171,13 @@ Myna refuses to send. Reminds you it drafts only. Offers to turn it into a draft
 
 ## 1:30 PM — Cross-team email to clean up
 
-There's a vendor email Sam replied to with a drafting instruction, CCed to the instructions address.
+While clearing your inbox you left Myna an instruction on a vendor thread — replied to it with what you wanted done and CCed the instructions address.
 
 ```
-process my instructions
+process instructions
 ```
 
-Myna reads the instructions folder, verifies the sender, separates your instruction ("decline politely, reopen Q4") from the forwarded thread context, writes a diplomatic decline draft in `Drafts/`, and logs the instruction to the audit trail.
+Myna reads the configured instructions folder, verifies the sender, separates your instruction ("decline politely, reopen Q4") from the forwarded thread context, carries it out — writes a diplomatic decline draft in `Drafts/` — and logs the instruction to the audit trail.
 
 ---
 
@@ -193,17 +205,17 @@ Evidence-grounded: the Apr 9 review, the token cardinality catch, the Mar 12 inc
 
 ---
 
-## 3:00 PM — Inbound Slack catchup
+## 3:00 PM — Inbound updates catchup
 
-While you were heads-down, threads happened.
+While you were heads-down, threads happened across Slack and your project email folders.
 
 ```
-process these slack messages:
+process updates:
 
 {paste #atlas-team thread starting Alex Thompson 2026-04-08 09:15 (with 3 replies) + Marcus Walker 2026-04-08 10:05 in #phoenix-eng from tests/fixtures/mock-data/mock-slack.md}
 ```
 
-LRU cascade finding → Atlas timeline. Marcus escalation question → a reply-needed task. Channel timestamps in `_system/state/slack-sync.yaml` updated so Myna knows where it left off.
+Myna reads your project-mapped Slack channels and email folders and routes the structured data into the vault: LRU cascade finding → Atlas timeline. Marcus escalation question → a reply-needed task. Channel timestamps in `_system/state/slack-sync.yaml` updated so Myna knows where it left off.
 
 ---
 
@@ -281,7 +293,7 @@ One prompt. Clean close.
 wrap up
 ```
 
-Planned-vs-actual against this morning's sync. Contributions split by source. End-of-day section in today's daily note. Tomorrow's note created with carry-forwards marked "(carried from 2026-04-11)". Summary line tells you: completed N of M, N contributions, N carried.
+Planned-vs-actual against this morning's daily brief. Contributions split by source. End-of-day section in today's daily note. Tomorrow's note created with carry-forwards marked "(carried from 2026-04-11)". Summary line tells you: completed N of M, N contributions, N carried.
 
 ---
 
