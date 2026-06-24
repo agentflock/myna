@@ -289,6 +289,7 @@ That's why Myna has two first-class outputs, not one: the assistant itself, and 
 | [A Day With Myna](docs/guide/a-day-with-myna.md) | Realistic workday walkthrough with real prompts |
 | [Obsidian Setup](docs/guide/obsidian-setup.md) | Plugin configuration and dashboards |
 | [Architecture](docs/design/architecture.md) | Runtime model, skill inventory, folder structure |
+| [Foundations](docs/design/foundations.md) | Vault folder structure and canonical file formats |
 | [How It Was Built](docs/how-it-was-built.md) | The Claude Code methodology behind Myna |
 
 ## Contributing
