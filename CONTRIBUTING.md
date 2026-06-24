@@ -152,9 +152,9 @@ These skills run independent of any specific change. Use them to check the overa
 
 | File | Purpose |
 |---|---|
-| `docs/vision.md` | North star — what Myna is and is not |
-| `docs/design/product-decisions.md` | Product and behavior decisions (settled — do not re-debate) |
-| `docs/design/architecture-decisions.md` | Runtime and install decisions (settled — do not re-debate) |
-| `docs/design/architecture.md` | Runtime model, skill inventory, vault structure |
-| `docs/design/foundations.md` | Vault folder structure, canonical file formats |
-| `docs/features/` | Approved features per domain — the authoritative source for what is being built |
+| [`docs/vision.md`](docs/vision.md) | North star — what Myna is and is not |
+| [`docs/design/product-decisions.md`](docs/design/product-decisions.md) | Product and behavior decisions (settled — do not re-debate) |
+| [`docs/design/architecture-decisions.md`](docs/design/architecture-decisions.md) | Runtime and install decisions (settled — do not re-debate) |
+| [`docs/design/architecture.md`](docs/design/architecture.md) | Runtime model, skill inventory, vault structure |
+| [`docs/design/foundations.md`](docs/design/foundations.md) | Vault folder structure, canonical file formats |
+| [`docs/features/`](docs/features) | Approved features per domain — the authoritative source for what is being built |

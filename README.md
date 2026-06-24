@@ -79,6 +79,18 @@ Not an EM? The same skills work for tech leads, senior engineers, and PMs — an
 
 Full walkthrough: [A Day With Myna](docs/guide/a-day-with-myna.md) · Browse the [demo vault](tests/fixtures/vault/myna) to see the files Myna creates.
 
+## Quick start
+
+Already convinced? Install it inside Claude Code in three lines:
+
+```
+/plugin marketplace add agentflock/plugins
+/plugin install myna@agentflock
+/myna:setup
+```
+
+You'll be running your first prompt in about five minutes. Prerequisites and run modes are in [Getting started](#getting-started) below.
+
 ## Why Myna is different
 
 Notice what those prompts have in common: not one needed a format, a tone, or a destination explained. Three things make that possible — and a fourth makes Myna yours to reshape.
@@ -239,16 +251,6 @@ You'll be running your first prompt in about five minutes.
 `/myna:setup` is a ~5-minute interactive conversation: it creates your Myna folder (the vault subfolder is always `myna/`), walks you through your projects, people, and preferences via the Config UI, and offers shell aliases so you can launch Myna from any terminal. Prefer to edit by hand? Skip the UI — your config lives at `<vault>/myna/_system/config/`, and each file ships with a `.example` showing every field.
 
 > **Not on Claude Code?** Run `./install.sh` from the repo root — it detects your installed AI runtime and runs the right installer. Kiro is supported today; Codex support is planned. Claude Code users should use the plugin commands above (`install.sh` will redirect you if you run it by mistake).
-
-**Connect your tools (optional).** Myna works without email, Slack, or calendar on day one. To enable them, register your company's existing MCP servers with Claude Code:
-
-```bash
-claude mcp add gmail-mcp -- <your-gmail-mcp-command>
-claude mcp add slack-mcp -- <your-slack-mcp-command>
-claude mcp add gcal-mcp  -- <your-gcal-mcp-command>
-```
-
-Skip any you don't have — skills that need a missing MCP degrade gracefully and tell you what's missing instead of breaking.
 
 **Run Myna.** From any directory:
 
