@@ -25,9 +25,9 @@ Myna sits exactly in that gap.
 
 ## What Myna is
 
-Myna is a [Claude Code](https://claude.ai/code) agent with **31 skills** built for the specific work tech professionals do every week. You type a prompt in plain language; Myna does the work — reading from the email, Slack, and calendar MCP servers your company already approved, and writing everything it learns as plain markdown into a single folder on your machine.
+Myna is a [Claude Code](https://claude.ai/code) agent with **31 skills** for the work that fills your week: it preps your meetings, triages your inbox, keeps every project and person up to date, and drafts your replies and status updates. You type a prompt in plain language; it reads from the email, Slack, and calendar MCP servers your company already approved, and writes everything it learns as plain markdown into one folder on your machine.
 
-Install it once, and every session builds on the last. The brief you get on Sarah this morning already includes the recognition you logged last week, the 1:1 notes from three weeks ago, and the design review she led on April 9 — because Myna wrote them down when they happened. The Phoenix risk note you draft today knows the blocker is 20 days old because that history is sitting in the project file.
+Plenty of tools can draft an email or summarize a thread. What sets Myna apart is the context behind every one: it keeps a living record of your projects, your people, and your history with them, and works from that. Install it once and every session builds on the last — the brief on Sarah this morning already includes the recognition you logged last week and the design review she led on April 9, and the Phoenix risk note you draft today knows the blocker is 20 days old, because Myna wrote it all down when it happened. Its drafts sound like you and reflect what's actually going on — not a blank-slate guess.
 
 It **drafts but never sends. It organizes but never decides. It surfaces but never hides.** You still pick up the phone, send the email, and make the call — Myna just makes sure that when you do, you're not winging it from memory.
 
