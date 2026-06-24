@@ -1,6 +1,8 @@
 # Contributing to Myna
 
-Myna includes project-scoped dev skills in `.claude/skills/myna-dev-*/` that automate the full contributor workflow — from idea validation through implementation, review, and merge. These skills are only available when you have the Myna repo open in Claude Code; they are not installed to users' machines.
+Myna is a local-first Chief of Staff for tech professionals — AI agent instructions that turn Claude Code into an assistant that reads from your email, Slack, and calendar, and writes exclusively to your local Obsidian vault. It drafts and organizes; it never sends or decides on your behalf.
+
+The project ships a suite of contributor-facing dev skills under `.claude/skills/myna-dev-*/` that automate the full contribution workflow inside Claude Code. These are only available in the Myna repo; they are not installed to user machines.
 
 ---
 
@@ -9,130 +11,150 @@ Myna includes project-scoped dev skills in `.claude/skills/myna-dev-*/` that aut
 Clone the repo and open it in Claude Code:
 
 ```bash
-git clone https://github.com/bathlasiddharth/myna.git
+git clone https://github.com/agentflock/myna.git
 cd myna
 claude
 ```
 
-All dev skills are automatically available as `/myna-dev-*` commands.
+All `/myna-dev-*` skills become available immediately. No additional setup is required to start contributing.
 
 ---
 
-## Two Workflows
+## Two Contribution Paths
 
-### Feature Path — Design to Implementation
+Contributions fall into one of two workflows depending on whether you have a settled design or a known fix.
 
-Use when: proposing a new skill, redesigning an existing behavior, or any change where the right approach isn't obvious upfront.
+---
+
+### Feature / Design Path
+
+Use this path when proposing a new skill, rethinking existing behavior, or any change where the right approach needs to be worked out before writing code.
+
+**Step 1 — Design session:**
 
 ```
 /myna-dev-brainstorm [describe your idea or problem]
 ```
 
-This runs an interactive design session. The skill:
-1. Reads the relevant files (vision, decisions, actual skill code)
-2. Validates the idea against vision fit, architecture constraints, and settled decisions
-3. Explores options with trade-offs and a recommendation
-4. Converges on a settled design
+This starts an interactive design session. It reads the relevant skill files, checks your idea against vision fit, architecture constraints, and settled decisions, then presents options with trade-offs and a recommendation. The session converges on a settled design — every design decision recorded explicitly before any implementation begins.
 
-When design is settled, say **"generate prompt"** — the skill invokes `/myna-dev-build-prompt`, which writes a self-contained execution prompt to `tmp/[name]/[prefix]-prompt.md`.
+At any point once the design is settled, say **"generate prompt"** to move to implementation.
 
-Paste that prompt into a new Claude Code session. It runs autonomously: implements the changes, reviews its own work (up to 3 rounds), fixes Critical and Important issues, and pushes a feature branch. Open a PR when done.
+**Step 2 — Generate an execution prompt:**
 
-**Skills in this path:**
-| Skill | Purpose |
-|-------|---------|
-| `/myna-dev-brainstorm` | Interactive design session — validity-first, then options |
-| `/myna-dev-build-prompt` | Packages design decisions into an autonomous execution prompt |
-| `/myna-dev-task-protocol` | Internal — used by task subagents to commit, review, fix, and push |
-| `/myna-dev-review` | Manual or task-mode review of agent artifacts |
+When you say "generate prompt", the brainstorm skill invokes `/myna-dev-build-prompt`, which writes a self-contained execution prompt to `tmp/[name]/[prefix]-prompt.md`. This file contains the full task breakdown, context, done-when criteria, and orchestration instructions for a fresh session to run autonomously.
+
+**Step 3 — Run the prompt in a new session:**
+
+Paste the prompt file contents into a new Claude Code session. The session runs without human involvement: it implements the changes, reviews its own work up to three rounds, fixes Critical and Important issues between rounds, and pushes a feature branch. You review the diff and open a PR.
+
+**Alternative — queue instead of running immediately:**
+
+Say **"add to queue"** instead of "generate prompt" to defer implementation. The brainstorm skill calls `/myna-dev-task-add`, which drafts a structured task entry and appends it to `tmp/tasks.md`. When you are ready to build, run `/myna-dev-execute-tasks` to process the queued tasks in one automated pass.
 
 ---
 
-### Fix Path — Queue to PR
+### Fix / Bug Path
 
-Use when: fixing a known bug, making a small change, or after `/myna-dev-diagnose` has identified the problem and selected an approach.
+Use this path for known bugs, small targeted changes, or anything where the problem is clearly understood.
 
-**Step 1 — Diagnose:**
+**Step 1 — Validate and diagnose:**
+
 ```
 /myna-dev-diagnose [describe the problem or proposed change]
 ```
 
-This validates the problem against vision and architecture, then generates options with a recommendation. Say **"add this"** when you've picked an option — it invokes `/myna-dev-task-add`.
+This evaluates whether the problem is real and the fix is valid — checking vision fit, architecture constraints, settled decisions, and whether the behavior is already handled by an existing skill. It then generates two to four options with a recommendation. Say **"add this"** to queue the chosen option directly, or proceed manually to Step 2.
 
-**Step 2 — Add to queue:**
+**Step 2 — Queue the task:**
+
 ```
 /myna-dev-task-add [describe the task]
 ```
 
-Drafts a structured task entry (problem, correct behavior, done-when criteria) and shows it for approval before appending to `tmp/tasks.md`. You can also invoke this directly to add any task.
+Drafts a structured task entry with a problem statement, correct behavior description, and verifiable done-when criteria. Shows you the draft before writing anything — you approve or adjust, then confirm. Appends to `tmp/tasks.md` on confirmation.
 
-**Step 3 — Execute:**
+You can invoke `/myna-dev-task-add` directly for any task without going through diagnose first.
+
+**Step 3 — Execute the queue:**
+
 ```
 /myna-dev-execute-tasks
 ```
 
-Reads all pending tasks from `tmp/tasks.md` and runs them sequentially on a single `fix/[date]` branch. Each task:
-- Gets its own subagent with full implementation context
-- Goes through up to 3 review rounds, fixing Critical and Important issues between rounds
-- Commits and reports back
+Reads all pending tasks from `tmp/tasks.md` and runs them sequentially on a single `fix/[date]` branch. Each task runs in its own subagent: the subagent implements the change, commits it, then runs the review loop — up to three rounds, fixing Critical and Important issues between rounds. When all tasks finish, the branch is pushed and results are reported. Completed tasks are archived out of `tmp/tasks.md`; failed tasks remain in the queue.
 
-After all tasks complete, creates a single PR for the full queue run. If any tasks fail, the branch is pushed with completed tasks and failures are reported — no PR created until all pass.
+PR creation is always your decision.
 
-**Skills in this path:**
-| Skill | Purpose |
-|-------|---------|
-| `/myna-dev-diagnose` | Validates problem, generates options — entry point for fixes |
-| `/myna-dev-task-add` | Drafts and queues a task entry in `tmp/tasks.md` |
-| `/myna-dev-execute-tasks` | Runs the queue on a fix branch, one task at a time, with review loops |
-| `/myna-dev-task-protocol` | Internal — used by task subagents to commit, review, fix, and push |
+---
+
+## Bug Reporting
+
+To file a bug from the current session:
+
+```
+/myna-dev-bug
+```
+
+The skill infers the prompt, Myna's output, the skill involved, and the model from conversation context. It auto-redacts private content — names, email addresses, and project names — before writing a filled GitHub issue template to `tmp/bugs/`. Review the file, then open the issue on GitHub manually.
+
+You can also pass a description inline:
+
+```
+/myna-dev-bug [describe the bug or what the output should have been]
+```
 
 ---
 
 ## Periodic QA
 
-Run these any time — not part of a specific change:
+These skills run independent of any specific change. Use them to check the overall health of the skills at any time:
 
 | Skill | What it does |
-|-------|-------------|
-| `/myna-dev-improve` | Full quality pipeline: lint until clean, then review → fix → verify |
-| `/myna-dev-review` | Deep technical review of skills against 8 dimensions |
-| `/myna-dev-consistency` | QA pass for vault format consistency across all skills |
-| `/myna-dev-coverage` | Audit: does every feature from `docs/features/` have executable steps in a skill? |
+|---|---|
+| `/myna-dev-improve` | Full quality pipeline — lint until clean, then review → fix → verify cycles until no Critical or Important issues remain |
+| `/myna-dev-review` | Deep technical review of agent artifacts against 8 dimensions: frontmatter, description quality, instruction clarity, feature completeness, vault format correctness, safety, output usefulness, and steering duplication |
+| `/myna-dev-consistency` | Cross-skill vault format audit — finds skills that write to the same vault destination with diverging formats |
+| `/myna-dev-coverage` | Feature coverage audit — checks whether every feature in `docs/features/` has executable read → decide → write steps in its owning skill |
 
 ---
 
-## Dev Skill Inventory
+## Skill Reference
 
-| Skill | Invocable | Purpose |
-|-------|-----------|---------|
-| `myna-dev-brainstorm` | yes | Design session — validity-first |
-| `myna-dev-build-prompt` | yes | Generate autonomous execution prompt |
-| `myna-dev-diagnose` | yes | Validate problems and generate fix options |
-| `myna-dev-task-add` | yes | Draft and queue a task entry |
-| `myna-dev-execute-tasks` | yes | Run the task queue on a fix branch |
-| `myna-dev-review` | yes | Deep review of agent artifacts |
-| `myna-dev-improve` | yes | Full quality pipeline |
-| `myna-dev-consistency` | yes | Cross-skill vault format audit |
-| `myna-dev-coverage` | yes | Feature spec vs skill coverage audit |
-| `myna-dev-task-protocol` | no | Internal — commit→review→fix→push protocol for task subagents |
+| Skill | User-invocable | Purpose |
+|---|---|---|
+| `/myna-dev-brainstorm` | yes | Interactive design session — validity-first, then options, then hand-off to build |
+| `/myna-dev-bug` | yes | File a bug report from the current session to `tmp/bugs/` |
+| `/myna-dev-build-prompt` | yes | Package a settled design into a self-contained autonomous execution prompt |
+| `/myna-dev-consistency` | yes | Cross-skill vault format audit — report only, does not fix |
+| `/myna-dev-coverage` | yes | Feature spec vs skill coverage audit — report only, does not fix |
+| `/myna-dev-diagnose` | yes | Validate a problem and generate fix options with a recommendation |
+| `/myna-dev-execute-tasks` | yes | Run the task queue on a fix branch, push the branch, report results |
+| `/myna-dev-improve` | yes | Full quality pipeline: lint, then review → fix → verify cycles |
+| `/myna-dev-review` | yes | Deep review of agent artifacts against 8 dimensions — report only, does not fix |
+| `/myna-dev-task-add` | yes | Draft and queue a structured task entry in `tmp/tasks.md` |
+| `/myna-dev-task-protocol` | no (internal) | Shared commit → review → fix protocol called by task subagents; not for direct use |
 
 ---
 
-## Conventions
+## Git Conventions
 
-- **Conventional commits:** `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`
-- **Scope** is the skill or area being changed — `feat(calendar):`, `fix(capture):`. Never use task IDs as scope.
-- **Never auto-commit** — only when explicitly asked.
+- **Conventional commits:** `feat:`, `fix:`, `docs:`, `chore:`, `refactor:` — scope is the skill or area being changed, such as `fix(capture):` or `feat(email-triage):`. Never use task IDs or queue numbers as scope.
+- **Never auto-commit** — only commit when explicitly asked.
 - **Atomic commits** — one logical change per commit.
-- **Never add Co-Authored-By lines.**
+- **No Co-Authored-By lines.**
+- **No merge commits** — all merges must be fast-forward. If a fast-forward is not possible, rebase first.
+- **Commit messages describe what was accomplished**, not which files changed. Lead with the most important change; explain decisions made and problems solved in the body.
 
-## Key Docs
+---
+
+## Key Documents
 
 | File | Purpose |
-|------|---------|
+|---|---|
 | `docs/vision.md` | North star — what Myna is and is not |
-| `docs/design/product-decisions.md` | Product and behavior decisions — don't re-debate |
-| `docs/design/architecture-decisions.md` | Runtime and install decisions — don't re-debate |
+| `docs/design/product-decisions.md` | Product and behavior decisions (settled — do not re-debate) |
+| `docs/design/architecture-decisions.md` | Runtime and install decisions (settled — do not re-debate) |
 | `docs/design/architecture.md` | Runtime model, skill inventory, vault structure |
 | `docs/design/foundations.md` | Vault folder structure, canonical file formats |
-| `docs/features/` | Approved features per domain — authoritative source |
+| `docs/features/` | Approved features per domain — the authoritative source for what is being built |
