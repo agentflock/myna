@@ -81,7 +81,7 @@ Full walkthrough: [A Day With Myna](docs/guide/a-day-with-myna.md) · Browse the
 
 ## Quick start
 
-Already convinced? Install it inside Claude Code in three lines:
+Install Myna inside Claude Code in three lines:
 
 ```
 /plugin marketplace add agentflock/plugins
