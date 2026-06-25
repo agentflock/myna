@@ -15,6 +15,9 @@ Point-in-time dashboard for all direct reports. Read-only — inline output. No 
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Data to Gather
 
 For each person in people.yaml with `relationship_tier: direct`:

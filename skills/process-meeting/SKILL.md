@@ -13,6 +13,9 @@ Process a completed meeting: read the meeting file, close what was discussed, no
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Invocation
 
 **Specific meeting:** "done with 1:1 with Sarah", "process my 1:1 with Sarah", "process the architecture review"

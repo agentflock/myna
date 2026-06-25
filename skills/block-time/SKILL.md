@@ -13,6 +13,9 @@ Creates personal calendar time blocks — focus time, task slots, deep work. Eve
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Time Block Planning
 
 **Triggers:** "reserve 2 hours Thursday for the design doc", "block 3 hours this week for deep work", "find me a good slot for [task]"

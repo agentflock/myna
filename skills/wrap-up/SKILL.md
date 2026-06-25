@@ -13,6 +13,9 @@ Closes out the day. Reads today's daily note and vault state, writes an End of D
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Step 1: Read Config and Today's Note
 
 Read `workspace.yaml`:

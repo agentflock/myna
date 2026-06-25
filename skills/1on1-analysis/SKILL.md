@@ -15,6 +15,9 @@ Reviews 1:1 session notes for a specific person and surfaces factual patterns ac
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Resolve the Person
 
 Match the user's input against people.yaml via fuzzy resolution. If multiple matches, ask the user to clarify. Proceed for any relationship tier — the user may analyze 1:1s with their manager or a peer.

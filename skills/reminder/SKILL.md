@@ -13,6 +13,9 @@ Creates a vault-native reminder that surfaces in the daily brief. The vault writ
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## How It Works
 
 ### Step 1: Parse the request

@@ -15,6 +15,9 @@ Parked files live at: `_system/parked/{topic-slug}.md`
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Park
 
 **Trigger:** "park this", "park: [topic name]", "pause and save context"

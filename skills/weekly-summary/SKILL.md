@@ -13,6 +13,9 @@ Generates or updates the weekly summary. Each run appends a fresh `## Weekly Sum
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Step 1: Determine Target Week
 
 **No argument:** Default to the current week (Monday–Sunday, using today's date and timezone from workspace.yaml).

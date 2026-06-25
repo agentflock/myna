@@ -13,6 +13,9 @@ Generate meeting prep — a set of checkboxes covering what to discuss, what to 
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Invocation Modes
 
 **Single meeting:** "prep for my 1:1 with Sarah", "prep for [meeting name]"

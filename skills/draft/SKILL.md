@@ -11,6 +11,9 @@ If vault_path is not in context, read `~/.myna/config.yaml` first. If the file d
 
 Generates polished professional writing from vault context. Outputs shown inline; saved to `Drafts/` only when user asks or when the draft is long. You never send — the user copies and sends outside Myna.
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Before You Start
 
 Read at session start:

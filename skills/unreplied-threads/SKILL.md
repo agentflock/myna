@@ -15,6 +15,9 @@ The unreplied tracker is not a separate log file. It's a view over open TODOs wi
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Query
 
 Primary source: vault tasks. Grep for open reply-needed tasks:

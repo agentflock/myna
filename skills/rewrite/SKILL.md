@@ -11,6 +11,9 @@ If vault_path is not in context, read `~/.myna/config.yaml` first. If the file d
 
 Transforms an existing message. The user provides the text; you return the transformed version inline. Always show output inline. User says "save" to write to `Drafts/`.
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Before You Start
 
 Read at session start:

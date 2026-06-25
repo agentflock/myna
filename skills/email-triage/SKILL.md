@@ -13,6 +13,9 @@ Sort inbox emails into folders. This skill is **purely about classification** �
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Three-Step Flow
 
 ### Step 1 — Recommend (triggered by "triage my inbox", "sort my inbox", "process my inbox")

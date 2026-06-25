@@ -13,6 +13,9 @@ Save and find links associated with projects or people. Every save writes to two
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Save Link
 
 **Triggers:** "save link: [url] for [entity]", "save this link: [url]", "save link: [context] [url]"

@@ -15,6 +15,9 @@ Scans the entire vault for blockers and surfaces them inline. Read-only — no v
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## What Counts as a Blocker
 
 Two signal types:

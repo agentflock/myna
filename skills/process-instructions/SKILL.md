@@ -13,6 +13,9 @@ Process natural language instructions the user sent via email (by replying to a 
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Before You Start
 
 Read:

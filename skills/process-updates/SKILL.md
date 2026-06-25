@@ -13,6 +13,9 @@ Extract and structure data from email, Slack, and pasted documents, then route e
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Before You Start
 
 Read `_system/config/workspace.yaml`.

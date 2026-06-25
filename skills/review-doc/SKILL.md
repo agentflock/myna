@@ -14,6 +14,9 @@ Orchestrate a multi-persona review of a technical document. You compose the righ
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Session Start
 
 On first invocation in a session, read these vault config files from `{vault_path}/myna/_system/config/`:

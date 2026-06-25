@@ -13,6 +13,9 @@ Processes pending review queue items. Writes approved items to their destination
 
 **Does NOT handle `review-inbox.md`** — email triage is handled by /myna:email-triage. If the glob for queue files picks up `review-inbox.md`, skip it without parsing.
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## Before You Start
 
 Read at session start:

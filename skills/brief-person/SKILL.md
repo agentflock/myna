@@ -13,6 +13,9 @@ Synthesize everything Myna knows about a person and display it inline. Read-only
 
 ---
 
+**Intent check:** Before reading an external source (email/Slack/calendar) or making your first vault write — proceed only if the user's request addressed Myna (contains "myna") or explicitly named this action. Otherwise, confirm intent before proceeding.
+
+
 ## What to Gather
 
 Resolve the person name via fuzzy matching against people.yaml. If multiple people match, list options and ask the user to pick. If no match, ask for clarification.
