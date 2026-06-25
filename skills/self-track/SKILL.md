@@ -1,6 +1,5 @@
 ---
 name: self-track
-disable-model-invocation: true
 description: Log your contributions to the vault and query them by category, project, or date range. YOUR contributions only.
 user-invocable: true
 argument-hint: "log contribution: [description] | what did I do this quarter | what decisions did I make in March | how much feedback did I give this month | what did I do on [project]"

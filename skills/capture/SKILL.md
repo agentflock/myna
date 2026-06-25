@@ -1,7 +1,6 @@
 ---
 name: capture
-disable-model-invocation: true
-description: Route user input to vault destinations — quick capture, observations, recognition, tasks (single or recurring), project/person file management. One input can produce multiple entries. For saving or finding links, use /myna:links.
+description: Save information to the vault — quick notes, observations, tasks, recognition, project status. Use when: "capture: [text]", "log this", "add task: [desc]", "observation about [person]", "create recurring task". NOT for processing email/messages (/myna:process-updates), meeting notes (/myna:process-meeting), or inbox triage (/myna:email-triage). For links, use /myna:links.
 user-invocable: true
 argument-hint: "capture: [anything] | observation about [person]: [text] | add task: [description] | create recurring task: [description] | update status of [project]"
 ---

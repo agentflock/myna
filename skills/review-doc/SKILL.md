@@ -1,6 +1,5 @@
 ---
 name: review-doc
-disable-model-invocation: true
 description: Multi-persona review of any technical document — PRFAQ, design doc/RFC, HLD, LLD, one-pager, or generic. Composes a doc-type-specific panel of reviewer subagents, runs them in parallel, layers Myna's Chief-of-Staff context (audience, vault evidence, project consistency), and synthesizes a single coherent report. Saved to Reviews/. Use for "review this doc", "review my PRFAQ", "give this design doc a critique", "review with security focus", "have the PE look at this".
 user-invocable: true
 argument-hint: '"review this doc", "review my PRFAQ", "review this LLD with security focus", "review Sarah''s one-pager", "review this RFC, skip writing feedback", "review my doc, compact"'

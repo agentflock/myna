@@ -1,7 +1,6 @@
 ---
 name: process-updates
-disable-model-invocation: true
-description: Extract and structure data from email, Slack, or pasted documents and route to the vault. Processes project-mapped folders/channels. Never touches inbox or instructions folder. Populates tasks, timelines, person files, review queues.
+description: Extract and structure data from email, Slack, or pasted documents into the vault. Use when: "process my email", "process my messages", "process this doc". NOT for sorting inbox (/myna:email-triage), instructions (/myna:process-instructions), or meeting notes (/myna:process-meeting). Populates tasks, timelines, person files, review queues.
 user-invocable: true
 argument-hint: '"process my email", "process my messages", "process this doc: [paste]"'
 ---

@@ -1,6 +1,5 @@
 ---
 name: unreplied-threads
-disable-model-invocation: true
 description: Show what's waiting on you (messages needing a reply from you) and what you're waiting on others for — queries reply-needed tasks in the vault. Use for any communication tracking request: "what am I waiting on?", "what's waiting for me?", "unreplied threads", "who owes me a reply?", "what needs a response?". Not the same as /myna:blockers, which tracks project blockers — this is specifically communication threads.
 user-invocable: true
 argument-hint: "e.g. 'what am I waiting on?' / 'who owes me a reply?' / optionally filter by person name"

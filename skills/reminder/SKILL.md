@@ -1,6 +1,5 @@
 ---
 name: reminder
-disable-model-invocation: true
 description: Set a vault-native reminder for a future day. Triggers on "remind me on [day] about [X]", "remind me [when] to [do X]", "set a reminder for [X] on [day]", "remind me about [X] [when]". Writes to the vault immediately — no calendar required.
 user-invocable: true
 argument-hint: "remind me on [day] about [what] | remind me to [do X] on [day] | set a reminder for [X] on [day]"

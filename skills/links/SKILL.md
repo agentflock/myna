@@ -1,6 +1,5 @@
 ---
 name: links
-disable-model-invocation: true
 description: Save and find links in the vault. Saves to the entity's Links section and the central index. Use for any link management request: "save link: [url] for [entity]", "find link for [topic]", "do I have a link for [project]?"
 user-invocable: true
 argument-hint: "save link: [url] for [entity] | find link: [query]"

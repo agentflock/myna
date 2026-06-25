@@ -1,6 +1,5 @@
 ---
 name: daily-brief
-disable-model-invocation: true
 description: 'Daily brief / "good morning" / "set up my day" — reads inbox and Slack in parallel, surfaces action items in the daily note, generates meeting prep, surfaces overdue tasks and review queue. Handles "plan tomorrow" and weekly note creation.'
 user-invocable: true
 argument-hint: "[plan tomorrow]"

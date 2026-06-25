@@ -1,6 +1,5 @@
 ---
 name: brief-project
-disable-model-invocation: true
 description: Catch me up on a project — quick (3-5 bullet TL;DR) or full (status, timeline, blockers, tasks, dependencies, upcoming meetings). Use for any project status or update request: "catch me up on X", "status of X", "how is X going", "where are we with X", "what's the latest on X".
 user-invocable: true
 argument-hint: "[project name] [quick?]"

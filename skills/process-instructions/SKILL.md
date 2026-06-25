@@ -1,7 +1,6 @@
 ---
 name: process-instructions
-disable-model-invocation: true
-description: Execute natural language instructions sent via email (CC to instructions address) or Slack instructions channel. Interprets each instruction using Myna skills or LLM capabilities. Additive vault writes only; destructive actions routed to review queue.
+description: Execute natural language instructions sent via the user's instructions email or Slack instructions channel. Use when: "process my instructions", "check my instructions", "any new instructions?". NOT for regular email processing (/myna:process-updates) or inbox sorting (/myna:email-triage). Additive vault writes only; destructive actions routed to review queue.
 user-invocable: true
 argument-hint: '"process my instructions", "check my instructions", "any new instructions?"'
 ---

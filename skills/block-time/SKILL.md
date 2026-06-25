@@ -1,6 +1,5 @@
 ---
 name: block-time
-disable-model-invocation: true
 description: Create personal calendar time blocks — focus time, task blocks, deep work. Finds free slots, proposes options, confirms before any write — no attendees, ever. For reminders, use /myna:reminder. Does not handle meeting prep or scheduling others.
 user-invocable: true
 argument-hint: "reserve [duration] [when] for [what] | block [duration] on [day] for [purpose] | find me a slot for [task]"

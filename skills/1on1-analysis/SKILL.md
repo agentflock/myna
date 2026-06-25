@@ -1,6 +1,5 @@
 ---
 name: 1on1-analysis
-disable-model-invocation: true
 description: Analyze 1:1 patterns with a specific person — action item follow-through, recurring topics, carry-forward rate. Reports facts from notes only. Does NOT assess relationship quality. Use for any 1:1 pattern analysis: "analyze my 1:1s with X", "1:1 trends with X", "1:1 patterns", "how are my 1:1s with X going?"
 user-invocable: true
 argument-hint: "[person name]"

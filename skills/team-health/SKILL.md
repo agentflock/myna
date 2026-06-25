@@ -1,6 +1,5 @@
 ---
 name: team-health
-disable-model-invocation: true
 description: Portfolio view of all direct reports — tasks, overdue, tasks assigned to them, feedback gap, attention gap, last 1:1. Team-wide glance, not a deep dive (use /myna:brief-person for that). Use for any team overview or health check: "how is my team doing?", "team health", "how are my directs doing?"
 user-invocable: true
 argument-hint: "[optional: person name to focus on one person]"
